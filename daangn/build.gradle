@@ -1,0 +1,52 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.3.11'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.ssafy'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Web + JPA
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    // DB Driver (MySQL)
+    runtimeOnly 'com.mysql:mysql-connector-j'
+
+
+    // Lombok (컴파일만)
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // 개발 도구 (자동 리로드 등)
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+    // 테스트
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    // env파일 인식
+    implementation 'me.paulschwarz:spring-dotenv:3.0.0'
+
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
