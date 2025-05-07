@@ -17,5 +17,5 @@ public class Category {
     @Id
     private String name; // 예: "ELECTRONICS", "BOOKS"
 
-//    private String description; // 예: "전자기기", "도서"
+    private String description; // 예: "전자기기", "도서"
 }

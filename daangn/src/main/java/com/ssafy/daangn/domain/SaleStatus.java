@@ -17,5 +17,5 @@ public class SaleStatus {
     @Id
     private String name; // 예: "ON_SALE", "RESERVED", "COMPLETED"
 
-//    private String description; // 예: "판매 중", "예약 중", "거래 완료"
+    private String description; // 예: "판매 중", "예약 중", "거래 완료"
 }
