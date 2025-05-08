@@ -678,3 +678,178 @@ class UserControllerIntegrationTest {
 # 특정 테스트 메소드만 실행
 ./gradlew test --tests "com.trip.xplore.user.repository.UserRepositoryTest.이메일로_사용자_찾기"
 ```
+
+---
+
+# JPA 관련 문제 해결 
+## 1. 어떻게 data jpa는 interface만으로도 함수가 구현이 되는가?
+```
+SimpleJpaRepository →      MemberRepsitoryProxy   → <<interface>> MemberRepository
+                    ↘                            ↙
+                        <<interface>> JpaRepository
+```
+정답은 `SimpleJpaRepository`에 있다.
+
+### 먼저 Spring Data JPA란?
+- SQL 쿼리를 직접 작성하는 대신 객체와 객체 간의 관계에 집중할 수 있게 돕는 기술
+- 덕분에 Java의 ORM 기술인 JPA (Java Persistence API)를 더 쉽고 편리하게 사용
+
+[Spring.io | Spring Data JPA](https://spring.io/projects/spring-data-jpa)
+
+
+### 이때 사용하는 인터페이스가 `JpaRepository`이다.
+
+그리고 `SimpleJpaRepository`는 `JpaRepository` 인터페이스의 기본 구현 클래스이다.
+```java
+public class SimpleJpaRepository<T, ID> implements JpaRepositoryImplementation<T, ID>
+```
+
+### 그리고 실제 구현을 담당하는 `SimpleJpaRepository`는 save(), findAll(), deleteById() 같은 기본 CRUD 메서드를 전부 구현하고 있다.
+
+[Spring.io | Class SimpleJpaRepository<T,ID>](https://docs.spring.io/spring-data/jpa/docs/current/api/org/springframework/data/jpa/repository/support/SimpleJpaRepository.html)
+
+Spring은 JDK Dynamic Proxy 또는 CGLIB을 이용해 인터페이스에 대한 프록시 객체를 만든다.
+
+정리하면
+
+> [!NOTE]
+> 1. 인터페이스 스캔 → RepositoryFactoryBean 등록
+> 2. 구현체 지정 → 기본 구현 SimpleJpaRepository
+> 3. 동적 프록시 생성 → 인터페이스 호출을 구현체로 위임
+> 4. 메서드 이름 분석 → CRUD 메서드 / 파생 쿼리 생성
+> 
+> Spring Data JPA가 런타임에 "프록시 + 팩토리 + 구현체"를 합쳐서 실제 동작하는 객체를 만들어 준다.
+> 
+> 덕분에 개발자는 메서드 시그니처만 선언해 두면 된다.
+
+## 2. data jpa를 찾다보면 SimpleJpaRepository에서  entity manager를 생성자 주입을 통해서 주입 받는다. 근데 싱글톤 객체는 한번만 할당을  받는데, 한번 연결 때 마다 생성이 되는 entity manager를 생성자 주입을 통해서 받는 것은 수상하지 않는가? 어떻게 되는 것일까? 한번 알아보자
+
+실제로는 트랜잭션 스코프에 따라 달라지는 실제 EntityManager 인스턴스를 찾아주는 프록시가 주입되는 구조이다.
+1. EntityManagerFactory는 싱글톤
+2. @PersistenceContext 또는 생성자 주입 시 주입되는 건 실제 구현체가 아니라 **프록시** 객체
+3. 메서드 호출 시 실제 EntityManager를 찾아 위임
+4. 싱글톤 리포지토리는 안전하게 한 번만 프록시를 주입받음
+
+따라서 리포지토리 입장에서는 매번 새로운 EntityManager를 받는 것이 아니라, 트랜잭션마다 달라지는 실제 매니저를 꺼내주는 프록시를 쓰는 것이어서 문제가 없다.
+
+> [!NOTE]
+> 결국 이것도 프록시 패턴이기 때문이다.
+
+## 3. fetch join(N+1) 할 때 distinct를 안하면 생길 수 있는 문제
+
+### 먼저 fetch join이란?
+- 한 번의 쿼리로 연관된 엔티티까지 한번에 함께 조회
+    - 나와 관련된 것들을 다 긁어오기!
+- SQL의 JOIN 뒤에 fetch를 붙여, 엔티티 연관 객체를 즉시 로딩
+- 예: Post 엔티티를 조회하면서, 연관된 Comment 컬렉션을 한 번에 가져오고 싶을 때
+```java
+// 순수 SQL
+SELECT 
+  p.post_id, p.title, …, 
+  c.comment_id, c.content, …
+FROM posts p
+LEFT JOIN comments c ON p.post_id = c.post_id
+WHERE p.post_id = ?
+
+// fetch join 사용
+SELECT p
+FROM Post p
+LEFT JOIN FETCH p.comments
+WHERE p.id = :postId
+```
+
+- 공통점 : 같은 행을 뽑아낸다.
+- 차이점 : fetch join은 결과를 Post 엔티티 하나로 묶고, 그 안에 comments 컬렉션을 채워서 반환
+    - fetch join 결과는 애플리케이션 코드에서 별도의 후처리 없이 바로 사용할 수 있어서 훨씬 편리하게 엔티티 관계를 유지
+
+### N+1 문제
+예: 게시글 1개에 댓글 N개가 달려있고 N개의 댓글을 로딩할 때
+- 게시글 호출 : `SELECT * FROM posts WHERE post_id = ?` → 1회
+- 댓글 호출 : `SELECT * FROM comments WHERE post_id = ?` → N회
+- 총 1 + N번의 쿼리가 나가서 성능이 급격히 저하된다.
+- 일대다 fetch join의 경우, 부모 엔티티가 자식 엔티티의 수만큼 중복돼서 나타나는 문제가 발생!
+
+### DISTINCT
+이걸 방지하려면 DISTINCT를 붙여준다.
+
+역할: JPA 레벨에서 중복된 루트(게시글) 엔티티를 필터링
+
+> [!NOTE]
+> 안 쓰면
+> - 엔티티 리스트에 중복 발생
+> - Set 컬렉션 등으로 변환하지 않는 이상 중복 제거가 번거로움
+> - 페이징(.setFirstResult(), .setMaxResults()) 시 잘못된 결과
+> - 예: 실제로는 1~3번째 행이지만, 중복 때문에 잘못된 Post가 포함될 수 있다.
+
+## 4. fetch join 을 할 때 생기는 에러가 생기는 3가지 에러 메시지의 원인과 해결 방안
+### 1. `HHH000104: firstResult/maxResults specified with collection fetch; applying in memory!`
+**페이징과 컬렉션 패치 충돌**
+- 원인
+    JPA (Hibernate)가 `JOIN FETCH`로 컬렉션을 즉시 로딩하는 쿼리에 `setFirstResult()`나 `setMaxResults()`(즉, 페이징)를 함께 사용했을 때 발생
+    페이징은 SQL 레벨에서 `LIMIT`/`OFFSET`을 걸어야 하지만, 조인된 컬렉션이 있을 경우 SQL 결과의 중복(row)이 문제여서, Hibernate는 페이징을 “메모리(애플리케이션 레벨)”에서 처리하겠다고 경고
+
+- 해결 방안
+  1. 쿼리 분리
+     - 먼저 루트 엔티티(예: `Post`)만 페이징 조회 → 조회된 식별자 목록만 뽑아서  
+     - 두 번째 쿼리로 `JOIN FETCH`를 통해 연관 컬렉션을 로딩  
+  2. 서브쿼리 페이징
+     - JPQL에서  
+       ```jpql
+       SELECT p FROM Post p
+       WHERE p.id IN (
+         SELECT p2.id FROM Post p2 ORDER BY p2.createdAt DESC
+       )
+       ```
+       식으로 서브쿼리에 페이징 적용 후, 외부 쿼리에서 Fetch Join
+  3. Spring Data JPA `@EntityGraph`
+     - 페이징 지원되는 메서드(`Pageable`)와 함께 `@EntityGraph(attributePaths = "comments")` 를 사용해 컬렉션만 지연 없이 로드하도록 설정
+
+### 2. `query specified join fetching, but the owner of the fetched association was not present in the select list`
+**잘못된 SELECT 절**
+- 원인
+JPQL에서 `JOIN FETCH`를 사용하면서, 패치 대상의 소유자(root 엔티티를 선택하지 않고 연관 엔티티만 SELECT 하려 할 때 발생한다.
+
+예를 들어:
+```jpql
+SELECT c FROM Comment c
+JOIN FETCH c.post p   -- 여기서 p를 SELECT 절에 포함하지 않는다.
+```
+이런 식으로 패치 조인에 사용된 소유자(p)가 SELECT c 에만 포함되어 있으면, Hibernate가 “누가 이 post 를 소유하는지 모르겠다”고 오류를 던진다.
+
+- 해결 방안
+    - Root 엔티티를 반드시 SELECT
+```jpql
+SELECT c FROM Comment c
+JOIN FETCH c.post p
+```
+여기서 c(Comment)를 루트로 두고 c.post 를 패치 조인했으므로, 오류가 발생하지 않는다.
+
+- 만약 Post 를 루트로 삼고 싶다면:
+```jpql
+SELECT p FROM Post p
+JOIN FETCH p.comments
+```
+처럼 소유자(p)를 SELECT 절에 포함해야 한다.
+
+### 3. `org.hibernate.loader.MultipleBagFetchException: cannot simultaneously fetch multiple bags`
+**다중 Bag 패치**
+- 원인
+Hibernate가 List 컬렉션(기본적으로 Bag 타입) 을 JOIN FETCH로 두 개 이상 동시에 로드하려 할 때 발생
+
+예를 들어 Post 엔티티에 List<Comment> comments 와 List<Tag> tags 두 개가 있고,
+
+```jpql
+SELECT p FROM Post p
+JOIN FETCH p.comments
+JOIN FETCH p.tags
+```
+같이 한 번에 두 개의 List<>(bag)를 fetch join 하면, SQL 결과에서 두 컬렉션의 Cartesian product(곱집합) 문제로 무한 중복이 발생하기 때문에 Hibernate가 차단
+
+- 해결 방안
+1. 컬렉션 타입 변경
+    - List 대신 Set(Hibernate의 @OneToMany Set<…>)을 쓰면 bag이 아닌 Set으로 간주되어, 중복 제거 후 메모리 로딩이 가능
+2. Fetch Join 분리
+- 두 컬렉션을 동시에 패치하는 대신, 엔티티 그래프(EntityGraph) 나 두 번의 쿼리로 분리 로드
+3. @BatchSize 또는 @Fetch(FetchMode.SUBSELECT) 사용
+- N+1 문제를 해결하면서도 여러 컬렉션을 한번에 패치하지 않도록, 배치사이즈 또는 서브셀렉트 패치 전략 적용
+
