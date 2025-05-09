@@ -1,7 +1,7 @@
 package org.example.springboot.repository;
 
-import org.example.springboot.entity.Comment;
-import org.example.springboot.entity.Post;
+import org.example.springboot.domain.Comment;
+import org.example.springboot.domain.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

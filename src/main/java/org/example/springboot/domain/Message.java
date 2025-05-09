@@ -1,4 +1,4 @@
-package org.example.springboot.entity;
+package org.example.springboot.domain;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;

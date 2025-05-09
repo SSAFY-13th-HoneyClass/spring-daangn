@@ -1,7 +1,7 @@
 // User Repository
 package org.example.springboot.repository;
 
-import org.example.springboot.entity.User;
+import org.example.springboot.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserRepository extends JpaRepository<User, Long> {

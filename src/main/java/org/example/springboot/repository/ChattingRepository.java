@@ -1,8 +1,8 @@
 // Chatting Repository
 package org.example.springboot.repository;
 
-import org.example.springboot.entity.Chatting;
-import org.example.springboot.entity.ChattingRoom;
+import org.example.springboot.domain.Chatting;
+import org.example.springboot.domain.ChattingRoom;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

@@ -1,8 +1,8 @@
 package org.example.springboot.repository;
 
-import org.example.springboot.entity.Post;
-import org.example.springboot.entity.PostLike;
-import org.example.springboot.entity.User;
+import org.example.springboot.domain.Post;
+import org.example.springboot.domain.PostLike;
+import org.example.springboot.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

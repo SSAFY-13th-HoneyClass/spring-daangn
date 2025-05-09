@@ -1,4 +1,4 @@
-package org.example.springboot.entity;
+package org.example.springboot.domain;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -10,31 +10,26 @@ import java.util.List;
 
 @Data
 @Entity
-@Table(name = "comments")
-public class Comment {
+@Table(name = "posts")
+public class Post {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "comment_id")
-    private Long commentId;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id", nullable = false)
-    private Post post;
+    @Column(name = "post_id")
+    private Long postId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_comment_id")
-    private Comment parentComment;
-
-    @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL)
-    private List<Comment> childComments;
+    @Column(name = "title", nullable = false)
+    private String title;
 
     @Column(name = "content", nullable = false, columnDefinition = "TEXT")
     private String content;
+
+    @Column(name = "status", nullable = false)
+    private String status;
 
     @CreationTimestamp
     @Column(name = "created_at")
@@ -43,4 +38,14 @@ public class Comment {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    // 관계 매핑
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    private List<Comment> comments;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    private List<PostLike> likes;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    private List<Photo> photos;
 }

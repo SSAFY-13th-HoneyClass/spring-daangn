@@ -1,5 +1,5 @@
 // ChattingRoom Entity
-package org.example.springboot.entity;
+package org.example.springboot.domain;
 
 import jakarta.persistence.*;
 import lombok.Data;

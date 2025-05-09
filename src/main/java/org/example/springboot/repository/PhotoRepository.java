@@ -1,7 +1,7 @@
 package org.example.springboot.repository;
 
-import org.example.springboot.entity.Photo;
-import org.example.springboot.entity.Post;
+import org.example.springboot.domain.Photo;
+import org.example.springboot.domain.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
