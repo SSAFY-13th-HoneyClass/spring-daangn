@@ -555,8 +555,7 @@ test {
 
 아직도 뺴에엑….
 
-정답
-
+정답 : 설정에 빌드 및 실행값이 default 가 아닌 IntelliJ IDEA로 바꿔서 해결
 ![image](https://github.com/user-attachments/assets/ff0e0cdb-8a81-40eb-b3cf-483dd48006be)
 
 
@@ -565,5 +564,25 @@ test {
 
 이러니 코드를 아무리 고쳐봐야 안되지
 
-오늘은 이만 잠이나 자자..
+## ❗깃 망가짐
+.git 파일이 두개생겼다
+pull, push 하는 과정에서 뭔가가 꼬였다..
+그냥 새로 fork 해서 레포지토리를 다시 파서 해결했다..
+
+근데 out 이라는 처음보는 폴더가 생겼다
+저게 뭐냐
+
+🔹 out 폴더란?
+Java 프로젝트를 컴파일할 때 컴파일된 .class 파일을 저장하는 디폴트 출력 디렉토리입니다.
+
+build 폴더와는 다르게, Gradle/Maven이 아닌 IntelliJ 자체 빌드 시스템을 사용할 때 생성됩니다.
+
+📁 하위 폴더 설명
+production : src/main/java 쪽 코드를 컴파일한 결과물(.class 파일 등)이 저장됩니다.
+
+test : src/test/java 쪽 테스트 코드를 컴파일한 결과물들이 여기에 저장됩니다.
+
+라고 한다
+
+
 
