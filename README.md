@@ -240,12 +240,14 @@ public class Member {
 | is_read      | TINYINT  | NOT NULL, DEFAULT 0               | 읽음 여부 (0/1)    |
 
 
-## ❗ 비상 사태
+## ❗ 비상 사태 😢
 단위테스트가 안된다…
 
 하나씩 다시 해보자
 
 일단 Gradle 이 익숙 하지 않아 조금 찾아봤다.
+
+## ✏️ Gradle
 
 의존성 관리는 build.gradle 에서 DI , 의존성 주입을 해줘야 한다.
 
@@ -263,6 +265,8 @@ Spring Boot의 환경 설정 파일이다.
 
 두개의 차이가 뭘까?
 
+### ✏️ 야물과 쁘로빠리
+
 .properties 는 key = value 방식이고
 
 .yml 은 들여쓰기 기반 구조이다.
@@ -272,6 +276,8 @@ Spring Boot의 환경 설정 파일이다.
 쁘로빠리의 장점은 상대적으로 명확하다, 하지만 설정이 많아지면 가독성이 떨어지게 된다.
 
 야물의 장점은 더 계층적이고 정돈되어 가독성은 좋지만 들여쓰기 실수 시 에러가 날 수 있다는 점이있다.
+
+### ✏️ 스프링 부트를 생성하면..
 
 제일 위에 생기는 4개의 폴더는 뭐야..?
 
@@ -297,6 +303,8 @@ gradlew, gradlew.bat : Gradle이 설치되어 있지 않아도 실행할 수 있
 
 다음에는 단위테스트를 해보자..
 
+## ✏️ 단위 테스트
+
 먼저 실제 DB 연결 안하고 간단하게 실행해 보고싶었다.
 
 H2 인메모리 데이터베이스를 사용하면 살제 DB와 연동되는 JPA Repository 단위 테스트를 진행 할 수 있다고 한다.
@@ -307,7 +315,8 @@ H2 인메모리 데이터베이스를 사용하면 살제 DB와 연동되는 JPA
 
 근데 궁금증
 
-Entity랑 Domain이랑 DTO랑 뭐가다른거야?
+## ❓Entity랑 Domain이랑 DTO랑 뭐가다른거야?
+
 
 1. Entity는 DB의 테이블과 1:1 매핑되는 클래스이다. JPA의 @Entity 어노테이션으로 지정..
 
@@ -377,6 +386,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
 JPARepository를 extends하면 뭐가되나..?
 
+## ❓extends JPARepository
+
 1. 기본 CRUD 메서드 제공 :`save()`, `findById()`, `findAll()`, `deleteById()` 등 자동으로 사용 가능
 2. 페이징 및 정렬 : `findAll(Pageable pageable)`, `findAll(Sort sort)` 등 제공
 3. 커스텀 메서드 생성 가능 : 메서드 이름만으로 `findByEmail()`처럼 쿼리 메서드 자동 생성
@@ -444,6 +455,8 @@ Repository테스트에 특화된 환경을 빠르게 구성해준다.
 
 뭔가 이렇게 많단다.
 
+## ❓assertThat vs assertEquals
+
 아니그래서 assertThat(result).isPresent() 이거뭔데
 
 - null 이 아닌 값이 존재하냐? 라는 뜻
@@ -482,6 +495,8 @@ assertThat에 null 아니니? 이후 테스트 값 맞니?? 해봤더니
 @Transactional(propagation = Propagation.NOT_SUPPORTED 하면 트랜잭션 끌수도 있다.
 
 처음으로 단위테스트 통과 초록불을 봤다…
+
+✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨
 
 위에 한것들이 노트북으로 했는데 안돌아가서 처음부터 깎아본거다.. 처음으로 초록불 떴으니 노트북으로 다시 실행해 봤는데 역시나 안되고 오류를 못찾겠다..
 
@@ -555,7 +570,9 @@ test {
 
 아직도 뺴에엑….
 
-정답 : 설정에 빌드 및 실행값이 default 가 아닌 IntelliJ IDEA로 바꿔서 해결
+## 👍정답  
+- 설정에 빌드 및 실행값이 default 가 아닌 IntelliJ IDEA로 바꿔서 해결
+
 ![image](https://github.com/user-attachments/assets/ff0e0cdb-8a81-40eb-b3cf-483dd48006be)
 
 
@@ -774,12 +791,12 @@ EntityManager는 DB랑 연결된 객체이고 이 객체가 매번 새로 만들
 "걔가 지금 연결된 진짜 창고한테 알아서 요청할 거야."
 즉, 프록시는 창고가 누구든 대신 전달해주는 사람이에요.
 
-### 정리
+## ✏️ 정리
 SimpleJpaRepository : 싱글톤
 EntityManager : 프록시 객체가 생성자 주입됨
 요청마다 새로 생성되는 실제 EM : 이 프록시가 내부적으로 트랜잭션에 따라 꺼내 사용
 
-## 요약
+## ✏️ 요약
 - EntityManager는 트랜잭션마다 새로 생기는 객체
 - @Autowired나 생성자 주입으로 주입받을 땐 프록시 객체가 주입
 - 이 프록시는 항상 현재 트랜잭션에 맞는 실제 EntityManager를 찾아서 위임
@@ -880,7 +897,7 @@ void noNPlusOneWithFetchJoin() {
 }
 ```
 
-### 요약
+### ✏️ 요약
 기본적으로 JPA는 연관 엔티티를 Lazy로 가져온다,
 그래서 연관된 엔티티를 꺼낼 때 쿼리를 추가로 날려서 가져온다. N번 만큼
 fetch join은 연관된 엔티티를 한번의 쿼리로 함께 로딩한다. 따라서 쿼리를 1번만 실행해도 된다!!
@@ -891,7 +908,7 @@ fetch join 을 할 때 생기는 에러가 생기는 3가지 에러 메시지의
 2. `query specified join fetching, but the owner of the fetched association was not present in the select list`
 3. `org.hibernate.loader.MultipleBagFetchException: cannot simultaneously fetch multiple bags`
 
-## 1번 에런
+## 1번 에러
 `HHH000104: firstResult/maxResults specified with collection fetch; applying in memory!`
 ### 🔍 원인
 - @OneToMany 또는 컬렉션을 fetch join 하면서 페이징 하면 발생
@@ -948,7 +965,7 @@ private Set<Product> products;
 
 ## 추가...
 
-# 영속성 컨텍스트란?
+# ✏️ 영속성 컨텍스트란?
 - JPA가 엔티티 객체를 관리하는 1차 캐시 공간
 - EntityManager가 관리하는 메모리 공간.
 
