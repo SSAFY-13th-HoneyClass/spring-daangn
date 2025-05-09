@@ -946,9 +946,44 @@ private Set<Product> products;
 | `query specified join fetching, but ...` | fetch 대상이 select에 없음 | 엔티티 전체를 select     |
 | `MultipleBagFetchException`              | 여러 List fetch join   | 하나를 Set으로, 쿼리 분리   |
 
+## 추가...
 
+# 영속성 컨텍스트란?
+- JPA가 엔티티 객체를 관리하는 1차 캐시 공간
+- EntityManager가 관리하는 메모리 공간.
 
+## 영속성 컨텍스트의 특징
+1. 1차 캐시 : DB에서 조회한 엔티티를 Map 형태로 저장해서 같은 엔티티를 다시 조회할 때 DB를 안찾음
+2. 동일성 보장 : 같은 엔티티는 항상 같은 객체로 리턴
+3. 변경 감지 (Dirty Checking) : 객체의 필드 값이 바뀌면 JPA가 알아서 UPDATE 쿼리 만들어줌
+4. 지연 쓰기 (Write-Behind) : save() 해도 당장 DB 반영 안됨, 트랜잭션 끝날 때 한꺼번에 반영
+5. flush() : 변경 사항을 DB에 강제로 반영
+6. clear() : 1차 캐싱(영속성 컨텍스트)를 초기화, 이후부터는 DB 다시 조회
 
+### 그래서.. 단위테스드 좀더해보자
+
+```java
+2025-05-09T15:26:05.244+09:00 DEBUG 1724 --- [           main] org.hibernate.SQL                        : insert into category (type) values (?)
+Hibernate: insert into category (type) values (?)
+2025-05-09T15:26:05.281+09:00 DEBUG 1724 --- [           main] org.hibernate.SQL                        : insert into category (type) values (?)
+Hibernate: insert into category (type) values (?)
+2025-05-09T15:26:05.354+09:00 DEBUG 1724 --- [           main] org.hibernate.SQL                        : select c1_0.id,c1_0.type from category c1_0
+Hibernate: select c1_0.id,c1_0.type from category c1_0
+[Category(id=1, type=전자기기), Category(id=2, type=가구)]
+
+org.opentest4j.AssertionFailedError: 
+expected: "가구"
+ but was: "전자기기"
+필요:"가구"
+실제   :"전자기기"
+```
+
+처음으로 직접 입력해서 단위테스트를 해봤다..
+오.. 뭐가 잘못되었는지 잘 나오니까 디버깅을 할 수 있겠다
+
+![img.png](img.png)
+
+야호
 
 
 
