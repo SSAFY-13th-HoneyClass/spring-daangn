@@ -1,5 +1,6 @@
 # spring-daangn
-1. 당근마켓 ERD 다이어그램
+
+# 1. 당근마켓 ERD 다이어그램
 <img width="788" alt="image" src="https://github.com/user-attachments/assets/8f358789-e71e-4ba3-b37f-cc63fb98910c" />
 
 * 게시물 테이블
@@ -36,7 +37,7 @@
   * post_id: 좋아요 받은 게시물 아이디(FK)
   * user_id: 좋아요 누른 회원아이디(FK)
  
--> 연관된 테이블
+-> 연관된 테이블(식별 관계)
   - user_id → user.user_id (N:1)
   - post_id → post.post_id (N:1)
   
@@ -71,16 +72,13 @@
   - user_id → user.user_id (N:1 비식별 관계)
 
 
-
-
-2. Repository 단위 테스트
+# 2. Repository 단위 테스트
 
 * PostRepositoryTest
 
 <img width="487" alt="image" src="https://github.com/user-attachments/assets/c7646f45-8c48-409d-9909-572da3488e45" />
 <img width="481" alt="image" src="https://github.com/user-attachments/assets/d43cea89-950f-49a3-8d52-360fe2bdc941" />
 <img width="719" alt="image" src="https://github.com/user-attachments/assets/823d07c8-7f6d-45ef-9436-2c572d60b250" />
-
 
 
 * 실행결과
