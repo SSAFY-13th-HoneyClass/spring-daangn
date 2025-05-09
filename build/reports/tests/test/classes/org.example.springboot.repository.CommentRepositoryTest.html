@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - CommentRepositoryTest</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>CommentRepositoryTest</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/org.example.springboot.repository.html">org.example.springboot.repository</a> &gt; CommentRepositoryTest</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">1</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.022s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="tab-container">
+<ul class="tabLinks">
+<li>
+<a href="#">Tests</a>
+</li>
+<li>
+<a href="#">Standard output</a>
+</li>
+</ul>
+<div class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Method name</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">댓글 등록 및 조회 테스트</td>
+<td class="success">createAndFindComments()</td>
+<td class="success">0.022s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>2025-05-09T20:10:44.493+09:00  INFO 18646 --- [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [org.example.springboot.repository.CommentRepositoryTest]: CommentRepositoryTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2025-05-09T20:10:44.494+09:00  INFO 18646 --- [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration org.example.springboot.Application for test class org.example.springboot.repository.CommentRepositoryTest
+2025-05-09T20:10:44.498+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+    insert 
+    into
+        users
+        (created_at, email, name, nickname, password, phone, profile, profile_img_path, role) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        users
+        (created_at, email, name, nickname, password, phone, profile, profile_img_path, role) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-05-09T20:10:44.500+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+    insert 
+    into
+        users
+        (created_at, email, name, nickname, password, phone, profile, profile_img_path, role) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        users
+        (created_at, email, name, nickname, password, phone, profile, profile_img_path, role) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-05-09T20:10:44.502+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+    insert 
+    into
+        posts
+        (content, created_at, status, title, updated_at, user_id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        posts
+        (content, created_at, status, title, updated_at, user_id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+2025-05-09T20:10:44.504+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+    insert 
+    into
+        comments
+        (content, created_at, parent_comment_id, post_id, updated_at, user_id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        comments
+        (content, created_at, parent_comment_id, post_id, updated_at, user_id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+2025-05-09T20:10:44.506+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+    insert 
+    into
+        comments
+        (content, created_at, parent_comment_id, post_id, updated_at, user_id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        comments
+        (content, created_at, parent_comment_id, post_id, updated_at, user_id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+2025-05-09T20:10:44.507+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+    insert 
+    into
+        comments
+        (content, created_at, parent_comment_id, post_id, updated_at, user_id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        comments
+        (content, created_at, parent_comment_id, post_id, updated_at, user_id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+2025-05-09T20:10:44.508+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+    insert 
+    into
+        comments
+        (content, created_at, parent_comment_id, post_id, updated_at, user_id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        comments
+        (content, created_at, parent_comment_id, post_id, updated_at, user_id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+2025-05-09T20:10:44.510+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+    select
+        c1_0.comment_id,
+        c1_0.content,
+        c1_0.created_at,
+        c1_0.parent_comment_id,
+        c1_0.post_id,
+        c1_0.updated_at,
+        c1_0.user_id 
+    from
+        comments c1_0 
+    where
+        c1_0.post_id=?
+Hibernate: 
+    select
+        c1_0.comment_id,
+        c1_0.content,
+        c1_0.created_at,
+        c1_0.parent_comment_id,
+        c1_0.post_id,
+        c1_0.updated_at,
+        c1_0.user_id 
+    from
+        comments c1_0 
+    where
+        c1_0.post_id=?
+2025-05-09T20:10:44.512+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+    select
+        c1_0.comment_id,
+        c1_0.content,
+        c1_0.created_at,
+        c1_0.parent_comment_id,
+        c1_0.post_id,
+        c1_0.updated_at,
+        c1_0.user_id 
+    from
+        comments c1_0 
+    where
+        c1_0.post_id=? 
+        and c1_0.parent_comment_id is null
+Hibernate: 
+    select
+        c1_0.comment_id,
+        c1_0.content,
+        c1_0.created_at,
+        c1_0.parent_comment_id,
+        c1_0.post_id,
+        c1_0.updated_at,
+        c1_0.user_id 
+    from
+        comments c1_0 
+    where
+        c1_0.post_id=? 
+        and c1_0.parent_comment_id is null
+2025-05-09T20:10:44.515+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+    select
+        c1_0.comment_id,
+        c1_0.content,
+        c1_0.created_at,
+        c1_0.parent_comment_id,
+        c1_0.post_id,
+        c1_0.updated_at,
+        c1_0.user_id 
+    from
+        comments c1_0 
+    where
+        c1_0.parent_comment_id=?
+Hibernate: 
+    select
+        c1_0.comment_id,
+        c1_0.content,
+        c1_0.created_at,
+        c1_0.parent_comment_id,
+        c1_0.post_id,
+        c1_0.updated_at,
+        c1_0.user_id 
+    from
+        comments c1_0 
+    where
+        c1_0.parent_comment_id=?
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="https://www.gradle.org">Gradle 8.13</a> at 2025. 5. 9. 오후 8:10:44</p>
+</div>
+</div>
+</body>
+</html>

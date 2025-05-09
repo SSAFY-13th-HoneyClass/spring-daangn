@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.example.springboot.repository.UserRepositoryTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2025-05-09T11:10:44.625Z" hostname="bagbyeongchan-ui-MacBook-Pro.local" time="0.022">
+  <properties/>
+  <testcase name="사용자 등록 및 조회 테스트" classname="org.example.springboot.repository.UserRepositoryTest" time="0.022"/>
+  <system-out><![CDATA[2025-05-09T20:10:44.623+09:00  INFO 18646 --- [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [org.example.springboot.repository.UserRepositoryTest]: UserRepositoryTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2025-05-09T20:10:44.624+09:00  INFO 18646 --- [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration org.example.springboot.Application for test class org.example.springboot.repository.UserRepositoryTest
+2025-05-09T20:10:44.628+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+    insert 
+    into
+        users
+        (created_at, email, name, nickname, password, phone, profile, profile_img_path, role) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        users
+        (created_at, email, name, nickname, password, phone, profile, profile_img_path, role) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-05-09T20:10:44.629+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+    insert 
+    into
+        users
+        (created_at, email, name, nickname, password, phone, profile, profile_img_path, role) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        users
+        (created_at, email, name, nickname, password, phone, profile, profile_img_path, role) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-05-09T20:10:44.631+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+    insert 
+    into
+        users
+        (created_at, email, name, nickname, password, phone, profile, profile_img_path, role) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        users
+        (created_at, email, name, nickname, password, phone, profile, profile_img_path, role) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-05-09T20:10:44.633+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+    select
+        u1_0.user_id,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.name,
+        u1_0.nickname,
+        u1_0.password,
+        u1_0.phone,
+        u1_0.profile,
+        u1_0.profile_img_path,
+        u1_0.role 
+    from
+        users u1_0
+Hibernate: 
+    select
+        u1_0.user_id,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.name,
+        u1_0.nickname,
+        u1_0.password,
+        u1_0.phone,
+        u1_0.profile,
+        u1_0.profile_img_path,
+        u1_0.role 
+    from
+        users u1_0
+2025-05-09T20:10:44.636+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+    select
+        u1_0.user_id,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.name,
+        u1_0.nickname,
+        u1_0.password,
+        u1_0.phone,
+        u1_0.profile,
+        u1_0.profile_img_path,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.user_id,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.name,
+        u1_0.nickname,
+        u1_0.password,
+        u1_0.phone,
+        u1_0.profile,
+        u1_0.profile_img_path,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+2025-05-09T20:10:44.639+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+    select
+        u1_0.user_id,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.name,
+        u1_0.nickname,
+        u1_0.password,
+        u1_0.phone,
+        u1_0.profile,
+        u1_0.profile_img_path,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.user_id=?
+Hibernate: 
+    select
+        u1_0.user_id,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.name,
+        u1_0.nickname,
+        u1_0.password,
+        u1_0.phone,
+        u1_0.profile,
+        u1_0.profile_img_path,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.user_id=?
+2025-05-09T20:10:44.641+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+    select
+        u1_0.user_id 
+    from
+        users u1_0 
+    where
+        u1_0.email=? 
+    limit
+        ?
+Hibernate: 
+    select
+        u1_0.user_id 
+    from
+        users u1_0 
+    where
+        u1_0.email=? 
+    limit
+        ?
+2025-05-09T20:10:44.643+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+    select
+        u1_0.user_id 
+    from
+        users u1_0 
+    where
+        u1_0.nickname=? 
+    limit
+        ?
+Hibernate: 
+    select
+        u1_0.user_id 
+    from
+        users u1_0 
+    where
+        u1_0.nickname=? 
+    limit
+        ?
+2025-05-09T20:10:44.644+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+    select
+        u1_0.user_id 
+    from
+        users u1_0 
+    where
+        u1_0.nickname=? 
+    limit
+        ?
+Hibernate: 
+    select
+        u1_0.user_id 
+    from
+        users u1_0 
+    where
+        u1_0.nickname=? 
+    limit
+        ?
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
