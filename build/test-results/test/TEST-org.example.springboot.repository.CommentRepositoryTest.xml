@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="org.example.springboot.repository.CommentRepositoryTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2025-05-09T11:10:44.496Z" hostname="bagbyeongchan-ui-MacBook-Pro.local" time="0.022">
+<testsuite name="org.example.springboot.repository.CommentRepositoryTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2025-05-09T11:52:37.002Z" hostname="bagbyeongchan-ui-MacBook-Pro.local" time="0.026">
   <properties/>
-  <testcase name="댓글 등록 및 조회 테스트" classname="org.example.springboot.repository.CommentRepositoryTest" time="0.022"/>
-  <system-out><![CDATA[2025-05-09T20:10:44.493+09:00  INFO 18646 --- [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [org.example.springboot.repository.CommentRepositoryTest]: CommentRepositoryTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-2025-05-09T20:10:44.494+09:00  INFO 18646 --- [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration org.example.springboot.Application for test class org.example.springboot.repository.CommentRepositoryTest
-2025-05-09T20:10:44.498+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+  <testcase name="댓글 등록 및 조회 테스트" classname="org.example.springboot.repository.CommentRepositoryTest" time="0.026"/>
+  <system-out><![CDATA[2025-05-09T20:52:37.000+09:00  INFO 31616 --- [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [org.example.springboot.repository.CommentRepositoryTest]: CommentRepositoryTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2025-05-09T20:52:37.001+09:00  INFO 31616 --- [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration org.example.springboot.Application for test class org.example.springboot.repository.CommentRepositoryTest
+2025-05-09T20:52:37.004+09:00 DEBUG 31616 --- [    Test worker] org.hibernate.SQL                        : 
     insert 
     into
         users
@@ -18,7 +18,7 @@ Hibernate:
         (created_at, email, name, nickname, password, phone, profile, profile_img_path, role) 
     values
         (?, ?, ?, ?, ?, ?, ?, ?, ?)
-2025-05-09T20:10:44.500+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+2025-05-09T20:52:37.006+09:00 DEBUG 31616 --- [    Test worker] org.hibernate.SQL                        : 
     insert 
     into
         users
@@ -32,7 +32,7 @@ Hibernate:
         (created_at, email, name, nickname, password, phone, profile, profile_img_path, role) 
     values
         (?, ?, ?, ?, ?, ?, ?, ?, ?)
-2025-05-09T20:10:44.502+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+2025-05-09T20:52:37.008+09:00 DEBUG 31616 --- [    Test worker] org.hibernate.SQL                        : 
     insert 
     into
         posts
@@ -46,7 +46,7 @@ Hibernate:
         (content, created_at, status, title, updated_at, user_id) 
     values
         (?, ?, ?, ?, ?, ?)
-2025-05-09T20:10:44.504+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+2025-05-09T20:52:37.010+09:00 DEBUG 31616 --- [    Test worker] org.hibernate.SQL                        : 
     insert 
     into
         comments
@@ -60,7 +60,7 @@ Hibernate:
         (content, created_at, parent_comment_id, post_id, updated_at, user_id) 
     values
         (?, ?, ?, ?, ?, ?)
-2025-05-09T20:10:44.506+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+2025-05-09T20:52:37.012+09:00 DEBUG 31616 --- [    Test worker] org.hibernate.SQL                        : 
     insert 
     into
         comments
@@ -74,7 +74,7 @@ Hibernate:
         (content, created_at, parent_comment_id, post_id, updated_at, user_id) 
     values
         (?, ?, ?, ?, ?, ?)
-2025-05-09T20:10:44.507+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+2025-05-09T20:52:37.013+09:00 DEBUG 31616 --- [    Test worker] org.hibernate.SQL                        : 
     insert 
     into
         comments
@@ -88,7 +88,7 @@ Hibernate:
         (content, created_at, parent_comment_id, post_id, updated_at, user_id) 
     values
         (?, ?, ?, ?, ?, ?)
-2025-05-09T20:10:44.508+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+2025-05-09T20:52:37.015+09:00 DEBUG 31616 --- [    Test worker] org.hibernate.SQL                        : 
     insert 
     into
         comments
@@ -102,7 +102,7 @@ Hibernate:
         (content, created_at, parent_comment_id, post_id, updated_at, user_id) 
     values
         (?, ?, ?, ?, ?, ?)
-2025-05-09T20:10:44.510+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+2025-05-09T20:52:37.017+09:00 DEBUG 31616 --- [    Test worker] org.hibernate.SQL                        : 
     select
         c1_0.comment_id,
         c1_0.content,
@@ -128,7 +128,7 @@ Hibernate:
         comments c1_0 
     where
         c1_0.post_id=?
-2025-05-09T20:10:44.512+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+2025-05-09T20:52:37.021+09:00 DEBUG 31616 --- [    Test worker] org.hibernate.SQL                        : 
     select
         c1_0.comment_id,
         c1_0.content,
@@ -156,7 +156,7 @@ Hibernate:
     where
         c1_0.post_id=? 
         and c1_0.parent_comment_id is null
-2025-05-09T20:10:44.515+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+2025-05-09T20:52:37.025+09:00 DEBUG 31616 --- [    Test worker] org.hibernate.SQL                        : 
     select
         c1_0.comment_id,
         c1_0.content,

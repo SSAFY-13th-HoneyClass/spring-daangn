@@ -21,7 +21,7 @@ public class UserRepositoryTest {
     @Test
     @DisplayName("사용자 등록 및 조회 테스트")
     public void createAndFindUsers() {
-        // 테스트 데이터 생성 - Builder 사용
+        // given
         User user1 = User.builder()
                 .email("user1@example.com")
                 .password("password1")
@@ -55,38 +55,34 @@ public class UserRepositoryTest {
                 .role("ADMIN")
                 .build();
 
-        // 사용자 저장
+        // when
         userRepository.save(user1);
         userRepository.save(user2);
         userRepository.save(user3);
 
-        // 전체 사용자 조회 테스트
         List<User> allUsers = userRepository.findAll();
+        User foundUser = userRepository.findById(user1.getUserId()).orElse(null);
+        User foundByEmail = userRepository.findByEmail("user2@example.com");
+        User foundByUserId = userRepository.findByUserId(user3.getUserId());
+        boolean existsEmail = userRepository.existsByEmail("user1@example.com");
+        boolean existsNickname = userRepository.existsByNickname("닉네임3");
+        boolean notExistsNickname = userRepository.existsByNickname("존재하지않는닉네임");
+
+        // then
         assertThat(allUsers).hasSize(3);
 
-        // ID로 사용자 조회 테스트
-        User foundUser = userRepository.findById(user1.getUserId()).orElse(null);
         assertThat(foundUser).isNotNull();
         assertThat(foundUser.getEmail()).isEqualTo("user1@example.com");
 
-        // 이메일로 사용자 조회 테스트
-        User foundByEmail = userRepository.findByEmail("user2@example.com");
         assertThat(foundByEmail).isNotNull();
         assertThat(foundByEmail.getName()).isEqualTo("사용자2");
 
-        // 사용자 ID로 조회 테스트
-        User foundByUserId = userRepository.findByUserId(user3.getUserId());
         assertThat(foundByUserId).isNotNull();
         assertThat(foundByUserId.getRole()).isEqualTo("ADMIN");
 
-        // 이메일 존재 여부 테스트
-        boolean existsEmail = userRepository.existsByEmail("user1@example.com");
         assertThat(existsEmail).isTrue();
 
-        // 닉네임 존재 여부 테스트
-        boolean existsNickname = userRepository.existsByNickname("닉네임3");
         assertThat(existsNickname).isTrue();
-        boolean notExistsNickname = userRepository.existsByNickname("존재하지않는닉네임");
         assertThat(notExistsNickname).isFalse();
     }
 }

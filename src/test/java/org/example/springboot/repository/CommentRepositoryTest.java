@@ -71,22 +71,23 @@ public class CommentRepositoryTest {
     @Test
     @DisplayName("댓글 등록 및 조회 테스트")
     public void createAndFindComments() {
-        // 루트 댓글 생성 - Builder 사용
+        // given
         Comment rootComment1 = Comment.builder()
                 .post(post)
                 .user(user1)
                 .content("첫 번째 댓글입니다.")
                 .build();
-        commentRepository.save(rootComment1);
 
         Comment rootComment2 = Comment.builder()
                 .post(post)
                 .user(user2)
                 .content("두 번째 댓글입니다.")
                 .build();
+
+        // when
+        commentRepository.save(rootComment1);
         commentRepository.save(rootComment2);
 
-        // 대댓글 생성 - Builder 사용
         Comment childComment1 = Comment.builder()
                 .post(post)
                 .user(user2)
@@ -103,25 +104,22 @@ public class CommentRepositoryTest {
                 .build();
         commentRepository.save(childComment2);
 
-        // 게시물 댓글 조회 테스트
         List<Comment> postComments = commentRepository.findByPost(post);
+        List<Comment> rootComments = commentRepository.findRootCommentsByPostId(post.getPostId());
+        List<Comment> childComments = commentRepository.findByParentComment(rootComment1);
+        Comment foundComment = commentRepository.findById(rootComment1.getCommentId()).orElse(null);
+        Comment foundChildComment = commentRepository.findById(childComment1.getCommentId()).orElse(null);
+
+        // then
         assertThat(postComments).hasSize(4); // 루트 댓글 2개 + 대댓글 2개
 
-        // 루트 댓글만 조회 테스트
-        List<Comment> rootComments = commentRepository.findRootCommentsByPostId(post.getPostId());
         assertThat(rootComments).hasSize(2);
 
-        // 특정 댓글의 대댓글 조회 테스트
-        List<Comment> childComments = commentRepository.findByParentComment(rootComment1);
         assertThat(childComments).hasSize(2);
 
-        // 댓글 ID로 조회 테스트
-        Comment foundComment = commentRepository.findById(rootComment1.getCommentId()).orElse(null);
         assertThat(foundComment).isNotNull();
         assertThat(foundComment.getContent()).isEqualTo("첫 번째 댓글입니다.");
 
-        // 대댓글 내용 확인
-        Comment foundChildComment = commentRepository.findById(childComment1.getCommentId()).orElse(null);
         assertThat(foundChildComment).isNotNull();
         assertThat(foundChildComment.getParentComment().getCommentId()).isEqualTo(rootComment1.getCommentId());
     }

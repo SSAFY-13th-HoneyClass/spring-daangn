@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="org.example.springboot.repository.UserRepositoryTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2025-05-09T11:10:44.625Z" hostname="bagbyeongchan-ui-MacBook-Pro.local" time="0.022">
+<testsuite name="org.example.springboot.repository.UserRepositoryTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2025-05-09T11:52:37.139Z" hostname="bagbyeongchan-ui-MacBook-Pro.local" time="0.021">
   <properties/>
-  <testcase name="사용자 등록 및 조회 테스트" classname="org.example.springboot.repository.UserRepositoryTest" time="0.022"/>
-  <system-out><![CDATA[2025-05-09T20:10:44.623+09:00  INFO 18646 --- [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [org.example.springboot.repository.UserRepositoryTest]: UserRepositoryTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-2025-05-09T20:10:44.624+09:00  INFO 18646 --- [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration org.example.springboot.Application for test class org.example.springboot.repository.UserRepositoryTest
-2025-05-09T20:10:44.628+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+  <testcase name="사용자 등록 및 조회 테스트" classname="org.example.springboot.repository.UserRepositoryTest" time="0.021"/>
+  <system-out><![CDATA[2025-05-09T20:52:37.137+09:00  INFO 31616 --- [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [org.example.springboot.repository.UserRepositoryTest]: UserRepositoryTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2025-05-09T20:52:37.138+09:00  INFO 31616 --- [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration org.example.springboot.Application for test class org.example.springboot.repository.UserRepositoryTest
+2025-05-09T20:52:37.141+09:00 DEBUG 31616 --- [    Test worker] org.hibernate.SQL                        : 
     insert 
     into
         users
@@ -18,7 +18,7 @@ Hibernate:
         (created_at, email, name, nickname, password, phone, profile, profile_img_path, role) 
     values
         (?, ?, ?, ?, ?, ?, ?, ?, ?)
-2025-05-09T20:10:44.629+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+2025-05-09T20:52:37.143+09:00 DEBUG 31616 --- [    Test worker] org.hibernate.SQL                        : 
     insert 
     into
         users
@@ -32,7 +32,7 @@ Hibernate:
         (created_at, email, name, nickname, password, phone, profile, profile_img_path, role) 
     values
         (?, ?, ?, ?, ?, ?, ?, ?, ?)
-2025-05-09T20:10:44.631+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+2025-05-09T20:52:37.145+09:00 DEBUG 31616 --- [    Test worker] org.hibernate.SQL                        : 
     insert 
     into
         users
@@ -46,7 +46,7 @@ Hibernate:
         (created_at, email, name, nickname, password, phone, profile, profile_img_path, role) 
     values
         (?, ?, ?, ?, ?, ?, ?, ?, ?)
-2025-05-09T20:10:44.633+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+2025-05-09T20:52:37.147+09:00 DEBUG 31616 --- [    Test worker] org.hibernate.SQL                        : 
     select
         u1_0.user_id,
         u1_0.created_at,
@@ -74,7 +74,7 @@ Hibernate:
         u1_0.role 
     from
         users u1_0
-2025-05-09T20:10:44.636+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+2025-05-09T20:52:37.149+09:00 DEBUG 31616 --- [    Test worker] org.hibernate.SQL                        : 
     select
         u1_0.user_id,
         u1_0.created_at,
@@ -106,7 +106,7 @@ Hibernate:
         users u1_0 
     where
         u1_0.email=?
-2025-05-09T20:10:44.639+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+2025-05-09T20:52:37.151+09:00 DEBUG 31616 --- [    Test worker] org.hibernate.SQL                        : 
     select
         u1_0.user_id,
         u1_0.created_at,
@@ -138,7 +138,7 @@ Hibernate:
         users u1_0 
     where
         u1_0.user_id=?
-2025-05-09T20:10:44.641+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+2025-05-09T20:52:37.153+09:00 DEBUG 31616 --- [    Test worker] org.hibernate.SQL                        : 
     select
         u1_0.user_id 
     from
@@ -156,7 +156,7 @@ Hibernate:
         u1_0.email=? 
     limit
         ?
-2025-05-09T20:10:44.643+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+2025-05-09T20:52:37.155+09:00 DEBUG 31616 --- [    Test worker] org.hibernate.SQL                        : 
     select
         u1_0.user_id 
     from
@@ -174,7 +174,7 @@ Hibernate:
         u1_0.nickname=? 
     limit
         ?
-2025-05-09T20:10:44.644+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+2025-05-09T20:52:37.156+09:00 DEBUG 31616 --- [    Test worker] org.hibernate.SQL                        : 
     select
         u1_0.user_id 
     from

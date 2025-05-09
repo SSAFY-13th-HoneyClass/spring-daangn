@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="org.example.springboot.repository.PhotoRepositoryTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2025-05-09T11:10:44.522Z" hostname="bagbyeongchan-ui-MacBook-Pro.local" time="0.023">
+<testsuite name="org.example.springboot.repository.PhotoRepositoryTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2025-05-09T11:52:37.033Z" hostname="bagbyeongchan-ui-MacBook-Pro.local" time="0.022">
   <properties/>
-  <testcase name="사진 등록 및 조회 테스트" classname="org.example.springboot.repository.PhotoRepositoryTest" time="0.023"/>
-  <system-out><![CDATA[2025-05-09T20:10:44.520+09:00  INFO 18646 --- [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [org.example.springboot.repository.PhotoRepositoryTest]: PhotoRepositoryTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-2025-05-09T20:10:44.521+09:00  INFO 18646 --- [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration org.example.springboot.Application for test class org.example.springboot.repository.PhotoRepositoryTest
-2025-05-09T20:10:44.524+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+  <testcase name="사진 등록 및 조회 테스트" classname="org.example.springboot.repository.PhotoRepositoryTest" time="0.022"/>
+  <system-out><![CDATA[2025-05-09T20:52:37.030+09:00  INFO 31616 --- [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [org.example.springboot.repository.PhotoRepositoryTest]: PhotoRepositoryTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2025-05-09T20:52:37.031+09:00  INFO 31616 --- [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration org.example.springboot.Application for test class org.example.springboot.repository.PhotoRepositoryTest
+2025-05-09T20:52:37.035+09:00 DEBUG 31616 --- [    Test worker] org.hibernate.SQL                        : 
     insert 
     into
         users
@@ -18,7 +18,7 @@ Hibernate:
         (created_at, email, name, nickname, password, phone, profile, profile_img_path, role) 
     values
         (?, ?, ?, ?, ?, ?, ?, ?, ?)
-2025-05-09T20:10:44.526+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+2025-05-09T20:52:37.036+09:00 DEBUG 31616 --- [    Test worker] org.hibernate.SQL                        : 
     insert 
     into
         posts
@@ -32,7 +32,7 @@ Hibernate:
         (content, created_at, status, title, updated_at, user_id) 
     values
         (?, ?, ?, ?, ?, ?)
-2025-05-09T20:10:44.527+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+2025-05-09T20:52:37.038+09:00 DEBUG 31616 --- [    Test worker] org.hibernate.SQL                        : 
     insert 
     into
         posts
@@ -46,7 +46,7 @@ Hibernate:
         (content, created_at, status, title, updated_at, user_id) 
     values
         (?, ?, ?, ?, ?, ?)
-2025-05-09T20:10:44.529+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+2025-05-09T20:52:37.040+09:00 DEBUG 31616 --- [    Test worker] org.hibernate.SQL                        : 
     insert 
     into
         photos
@@ -60,7 +60,7 @@ Hibernate:
         (created_at, path, post_id) 
     values
         (?, ?, ?)
-2025-05-09T20:10:44.531+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+2025-05-09T20:52:37.042+09:00 DEBUG 31616 --- [    Test worker] org.hibernate.SQL                        : 
     insert 
     into
         photos
@@ -74,7 +74,7 @@ Hibernate:
         (created_at, path, post_id) 
     values
         (?, ?, ?)
-2025-05-09T20:10:44.533+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+2025-05-09T20:52:37.043+09:00 DEBUG 31616 --- [    Test worker] org.hibernate.SQL                        : 
     insert 
     into
         photos
@@ -88,7 +88,7 @@ Hibernate:
         (created_at, path, post_id) 
     values
         (?, ?, ?)
-2025-05-09T20:10:44.534+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+2025-05-09T20:52:37.044+09:00 DEBUG 31616 --- [    Test worker] org.hibernate.SQL                        : 
     insert 
     into
         photos
@@ -102,7 +102,7 @@ Hibernate:
         (created_at, path, post_id) 
     values
         (?, ?, ?)
-2025-05-09T20:10:44.535+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+2025-05-09T20:52:37.046+09:00 DEBUG 31616 --- [    Test worker] org.hibernate.SQL                        : 
     insert 
     into
         photos
@@ -116,7 +116,7 @@ Hibernate:
         (created_at, path, post_id) 
     values
         (?, ?, ?)
-2025-05-09T20:10:44.536+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+2025-05-09T20:52:37.048+09:00 DEBUG 31616 --- [    Test worker] org.hibernate.SQL                        : 
     select
         p1_0.image_id,
         p1_0.created_at,
@@ -132,7 +132,7 @@ Hibernate:
         p1_0.post_id 
     from
         photos p1_0
-2025-05-09T20:10:44.540+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+2025-05-09T20:52:37.050+09:00 DEBUG 31616 --- [    Test worker] org.hibernate.SQL                        : 
     select
         p1_0.image_id,
         p1_0.created_at,
@@ -152,7 +152,7 @@ Hibernate:
         photos p1_0 
     where
         p1_0.post_id=?
-2025-05-09T20:10:44.541+09:00 DEBUG 18646 --- [    Test worker] org.hibernate.SQL                        : 
+2025-05-09T20:52:37.052+09:00 DEBUG 31616 --- [    Test worker] org.hibernate.SQL                        : 
     select
         p1_0.image_id,
         p1_0.created_at,

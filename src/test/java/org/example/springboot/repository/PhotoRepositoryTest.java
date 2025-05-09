@@ -32,7 +32,8 @@ public class PhotoRepositoryTest {
 
     @BeforeEach
     public void setup() {
-        // 테스트 사용자 생성 - Builder 사용
+        // given
+        // 테스트 사용자 생성
         User user = User.builder()
                 .email("user@example.com")
                 .password("password")
@@ -45,7 +46,7 @@ public class PhotoRepositoryTest {
                 .build();
         userRepository.save(user);
 
-        // 테스트 게시물 생성 - Builder 사용
+        // 테스트 게시물 생성
         post1 = Post.builder()
                 .user(user)
                 .title("첫 번째 게시물")
@@ -66,55 +67,54 @@ public class PhotoRepositoryTest {
     @Test
     @DisplayName("사진 등록 및 조회 테스트")
     public void createAndFindPhotos() {
-        // 첫 번째 게시물 사진 생성 - Builder 사용
+        // given
         Photo photo1 = Photo.builder()
                 .post(post1)
                 .path("/images/posts/post1_1.jpg")
                 .build();
-        photoRepository.save(photo1);
 
         Photo photo2 = Photo.builder()
                 .post(post1)
                 .path("/images/posts/post1_2.jpg")
                 .build();
-        photoRepository.save(photo2);
 
-        // 두 번째 게시물 사진 생성 - Builder 사용
         Photo photo3 = Photo.builder()
                 .post(post2)
                 .path("/images/posts/post2_1.jpg")
                 .build();
-        photoRepository.save(photo3);
 
         Photo photo4 = Photo.builder()
                 .post(post2)
                 .path("/images/posts/post2_2.jpg")
                 .build();
-        photoRepository.save(photo4);
 
         Photo photo5 = Photo.builder()
                 .post(post2)
                 .path("/images/posts/post2_3.jpg")
                 .build();
+
+        // when
+        photoRepository.save(photo1);
+        photoRepository.save(photo2);
+        photoRepository.save(photo3);
+        photoRepository.save(photo4);
         photoRepository.save(photo5);
 
-        // 전체 사진 조회 테스트
         List<Photo> allPhotos = photoRepository.findAll();
+        Photo foundPhoto = photoRepository.findById(photo1.getImageId()).orElse(null);
+        List<Photo> post1Photos = photoRepository.findByPost(post1);
+        List<Photo> post2Photos = photoRepository.findByPost(post2);
+
+        // then
         assertThat(allPhotos).hasSize(5);
 
-        // ID로 사진 조회 테스트
-        Photo foundPhoto = photoRepository.findById(photo1.getImageId()).orElse(null);
         assertThat(foundPhoto).isNotNull();
         assertThat(foundPhoto.getPath()).isEqualTo("/images/posts/post1_1.jpg");
 
-        // 게시물별 사진 조회 테스트
-        List<Photo> post1Photos = photoRepository.findByPost(post1);
         assertThat(post1Photos).hasSize(2);
 
-        List<Photo> post2Photos = photoRepository.findByPost(post2);
         assertThat(post2Photos).hasSize(3);
 
-        // 사진 경로 확인
         assertThat(post1Photos.get(0).getPath()).contains("post1");
         assertThat(post2Photos.get(0).getPath()).contains("post2");
     }

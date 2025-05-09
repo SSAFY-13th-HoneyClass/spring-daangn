@@ -36,7 +36,8 @@ public class PostLikeRepositoryTest {
 
     @BeforeEach
     public void setup() {
-        // 테스트 사용자 생성 - Builder 사용
+        // given
+        // 테스트 사용자 생성
         user1 = User.builder()
                 .email("user1@example.com")
                 .password("password1")
@@ -73,7 +74,7 @@ public class PostLikeRepositoryTest {
                 .build();
         userRepository.save(user3);
 
-        // 테스트 게시물 생성 - Builder 사용
+        // 테스트 게시물 생성
         post1 = Post.builder()
                 .user(user1)
                 .title("첫 번째 게시물")
@@ -94,68 +95,64 @@ public class PostLikeRepositoryTest {
     @Test
     @DisplayName("게시물 좋아요 등록 및 조회 테스트")
     public void createAndFindPostLikes() {
-        // user1이 post2에 좋아요 - Builder 사용
+        // given
         PostLike postLike1 = PostLike.builder()
                 .post(post2)
                 .user(user1)
                 .build();
-        postLikeRepository.save(postLike1);
 
-        // user2가 post1에 좋아요 - Builder 사용
         PostLike postLike2 = PostLike.builder()
                 .post(post1)
                 .user(user2)
                 .build();
-        postLikeRepository.save(postLike2);
 
-        // user3가 post1과 post2 모두 좋아요 - Builder 사용
         PostLike postLike3 = PostLike.builder()
                 .post(post1)
                 .user(user3)
                 .build();
-        postLikeRepository.save(postLike3);
 
         PostLike postLike4 = PostLike.builder()
                 .post(post2)
                 .user(user3)
                 .build();
+
+        // when
+        postLikeRepository.save(postLike1);
+        postLikeRepository.save(postLike2);
+        postLikeRepository.save(postLike3);
         postLikeRepository.save(postLike4);
 
-        // 전체 좋아요 조회 테스트
         List<PostLike> allPostLikes = postLikeRepository.findAll();
+        List<PostLike> post1Likes = postLikeRepository.findByPost(post1);
+        List<PostLike> post2Likes = postLikeRepository.findByPost(post2);
+        List<PostLike> user1Likes = postLikeRepository.findByUser(user1);
+        List<PostLike> user3Likes = postLikeRepository.findByUser(user3);
+        Optional<PostLike> user2LikesPost1 = postLikeRepository.findByPostAndUser(post1, user2);
+        boolean user1LikesPost2 = postLikeRepository.existsByPostAndUser(post2, user1);
+        boolean user2LikesPost2 = postLikeRepository.existsByPostAndUser(post2, user2);
+        Long post1LikesCount = postLikeRepository.countByPostId(post1.getPostId());
+        Long post2LikesCount = postLikeRepository.countByPostId(post2.getPostId());
+
+        // then
         assertThat(allPostLikes).hasSize(4);
 
-        // 게시물별 좋아요 조회 테스트
-        List<PostLike> post1Likes = postLikeRepository.findByPost(post1);
         assertThat(post1Likes).hasSize(2);
 
-        List<PostLike> post2Likes = postLikeRepository.findByPost(post2);
         assertThat(post2Likes).hasSize(2);
 
-        // 사용자별 좋아요 조회 테스트
-        List<PostLike> user1Likes = postLikeRepository.findByUser(user1);
         assertThat(user1Likes).hasSize(1);
         assertThat(user1Likes.get(0).getPost().getTitle()).isEqualTo("두 번째 게시물");
 
-        List<PostLike> user3Likes = postLikeRepository.findByUser(user3);
         assertThat(user3Likes).hasSize(2);
 
-        // 특정 게시물+사용자 좋아요 조회 테스트
-        Optional<PostLike> user2LikesPost1 = postLikeRepository.findByPostAndUser(post1, user2);
         assertThat(user2LikesPost1).isPresent();
 
-        // 좋아요 존재 여부 테스트
-        boolean user1LikesPost2 = postLikeRepository.existsByPostAndUser(post2, user1);
         assertThat(user1LikesPost2).isTrue();
 
-        boolean user2LikesPost2 = postLikeRepository.existsByPostAndUser(post2, user2);
         assertThat(user2LikesPost2).isFalse();
 
-        // 좋아요 개수 테스트
-        Long post1LikesCount = postLikeRepository.countByPostId(post1.getPostId());
         assertThat(post1LikesCount).isEqualTo(2);
 
-        Long post2LikesCount = postLikeRepository.countByPostId(post2.getPostId());
         assertThat(post2LikesCount).isEqualTo(2);
     }
 }
