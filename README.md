@@ -130,3 +130,91 @@
 ### ❇️ 데이터를 조회하는 쿼리
 ![select.png](img/select.png)
 ---
+
+
+## 👏🏻 추가 공부 : JPA 엔티티에서 @Data와 Setter 사용을 지양해야 하는 이유
+
+### 1. @Data 어노테이션의 문제점
+
+**@Data 어노테이션은 다음 기능을 모두 포함합니다:**
+- `@Getter`
+- `@Setter`
+- `@ToString`
+- `@EqualsAndHashCode`
+- `@RequiredArgsConstructor`
+
+이는 편리해 보이지만 JPA 엔티티에서는 심각한 문제를 일으킬 수 있습니다:
+
+- **순환 참조(Circular Reference) 문제**: 양방향 연관관계가 있는 엔티티에서 `@ToString`이 기본적으로 모든 필드를 포함하므로 무한 순환 참조가 발생할 수 있습니다. 이는 `StackOverflowError`를 발생시킵니다.
+
+- **부적절한 해시코드 구현**: `@EqualsAndHashCode`는 기본적으로 모든 필드를 사용하므로, 양방향 관계에서 또다시 순환 참조 문제가 발생합니다.
+
+- **불필요한 Setter 노출**: 모든 필드에 대한 Setter 메서드가 생성되어 객체의 불변성(Immutability)을 해칩니다.
+
+### 2. 무분별한 Setter 사용의 문제점
+
+JPA 엔티티에서 무분별한 Setter 사용은 다음과 같은 문제를 야기합니다:
+
+- **객체의 일관성 훼손**: 어디서든 객체의 상태를 변경할 수 있게 되어 객체가 항상 유효한 상태를 유지하기 어렵습니다.
+
+- **의도하지 않은 상태 변경**: 여러 곳에서 Setter를 호출하면 객체의 상태 추적이 어려워져 버그 원인을 찾기 힘들게 됩니다.
+
+- **JPA의 변경 감지(Dirty Checking) 메커니즘과의 충돌**: JPA는 엔티티의 변경을 감지하여 자동으로 업데이트 쿼리를 생성합니다. 무분별한 Setter 사용은 이 메커니즘을 예측하기 어렵게 만듭니다.
+
+### 3. 더 나은 대안
+
+#### Builder 패턴
+```java
+User user = User.builder()
+    .email("user@example.com")
+    .password("password")
+    .name("사용자")
+    // ...
+    .build();
+```
+
+**장점:**
+- 객체 생성 시 필요한 값만 명시적으로 설정
+- 가독성 향상
+- 불변 객체 생성 가능
+- 필수 값 검증이 용이
+
+#### 도메인 특화 메서드
+필요한 상태 변경은 의미 있는 이름의 메서드로 구현:
+
+```java
+public void changePassword(String newPassword) {
+    this.password = newPassword;
+}
+
+public void updateProfile(String profile) {
+    this.profile = profile;
+}
+```
+
+### 4. 객체 불변성의 중요성
+
+불변성이 높은 객체는:
+
+- **스레드 안전(Thread-safe)**: 여러 스레드에서 동시에 접근해도 안전합니다.
+- **예측 가능한 동작**: 한번 생성된 객체의 상태가 변경되지 않으므로 코드의 예측 가능성이 높아집니다.
+- **버그 감소**: 상태 변경이 명확한 메서드를 통해서만 이루어지므로 버그 발생 가능성이 줄어듭니다.
+
+### 5. JPA 영속성 컨텍스트와의 조화
+
+- JPA는 트랜잭션 내에서 엔티티의 변경을 감지하여 자동으로 데이터베이스에 반영합니다.
+- 제한된 접근 방식(Builder + 도메인 메서드)은 이러한 변경이 언제, 어디서 일어나는지 명확하게 파악할 수 있게 해줍니다.
+- 결과적으로 애플리케이션의 유지보수성과 안정성이 향상됩니다.
+
+### 결론
+
+JPA 엔티티에서는 `@Data` 대신 다음을 사용하는 것이 좋습니다:
+
+- **`@Getter`**: 필드 접근용
+- **`@NoArgsConstructor`**: JPA 요구사항
+- **`@AllArgsConstructor` + `@Builder`**: 객체 생성 패턴
+- **특정 필드에만 `@Setter` 또는 도메인 메서드**: 필요한 경우에만 제한적으로 사용
+- **`@ToString(exclude = {...})`**: 순환 참조 방지
+- **`@EqualsAndHashCode(of = "id")`**: 식별자 필드만 사용
+
+이러한 접근 방식은 코드의 안정성, 가독성, 유지보수성을 크게 향상시킵니다.
