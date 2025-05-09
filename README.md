@@ -27,6 +27,9 @@
 - `POST_LIKE`  
 - `CHATROOM`
 
+![image](https://github.com/user-attachments/assets/f7fba4f3-c1ca-4d2d-bbf0-2e539e96f3d9)
+
+
 <br>
 
 ### USER (회원)
@@ -105,6 +108,138 @@ role 을 통해 권한 구분이 가능합니다.
 <br>
 
 ## Repository 단위 테스트
+
+
+### User entity
+
+```java
+package com.example.daangn.domain;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class User {
+
+    @Id
+    @GeneratedValue
+    private Long userId;
+
+    private String nickname;
+    @Column(nullable = false, unique = true)
+    private String email;
+    @Column(nullable = false)
+    private String password;
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
+}
+
+```
+
+```java
+package com.example.daangn.domain;
+
+public enum Role {
+    USER, ADMIN
+}
+
+```
+
+```java
+package com.example.daangn.repository;
+
+import com.example.daangn.domain.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
+
+public interface UserRepository extends JpaRepository<User, Long> {
+    Optional<User> findByEmail(String email);
+}
+```
+
+<br>
+
+```java
+package com.example.daangn.repository;
+
+import com.example.daangn.domain.Role;
+import com.example.daangn.domain.User;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+@SpringBootTest
+@Transactional
+public class UserRepositoryTest {
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Test
+    @DisplayName("사용자 3명 저장")
+    void saveUsers() {
+        // given
+        User user1 = User.builder()
+                .nickname("홍정인")
+                .email("sss@ss.ss")
+                .password("1234")
+                .role(Role.ADMIN)
+                .build();
+        User user2 = User.builder()
+                .nickname("이휘")
+                .email("hwi@w.w")
+                .password("1234")
+                .role(Role.USER)
+                .build();
+        User user3 = User.builder()
+                .nickname("이주현")
+                .email("math@m.m")
+                .password("1234")
+                .role(Role.USER)
+                .build();
+        // when
+        userRepository.save(user1);
+        userRepository.save(user2);
+        userRepository.save(user3);
+
+        Optional<User> found = userRepository.findByEmail("sss@ss.ss");
+        // then
+        assertThat(found).isPresent();
+        assertThat(found.get().getNickname()).isEqualTo("홍정인");
+        assertThat(found.get().getRole()).isEqualTo(Role.ADMIN);
+    }
+}
+
+```
+
+- given : 3명의 사용자 데이터 생성
+- when : 사용자들을 DB에 저장하고 이메일로 조회
+- then : 기대한 결과 값과 일치하는지 확인 
+
 
 ### given-when-then 패턴이란?
 
