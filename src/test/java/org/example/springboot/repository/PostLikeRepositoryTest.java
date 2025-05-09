@@ -36,80 +36,89 @@ public class PostLikeRepositoryTest {
 
     @BeforeEach
     public void setup() {
-        // 테스트 사용자 생성
-        user1 = new User();
-        user1.setEmail("user1@example.com");
-        user1.setPassword("password1");
-        user1.setPhone("010-1111-1111");
-        user1.setName("사용자1");
-        user1.setProfile("안녕하세요 사용자1입니다.");
-        user1.setNickname("닉네임1");
-        user1.setProfileImgPath("/images/profile1.jpg");
-        user1.setRole("USER");
+        // 테스트 사용자 생성 - Builder 사용
+        user1 = User.builder()
+                .email("user1@example.com")
+                .password("password1")
+                .phone("010-1111-1111")
+                .name("사용자1")
+                .profile("안녕하세요 사용자1입니다.")
+                .nickname("닉네임1")
+                .profileImgPath("/images/profile1.jpg")
+                .role("USER")
+                .build();
         userRepository.save(user1);
 
-        user2 = new User();
-        user2.setEmail("user2@example.com");
-        user2.setPassword("password2");
-        user2.setPhone("010-2222-2222");
-        user2.setName("사용자2");
-        user2.setProfile("안녕하세요 사용자2입니다.");
-        user2.setNickname("닉네임2");
-        user2.setProfileImgPath("/images/profile2.jpg");
-        user2.setRole("USER");
+        user2 = User.builder()
+                .email("user2@example.com")
+                .password("password2")
+                .phone("010-2222-2222")
+                .name("사용자2")
+                .profile("안녕하세요 사용자2입니다.")
+                .nickname("닉네임2")
+                .profileImgPath("/images/profile2.jpg")
+                .role("USER")
+                .build();
         userRepository.save(user2);
 
-        user3 = new User();
-        user3.setEmail("user3@example.com");
-        user3.setPassword("password3");
-        user3.setPhone("010-3333-3333");
-        user3.setName("사용자3");
-        user3.setProfile("안녕하세요 사용자3입니다.");
-        user3.setNickname("닉네임3");
-        user3.setProfileImgPath("/images/profile3.jpg");
-        user3.setRole("USER");
+        user3 = User.builder()
+                .email("user3@example.com")
+                .password("password3")
+                .phone("010-3333-3333")
+                .name("사용자3")
+                .profile("안녕하세요 사용자3입니다.")
+                .nickname("닉네임3")
+                .profileImgPath("/images/profile3.jpg")
+                .role("USER")
+                .build();
         userRepository.save(user3);
 
-        // 테스트 게시물 생성
-        post1 = new Post();
-        post1.setUser(user1);
-        post1.setTitle("첫 번째 게시물");
-        post1.setContent("첫 번째 게시물 내용입니다.");
-        post1.setStatus("판매중");
+        // 테스트 게시물 생성 - Builder 사용
+        post1 = Post.builder()
+                .user(user1)
+                .title("첫 번째 게시물")
+                .content("첫 번째 게시물 내용입니다.")
+                .status("판매중")
+                .build();
         postRepository.save(post1);
 
-        post2 = new Post();
-        post2.setUser(user2);
-        post2.setTitle("두 번째 게시물");
-        post2.setContent("두 번째 게시물 내용입니다.");
-        post2.setStatus("판매중");
+        post2 = Post.builder()
+                .user(user2)
+                .title("두 번째 게시물")
+                .content("두 번째 게시물 내용입니다.")
+                .status("판매중")
+                .build();
         postRepository.save(post2);
     }
 
     @Test
     @DisplayName("게시물 좋아요 등록 및 조회 테스트")
     public void createAndFindPostLikes() {
-        // user1이 post2에 좋아요
-        PostLike postLike1 = new PostLike();
-        postLike1.setPost(post2);
-        postLike1.setUser(user1);
+        // user1이 post2에 좋아요 - Builder 사용
+        PostLike postLike1 = PostLike.builder()
+                .post(post2)
+                .user(user1)
+                .build();
         postLikeRepository.save(postLike1);
 
-        // user2가 post1에 좋아요
-        PostLike postLike2 = new PostLike();
-        postLike2.setPost(post1);
-        postLike2.setUser(user2);
+        // user2가 post1에 좋아요 - Builder 사용
+        PostLike postLike2 = PostLike.builder()
+                .post(post1)
+                .user(user2)
+                .build();
         postLikeRepository.save(postLike2);
 
-        // user3가 post1과 post2 모두 좋아요
-        PostLike postLike3 = new PostLike();
-        postLike3.setPost(post1);
-        postLike3.setUser(user3);
+        // user3가 post1과 post2 모두 좋아요 - Builder 사용
+        PostLike postLike3 = PostLike.builder()
+                .post(post1)
+                .user(user3)
+                .build();
         postLikeRepository.save(postLike3);
 
-        PostLike postLike4 = new PostLike();
-        postLike4.setPost(post2);
-        postLike4.setUser(user3);
+        PostLike postLike4 = PostLike.builder()
+                .post(post2)
+                .user(user3)
+                .build();
         postLikeRepository.save(postLike4);
 
         // 전체 좋아요 조회 테스트

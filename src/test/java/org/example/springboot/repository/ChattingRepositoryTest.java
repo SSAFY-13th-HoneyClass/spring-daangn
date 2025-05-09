@@ -38,74 +38,82 @@ public class ChattingRepositoryTest {
 
     @BeforeEach
     public void setup() {
-        // 테스트 사용자 생성 (판매자)
-        seller = new User();
-        seller.setEmail("seller@example.com");
-        seller.setPassword("password");
-        seller.setPhone("010-1111-1111");
-        seller.setName("판매자");
-        seller.setProfile("안녕하세요 판매자입니다.");
-        seller.setNickname("판매자닉네임");
-        seller.setProfileImgPath("/images/seller.jpg");
-        seller.setRole("USER");
+        // 테스트 사용자 생성 (판매자) - Builder 사용
+        seller = User.builder()
+                .email("seller@example.com")
+                .password("password")
+                .phone("010-1111-1111")
+                .name("판매자")
+                .profile("안녕하세요 판매자입니다.")
+                .nickname("판매자닉네임")
+                .profileImgPath("/images/seller.jpg")
+                .role("USER")
+                .build();
         userRepository.save(seller);
 
-        // 테스트 사용자 생성 (구매자)
-        buyer = new User();
-        buyer.setEmail("buyer@example.com");
-        buyer.setPassword("password");
-        buyer.setPhone("010-2222-2222");
-        buyer.setName("구매자");
-        buyer.setProfile("안녕하세요 구매자입니다.");
-        buyer.setNickname("구매자닉네임");
-        buyer.setProfileImgPath("/images/buyer.jpg");
-        buyer.setRole("USER");
+        // 테스트 사용자 생성 (구매자) - Builder 사용
+        buyer = User.builder()
+                .email("buyer@example.com")
+                .password("password")
+                .phone("010-2222-2222")
+                .name("구매자")
+                .profile("안녕하세요 구매자입니다.")
+                .nickname("구매자닉네임")
+                .profileImgPath("/images/buyer.jpg")
+                .role("USER")
+                .build();
         userRepository.save(buyer);
 
-        // 테스트 게시물 생성
-        post = new Post();
-        post.setUser(seller);
-        post.setTitle("판매 게시물");
-        post.setContent("판매 게시물 내용입니다.");
-        post.setStatus("판매중");
+        // 테스트 게시물 생성 - Builder 사용
+        post = Post.builder()
+                .user(seller)
+                .title("판매 게시물")
+                .content("판매 게시물 내용입니다.")
+                .status("판매중")
+                .build();
         postRepository.save(post);
 
-        // 테스트 채팅방 생성
-        chattingRoom = new ChattingRoom();
-        chattingRoom.setUser(buyer);
-        chattingRoom.setPostId(post.getPostId());
+        // 테스트 채팅방 생성 - Builder 사용
+        chattingRoom = ChattingRoom.builder()
+                .user(buyer)
+                .postId(post.getPostId())
+                .build();
         chattingRoomRepository.save(chattingRoom);
     }
 
     @Test
     @DisplayName("채팅 메시지 등록 및 조회 테스트")
     public void createAndFindChattings() {
-        // 구매자의 첫 메시지
-        Chatting chatting1 = new Chatting();
-        chatting1.setChattingRoom(chattingRoom);
-        chatting1.setUser(buyer);
-        chatting1.setContent("안녕하세요, 이 상품에 관심이 있습니다.");
+        // 구매자의 첫 메시지 - Builder 사용
+        Chatting chatting1 = Chatting.builder()
+                .chattingRoom(chattingRoom)
+                .user(buyer)
+                .content("안녕하세요, 이 상품에 관심이 있습니다.")
+                .build();
         chattingRepository.save(chatting1);
 
-        // 판매자의 답변
-        Chatting chatting2 = new Chatting();
-        chatting2.setChattingRoom(chattingRoom);
-        chatting2.setUser(seller);
-        chatting2.setContent("네, 안녕하세요. 어떤 점이 궁금하신가요?");
+        // 판매자의 답변 - Builder 사용
+        Chatting chatting2 = Chatting.builder()
+                .chattingRoom(chattingRoom)
+                .user(seller)
+                .content("네, 안녕하세요. 어떤 점이 궁금하신가요?")
+                .build();
         chattingRepository.save(chatting2);
 
-        // 구매자의 질문
-        Chatting chatting3 = new Chatting();
-        chatting3.setChattingRoom(chattingRoom);
-        chatting3.setUser(buyer);
-        chatting3.setContent("혹시 직거래 가능한가요?");
+        // 구매자의 질문 - Builder 사용
+        Chatting chatting3 = Chatting.builder()
+                .chattingRoom(chattingRoom)
+                .user(buyer)
+                .content("혹시 직거래 가능한가요?")
+                .build();
         chattingRepository.save(chatting3);
 
-        // 판매자의 답변
-        Chatting chatting4 = new Chatting();
-        chatting4.setChattingRoom(chattingRoom);
-        chatting4.setUser(seller);
-        chatting4.setContent("네, 가능합니다. 어느 지역에 계신가요?");
+        // 판매자의 답변 - Builder 사용
+        Chatting chatting4 = Chatting.builder()
+                .chattingRoom(chattingRoom)
+                .user(seller)
+                .content("네, 가능합니다. 어느 지역에 계신가요?")
+                .build();
         chattingRepository.save(chatting4);
 
         // 전체 채팅 메시지 조회 테스트

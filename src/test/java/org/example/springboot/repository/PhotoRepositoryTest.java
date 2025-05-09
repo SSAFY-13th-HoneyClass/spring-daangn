@@ -32,62 +32,70 @@ public class PhotoRepositoryTest {
 
     @BeforeEach
     public void setup() {
-        // 테스트 사용자 생성
-        User user = new User();
-        user.setEmail("user@example.com");
-        user.setPassword("password");
-        user.setPhone("010-1234-5678");
-        user.setName("테스트사용자");
-        user.setProfile("안녕하세요 테스트 사용자입니다.");
-        user.setNickname("테스트닉네임");
-        user.setProfileImgPath("/images/profile.jpg");
-        user.setRole("USER");
+        // 테스트 사용자 생성 - Builder 사용
+        User user = User.builder()
+                .email("user@example.com")
+                .password("password")
+                .phone("010-1234-5678")
+                .name("테스트사용자")
+                .profile("안녕하세요 테스트 사용자입니다.")
+                .nickname("테스트닉네임")
+                .profileImgPath("/images/profile.jpg")
+                .role("USER")
+                .build();
         userRepository.save(user);
 
-        // 테스트 게시물 생성
-        post1 = new Post();
-        post1.setUser(user);
-        post1.setTitle("첫 번째 게시물");
-        post1.setContent("첫 번째 게시물 내용입니다.");
-        post1.setStatus("판매중");
+        // 테스트 게시물 생성 - Builder 사용
+        post1 = Post.builder()
+                .user(user)
+                .title("첫 번째 게시물")
+                .content("첫 번째 게시물 내용입니다.")
+                .status("판매중")
+                .build();
         postRepository.save(post1);
 
-        post2 = new Post();
-        post2.setUser(user);
-        post2.setTitle("두 번째 게시물");
-        post2.setContent("두 번째 게시물 내용입니다.");
-        post2.setStatus("판매중");
+        post2 = Post.builder()
+                .user(user)
+                .title("두 번째 게시물")
+                .content("두 번째 게시물 내용입니다.")
+                .status("판매중")
+                .build();
         postRepository.save(post2);
     }
 
     @Test
     @DisplayName("사진 등록 및 조회 테스트")
     public void createAndFindPhotos() {
-        // 첫 번째 게시물 사진 생성
-        Photo photo1 = new Photo();
-        photo1.setPost(post1);
-        photo1.setPath("/images/posts/post1_1.jpg");
+        // 첫 번째 게시물 사진 생성 - Builder 사용
+        Photo photo1 = Photo.builder()
+                .post(post1)
+                .path("/images/posts/post1_1.jpg")
+                .build();
         photoRepository.save(photo1);
 
-        Photo photo2 = new Photo();
-        photo2.setPost(post1);
-        photo2.setPath("/images/posts/post1_2.jpg");
+        Photo photo2 = Photo.builder()
+                .post(post1)
+                .path("/images/posts/post1_2.jpg")
+                .build();
         photoRepository.save(photo2);
 
-        // 두 번째 게시물 사진 생성
-        Photo photo3 = new Photo();
-        photo3.setPost(post2);
-        photo3.setPath("/images/posts/post2_1.jpg");
+        // 두 번째 게시물 사진 생성 - Builder 사용
+        Photo photo3 = Photo.builder()
+                .post(post2)
+                .path("/images/posts/post2_1.jpg")
+                .build();
         photoRepository.save(photo3);
 
-        Photo photo4 = new Photo();
-        photo4.setPost(post2);
-        photo4.setPath("/images/posts/post2_2.jpg");
+        Photo photo4 = Photo.builder()
+                .post(post2)
+                .path("/images/posts/post2_2.jpg")
+                .build();
         photoRepository.save(photo4);
 
-        Photo photo5 = new Photo();
-        photo5.setPost(post2);
-        photo5.setPath("/images/posts/post2_3.jpg");
+        Photo photo5 = Photo.builder()
+                .post(post2)
+                .path("/images/posts/post2_3.jpg")
+                .build();
         photoRepository.save(photo5);
 
         // 전체 사진 조회 테스트

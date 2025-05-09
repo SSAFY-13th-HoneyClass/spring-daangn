@@ -28,51 +28,56 @@ public class PostRepositoryTest {
 
     @BeforeEach
     public void setup() {
-        // 테스트 사용자 생성
-        user1 = new User();
-        user1.setEmail("user1@example.com");
-        user1.setPassword("password1");
-        user1.setPhone("010-1111-1111");
-        user1.setName("사용자1");
-        user1.setProfile("안녕하세요 사용자1입니다.");
-        user1.setNickname("닉네임1");
-        user1.setProfileImgPath("/images/profile1.jpg");
-        user1.setRole("USER");
+        // 테스트 사용자 생성 - Builder 사용
+        user1 = User.builder()
+                .email("user1@example.com")
+                .password("password1")
+                .phone("010-1111-1111")
+                .name("사용자1")
+                .profile("안녕하세요 사용자1입니다.")
+                .nickname("닉네임1")
+                .profileImgPath("/images/profile1.jpg")
+                .role("USER")
+                .build();
         userRepository.save(user1);
 
-        user2 = new User();
-        user2.setEmail("user2@example.com");
-        user2.setPassword("password2");
-        user2.setPhone("010-2222-2222");
-        user2.setName("사용자2");
-        user2.setProfile("안녕하세요 사용자2입니다.");
-        user2.setNickname("닉네임2");
-        user2.setProfileImgPath("/images/profile2.jpg");
-        user2.setRole("USER");
+        user2 = User.builder()
+                .email("user2@example.com")
+                .password("password2")
+                .phone("010-2222-2222")
+                .name("사용자2")
+                .profile("안녕하세요 사용자2입니다.")
+                .nickname("닉네임2")
+                .profileImgPath("/images/profile2.jpg")
+                .role("USER")
+                .build();
         userRepository.save(user2);
     }
 
     @Test
     @DisplayName("게시물 등록 및 조회 테스트")
     public void createAndFindPosts() {
-        // 테스트 게시물 생성
-        Post post1 = new Post();
-        post1.setUser(user1);
-        post1.setTitle("첫 번째 게시물");
-        post1.setContent("첫 번째 게시물 내용입니다.");
-        post1.setStatus("판매중");
+        // 테스트 게시물 생성 - Builder 사용
+        Post post1 = Post.builder()
+                .user(user1)
+                .title("첫 번째 게시물")
+                .content("첫 번째 게시물 내용입니다.")
+                .status("판매중")
+                .build();
 
-        Post post2 = new Post();
-        post2.setUser(user1);
-        post2.setTitle("두 번째 게시물");
-        post2.setContent("두 번째 게시물 내용입니다.");
-        post2.setStatus("판매중");
+        Post post2 = Post.builder()
+                .user(user1)
+                .title("두 번째 게시물")
+                .content("두 번째 게시물 내용입니다.")
+                .status("판매중")
+                .build();
 
-        Post post3 = new Post();
-        post3.setUser(user2);
-        post3.setTitle("세 번째 게시물");
-        post3.setContent("세 번째 게시물 내용입니다.");
-        post3.setStatus("판매완료");
+        Post post3 = Post.builder()
+                .user(user2)
+                .title("세 번째 게시물")
+                .content("세 번째 게시물 내용입니다.")
+                .status("판매완료")
+                .build();
 
         // 게시물 저장
         postRepository.save(post1);

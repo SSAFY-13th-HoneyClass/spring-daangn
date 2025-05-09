@@ -21,36 +21,39 @@ public class UserRepositoryTest {
     @Test
     @DisplayName("사용자 등록 및 조회 테스트")
     public void createAndFindUsers() {
-        // 테스트 데이터 생성
-        User user1 = new User();
-        user1.setEmail("user1@example.com");
-        user1.setPassword("password1");
-        user1.setPhone("010-1111-1111");
-        user1.setName("사용자1");
-        user1.setProfile("안녕하세요 사용자1입니다.");
-        user1.setNickname("닉네임1");
-        user1.setProfileImgPath("/images/profile1.jpg");
-        user1.setRole("USER");
+        // 테스트 데이터 생성 - Builder 사용
+        User user1 = User.builder()
+                .email("user1@example.com")
+                .password("password1")
+                .phone("010-1111-1111")
+                .name("사용자1")
+                .profile("안녕하세요 사용자1입니다.")
+                .nickname("닉네임1")
+                .profileImgPath("/images/profile1.jpg")
+                .role("USER")
+                .build();
 
-        User user2 = new User();
-        user2.setEmail("user2@example.com");
-        user2.setPassword("password2");
-        user2.setPhone("010-2222-2222");
-        user2.setName("사용자2");
-        user2.setProfile("안녕하세요 사용자2입니다.");
-        user2.setNickname("닉네임2");
-        user2.setProfileImgPath("/images/profile2.jpg");
-        user2.setRole("USER");
+        User user2 = User.builder()
+                .email("user2@example.com")
+                .password("password2")
+                .phone("010-2222-2222")
+                .name("사용자2")
+                .profile("안녕하세요 사용자2입니다.")
+                .nickname("닉네임2")
+                .profileImgPath("/images/profile2.jpg")
+                .role("USER")
+                .build();
 
-        User user3 = new User();
-        user3.setEmail("user3@example.com");
-        user3.setPassword("password3");
-        user3.setPhone("010-3333-3333");
-        user3.setName("사용자3");
-        user3.setProfile("안녕하세요 사용자3입니다.");
-        user3.setNickname("닉네임3");
-        user3.setProfileImgPath("/images/profile3.jpg");
-        user3.setRole("ADMIN");
+        User user3 = User.builder()
+                .email("user3@example.com")
+                .password("password3")
+                .phone("010-3333-3333")
+                .name("사용자3")
+                .profile("안녕하세요 사용자3입니다.")
+                .nickname("닉네임3")
+                .profileImgPath("/images/profile3.jpg")
+                .role("ADMIN")
+                .build();
 
         // 사용자 저장
         userRepository.save(user1);

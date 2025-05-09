@@ -1,9 +1,15 @@
 package org.example.springboot.domain;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-@Data
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "postlikes", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"post_id", "user_id"})

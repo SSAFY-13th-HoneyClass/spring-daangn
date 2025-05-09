@@ -1,15 +1,21 @@
-// ChattingRoom Entity
 package org.example.springboot.domain;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
-@Data
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "chattingrooms")
 public class ChattingRoom {
@@ -35,6 +41,7 @@ public class ChattingRoom {
     private LocalDateTime updatedAt;
 
     // 관계 매핑
+    @Builder.Default
     @OneToMany(mappedBy = "chattingRoom", cascade = CascadeType.ALL)
-    private List<Chatting> chattings;
+    private List<Chatting> chattings = new ArrayList<>();
 }
