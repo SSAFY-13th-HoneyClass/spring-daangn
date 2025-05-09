@@ -584,5 +584,373 @@ test : src/test/java 쪽 테스트 코드를 컴파일한 결과물들이 여기
 
 라고 한다
 
+# 폴더 구조 고찰
+지금의 폴더구조는 gpt의 추천형식의 폴더 구조였다
+Domain 중심 구조..
+근데 만들고나니 폴더가 생각보다 너무 분리되어있어 한눈에 보이지가 않았다
+예전에는 계층식 구조로 만들었을때 한 폴더안에 너무 많은 파일들이 들어가서 찾기가 함들다는 단점이있어서 이 방법이 좋아 보였고 이런 방법으로 진해앟였는데
+이 구조가 편한것 만은 아닌것 같다
+
+그래서 각 구조의 장단점을 알아보자
+
+## 도메인 중심 구조의 목적
+- 기능별로 묶는 게 아니라, 도메인 단위로 책임을 명확하게 나눈다.
+### 장점
+- 각 도메인의 변경이 다른 도메인에 영향을 적게준다. (low coupling)
+- 팀 개발 시 도메인 별 역할 분담이 쉽다.
+- 마이크로서비스로 전환시 모듈화 기반이 됨
+
+확실히 팀개발시 역할 분담을 하고 큰 프로젝트라면 이 구조가 유리하긴 한것 같다
+하지만 지금 개인이 만드는 구조라 이 구조가 적합한지는 한번더 생각해 봤어야 할것같다.
+
+다른 구조도 알아보자
+## 계층 구조(Layered Architecutre)
+- Controller, Service, Repository, Entity 계층을 기준으로 폴더 구성
+### 장점
+- 계층 간 의존 관계가 명확하고 익숙
+- 빠르게 CRUD 뼈대를 잡기에 편함
+### 단점
+- 기능 하나 변경할때 여러 계층을 오가며 찾기 어려움
+- 실제 업무 기준인 "기능" 또는 "도메인" 관점과 괴리
+
+일단 지금 도메인 중심 구조로 시작했고 이런 폴더 구조로도 한번쯤 해보고 싶으니 이 방식으로 계속해서 진행해 보겠다..
+
+또한 이제와서 생각하는건데 각 FK가 PK로 사용되는 경우를 제대로 고민하지 않고 FK를 생성한것 같다
+다음에 진행할때는 어떤점을 고려해야할지 조금 더 알게 된것같다.
+사실 지금의 ERD가 좋은 ERD인가?? 아직 잘 모르곘고 어떻게 고쳐야 더 좋은 구조인지도 잘 모르곘다
+이번 과제 결과물들을 확인하면서 조금더 생각해 볼 필요가 있어보인다.
+
+어쩄든.. 다시 돌아와서
+## 2️⃣ Repository 단위 테스트를 진행해요
+모델링 제작을 완료하였다면 해당 모델이 제대로 되었는지 확인하기 위해서 `Repository` 계층의 단위 테스트를 작성해봅시다!
+
+- **ForeignKey 필드를 포함하는 Entity**을 하나 선택하여 다음과 같은 테스트를 진행해주세요
+    - given when then 에 따라서 테스트를 작성하기
+    - 테스트에서 객체를 3개 이상 넣은 이후에 해당 객체가 출력되는지 확인하기
+    - 테스트를 수행할 때 발생하는 JPA 쿼리를 조회해보기
+
+ForeignKey 필드를 포함하는 Entity인 ProductRepository로 테스트를 해보기로 헀다.
+given when than에 따라 테스트를 작성해야하는데..
+이게 뭐냐
+
+| 구분        | 의미              | 테스트 코드에서 하는 일         |
+| --------- | --------------- | --------------------- |
+| **given** | "어떤 상황이 주어졌을 때" | 테스트를 위한 **초기 데이터 생성** |
+| **when**  | "이 행동을 했을 때"    | 테스트 대상 **행동(메서드 호출)** |
+| **then**  | "이 결과가 나와야 한다"  | **결과 검증(assert)**     |
+
+JPA가 알아서 다해줘버리니까 쿼리가 뭔지 모른다
+그래서 우리는 야물 파일에서 설정을 통해 쿼리를 확인 할수 있다.
+```
+# application.yml
+spring:
+jpa:
+show-sql: true        # 콘솔에 SQL 보여줌
+properties:
+hibernate:
+format_sql: true  # 보기 좋게 정렬
+open-in-view: false   # (옵션) 성능상 좋음
+logging:
+level:
+org.hibernate.SQL: debug             # SQL 문장 출력
+org.hibernate.type.descriptor.sql: trace  # 바인딩 값까지 출력
+```
+그리고 ProductRepositoryTest를 실행해 보았다.
+
+```java
+2025-05-09T09:43:48.302+09:00 DEBUG 27504 --- [           main] org.hibernate.SQL                        : insert into region (name) values (?)
+Hibernate: insert into region (name) values (?)
+2025-05-09T09:43:48.361+09:00 DEBUG 27504 --- [           main] org.hibernate.SQL                        : insert into category (type) values (?)
+Hibernate: insert into category (type) values (?)
+2025-05-09T09:43:48.364+09:00 DEBUG 27504 --- [           main] org.hibernate.SQL                        : insert into users (create_at,email,nickname,password,phone,profile_url,region_id,temperature,update_at) values (?,?,?,?,?,?,?,?,?)
+Hibernate: insert into users (create_at,email,nickname,password,phone,profile_url,region_id,temperature,update_at) values (?,?,?,?,?,?,?,?,?)
+2025-05-09T09:43:48.372+09:00 DEBUG 27504 --- [           main] org.hibernate.SQL                        : insert into product (category_id,chat_count,created_at,description,dump_time,favorite_count,is_completed,is_negotiable,is_reserved,price,region_id,seller_id,thumbnail,title,view_count) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+Hibernate: insert into product (category_id,chat_count,created_at,description,dump_time,favorite_count,is_completed,is_negotiable,is_reserved,price,region_id,seller_id,thumbnail,title,view_count) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+2025-05-09T09:43:48.376+09:00 DEBUG 27504 --- [           main] org.hibernate.SQL                        : insert into product (category_id,chat_count,created_at,description,dump_time,favorite_count,is_completed,is_negotiable,is_reserved,price,region_id,seller_id,thumbnail,title,view_count) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+Hibernate: insert into product (category_id,chat_count,created_at,description,dump_time,favorite_count,is_completed,is_negotiable,is_reserved,price,region_id,seller_id,thumbnail,title,view_count) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+2025-05-09T09:43:48.379+09:00 DEBUG 27504 --- [           main] org.hibernate.SQL                        : insert into product (category_id,chat_count,created_at,description,dump_time,favorite_count,is_completed,is_negotiable,is_reserved,price,region_id,seller_id,thumbnail,title,view_count) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+Hibernate: insert into product (category_id,chat_count,created_at,description,dump_time,favorite_count,is_completed,is_negotiable,is_reserved,price,region_id,seller_id,thumbnail,title,view_count) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+2025-05-09T09:43:48.471+09:00 DEBUG 27504 --- [           main] org.hibernate.SQL                        : select p1_0.id,p1_0.category_id,p1_0.chat_count,p1_0.created_at,p1_0.description,p1_0.dump_time,p1_0.favorite_count,p1_0.is_completed,p1_0.is_negotiable,p1_0.is_reserved,p1_0.price,p1_0.region_id,p1_0.seller_id,p1_0.thumbnail,p1_0.title,p1_0.view_count from product p1_0
+Hibernate: select p1_0.id,p1_0.category_id,p1_0.chat_count,p1_0.created_at,p1_0.description,p1_0.dump_time,p1_0.favorite_count,p1_0.is_completed,p1_0.is_negotiable,p1_0.is_reserved,p1_0.price,p1_0.region_id,p1_0.seller_id,p1_0.thumbnail,p1_0.title,p1_0.view_count from product p1_0
+Product(id=1, title=아이폰, thumbnail=url1, description=null, price=null, createdAt=2025-05-09T09:43:48.371131, dumpTime=null, isReserved=false, isCompleted=false, isNegotiable=false, chatCount=0, viewCount=0, favoriteCount=0)
+Product(id=2, title=갤럭시, thumbnail=url2, description=null, price=null, createdAt=2025-05-09T09:43:48.376149, dumpTime=null, isReserved=false, isCompleted=false, isNegotiable=false, chatCount=0, viewCount=0, favoriteCount=0)
+Product(id=3, title=노트북, thumbnail=url3, description=null, price=null, createdAt=2025-05-09T09:43:48.379207, dumpTime=null, isReserved=false, isCompleted=false, isNegotiable=false, chatCount=0, viewCount=0, favoriteCount=0)
+```
+
+일단 지금 test 하는거 자체를 내가 뭔가 알고 한게 아닌것같다..
+일단 3번 과제도 내용이 궁금하니 먼저 진행하고 테스트를 추가해서 돌려보겠다
+
+# 3️⃣ JPA 관련 문제 해결 
+
+## Spring Data JPA에 인터페이스만 선언하고 Impl 하지 않았는데 어떻게 작동하지??
+- Spring Data JPA는 인터페이스 이름만 보고 동적으로 구현 클래스를 만들어준다.
+
+```java
+public interface ProductRepository extends JpaRepository<Product, Long> {
+    List<Product> findByTitle(String title);
+}
+```
+이렇게 JpaRepository를 상속하면
+```java
+class ProductRepositoryImpl implements ProductRepository {
+    List<Product> findByTitle(String title) {
+        // 내부적으로는 JPQL 쿼리 생성 → EntityManager로 실행
+    }
+}
+```
+실제 구현체가 자동으로 만들어진다고 한다.
+
+### 스프링 부트가 자동으로 프록시 구현체 생성
+- 스프링이 실행될 때 @EnableJpaRepositories가 동작
+- Repository 인터페이스 분석
+- 메스드 규칙 (findByTitle, findById, countBy...) 등을 읽음.
+- JPQL 쿼리를 동적으로 생성해서 실제 구현체를 만들어 등록
+
+### 내부 기술 : SimpleJpaRepository
+- JpaRepository의 내부 구현은 대부분 SimpleRepository 클래스가 담당 한다.
+- Spring은 이걸 프록시 객체로 감싸서 Bean으로 등록
+
+이런 방식으로 JPA가 알아서 다해주는 거였구나
+repository를 만들떄도 궁금했었다
+interface만 만들고 Impl을 안해줬는데 이게 어떻게 되지? 라는 질문에 대한 대답이 된것 같다.
+
+## Test 할때에도 있었는데 em 이 뭐지?
+### EntityManager 이란?
+- JPA에서 가장 핵심적인 객체
+- 엔티티를 데이터베이스에 CRUD 해줄 수 있게 해주는 인터페이스
+- JPA를 이용한 모든 DB 작업의 출입구
+  🧱 EntityManager가 하는 일
+  | 기능              | 설명                        |
+  | --------------- | ------------------------- |
+  | `persist()`     | 새로운 엔티티 저장 (INSERT)       |
+  | `find()`        | 기본 키(PK)로 엔티티 조회 (SELECT) |
+  | `merge()`       | 수정된 엔티티 저장 (UPDATE)       |
+  | `remove()`      | 엔티티 삭제 (DELETE)           |
+  | `createQuery()` | JPQL 쿼리 생성 후 실행           |
+  | `flush()`       | 변경 내용을 DB에 즉시 반영          |
+  | `clear()`       | 영속성 컨텍스트 초기화 (캐시 제거)      |
+
+CRUD 를 직접 안만들어도 할수 있었던게 이녀석 덕분이었구나
+### 내부적 동작
+- Spring Boot 가 실행 될 때, EntityManagerFactory가 만들어지고
+- 각 트랜잭션마다 EntityManager가 주입되고 사용된다.
+- EntityManager은 실제 DB Connection을 통해 SQL을 날린다.
+
+## data jpa를 찾다보면 SimpleRepository에서 entity manager 생성자자 주입을 통해ㅜ 주입 받는다.그런데 싱글통 객체는 한번만 할당을 받는데, 한번 연결 때 마다 생성이 되는 entity manager를 생성자 주입을 통해 받는것은 이상하다고 한다? 어떻게 되는 것인가
+### ✅ 결론
+- Spring이 주입해주는 EntityManager는 "프록시 객체"
+- 이 프록시가 내부적으로 현재 트랜잭션에 맞는 진짜 EntityManager을 찾아서 동작
+
+### ✅ 자세한 설명
+EntityManager는 기본적으로 트랜잭션 범위 빈
+- 트랜잭션이 열릴 떄마다 새로 생성
+- 트랜잭션이 끝나면 자동으로 닫히는 Scope = transaction
+
+Spring은 싱글톤 빈에게 @PersistenceContext 또는 Di를 통해 EntityManager를 주입할 때
+진짜 EntityManager가 아니라 EntityManager를 감싼 프록시를 주입한다.
+
+이게 뭔소리야
+EntityManager는 DB랑 연결된 객체이고 이 객체가 매번 새로 만들어져야한다.
+왜냐?
+- 누가 어떤 데이터를 보고 있는지 햇갈리면 안되고
+- 트랜잭션이 끝나면 그 연결은 닫아줘야함.
+
+@Repository 클래스나 SimpleJpaRepository는 싱글톤이다.
+근데 이 안에서 EntityManager를 사용해야한다.
+그래서 진짜 EntityManager를 주입하는게 아니라 가짜 프록시 객체를 넣는다..
+
+🤖 가짜 프록시 객체가 하는일
+- 이 프록시는 실제 EntityManager를 모른다.
+- 누군가 .persist()같은 메서드를 호출하면 
+- 지금 트랜잭션 안에서 사용중인 진짜 EntityManager가 누군지 찾고
+- 위임(delegate) 한다.
+ -> 이걸 `동적 프록시` 라고 한다.
+
+📦 GPT의 비유
+당신이 마트 직원이에요. 근데 그 마트는 매번 다른 창고에서 물건이 와요.
+그럼 마트 주인은 이렇게 말하죠:
+"네가 매번 직접 창고랑 통신하진 마."
+"창고 담당자(프록시)를 두고, 걔한테 '이거 가져와!'라고 해."
+"걔가 지금 연결된 진짜 창고한테 알아서 요청할 거야."
+즉, 프록시는 창고가 누구든 대신 전달해주는 사람이에요.
+
+### 정리
+SimpleJpaRepository : 싱글톤
+EntityManager : 프록시 객체가 생성자 주입됨
+요청마다 새로 생성되는 실제 EM : 이 프록시가 내부적으로 트랜잭션에 따라 꺼내 사용
+
+## 요약
+- EntityManager는 트랜잭션마다 새로 생기는 객체
+- @Autowired나 생성자 주입으로 주입받을 땐 프록시 객체가 주입
+- 이 프록시는 항상 현재 트랜잭션에 맞는 실제 EntityManager를 찾아서 위임
+- SimpleJpaRepository 같은 싱글톤 클래스도 안전하게 사용가능
+
+## Fetch join(N+1) 할 때 distinct릉 안하면 생길 수 있는 문제
+# 🧩 1. N+1 문제란?
+게시글 1개에 댓글이 3개 있다고 해보자 그럼 총 1+N개의 쿼리가 발생하게 되는데 이게 N+1 문제라고 한다.
+
+<br>
+
+# 🚀 2. fetch join으로 해결
+```java
+@Query("SELECT p FROM Post p JOIN FETCH p.comments")
+List<Post> findAllWithComments();
+```
+- fetch join은 한번에 조인해서 모든 데이터를 가져온다.
+- 따라서 쿼리는 1번만 날아간다
+- 단점은 결과가 중복될 수 있다.
+
+✅ 해결 방법: distinct 사용
+```java
+@Query("SELECT DISTINCT p FROM Post p JOIN FETCH p.comments")
+List<Post> findAllWithComments();
+```
+- distinct 를 사용하여 SQL에서 중복제거
+
+## 💡 정리
+- N+1 개의 쿼리가 발생하게 되는 문제가 있음
+- fetch join 과 distinct 를 이용하여 해결
+
+## ✅ fetch join이란?
+기본적으로 JPA는 연관된 엔티티를 지연로딩(LAZY) 방식으로 가져온다.
+
+잘 모르곘으니까 예시 들어보자
+
+🧱 엔티티
+```java
+@Entity
+public class User {
+    @Id @GeneratedValue
+    private Long id;
+
+    private String nickname;
+
+    @OneToMany(mappedBy = "seller")
+    private List<Product> products = new ArrayList<>();
+}
+```
+```java
+@Entity
+public class Product {
+    @Id @GeneratedValue
+    private Long id;
+
+    private String title;
+
+    @ManyToOne(fetch = FetchType.LAZY) // ❗ Lazy 설정
+    @JoinColumn(name = "seller_id")
+    private User seller;
+}
+```
+
+🧨 N+1 발생 Repository & Test
+```java
+public interface ProductRepository extends JpaRepository<Product, Long> {
+}
+```
+```java
+@Test
+void nPlusOneProblemTest() {
+    List<Product> products = productRepository.findAll();
+
+    for (Product p : products) {
+        System.out.println(p.getSeller().getNickname()); // ❗ 여기서 매번 쿼리 날림!
+    }
+}
+```
+- findAll()은 Product만 가져온다
+- getSeller() 호출 시마다 추가쿼리 -> N+1 문제 발생
+
+✅ fetch join으로 해결한 버전
+```java
+public interface ProductRepository extends JpaRepository<Product, Long> {
+
+    @Query("SELECT p FROM Product p JOIN FETCH p.seller")
+    List<Product> findAllWithSeller();
+}
+```
+```java
+@Test
+void noNPlusOneWithFetchJoin() {
+    List<Product> products = productRepository.findAllWithSeller();
+
+    for (Product p : products) {
+        System.out.println(p.getSeller().getNickname()); // 쿼리 1번에 다 가져옴
+    }
+}
+```
+
+### 요약
+기본적으로 JPA는 연관 엔티티를 Lazy로 가져온다,
+그래서 연관된 엔티티를 꺼낼 때 쿼리를 추가로 날려서 가져온다. N번 만큼
+fetch join은 연관된 엔티티를 한번의 쿼리로 함께 로딩한다. 따라서 쿼리를 1번만 실행해도 된다!!
+
+### 아직 fetch join을 실제로 사용해보진 못했지만 4번 질문이 있으니 먼저 에러를 맞아보자
+fetch join 을 할 때 생기는 에러가 생기는 3가지 에러 메시지의 원인과 해결 방안
+1. `HHH000104: firstResult/maxResults specified with collection fetch; applying in memory!`
+2. `query specified join fetching, but the owner of the fetched association was not present in the select list`
+3. `org.hibernate.loader.MultipleBagFetchException: cannot simultaneously fetch multiple bags`
+
+## 1번 에런
+`HHH000104: firstResult/maxResults specified with collection fetch; applying in memory!`
+### 🔍 원인
+- @OneToMany 또는 컬렉션을 fetch join 하면서 페이징 하면 발생
+- DB 레벨이 아니라 자바 메모리에서 페이징 처리, 성능 나빠짐!
+
+### ✅ 해결 방안
+- 컬렉션 fetch join + 페이징은 절대 함께 사용하면 안됨
+- 1. 컬렉션 fetch join 제거 + Batch Size로 최적화
+- 2. @EntityGraph로 1:1 또는 N:1관계만 join fetch 하도록 쿼리 분리
+
+## 2번 에러
+`query specified join fetching, but the owner of the fetched association was not present in the select list`
+
+### 🔍 원인
+- JPQL에서 fetch join 했는데, select 대상에 join 대상(owner 엔티티)이 없음.
+- JPA는 select된 엔티티에서 연관된 엔티티를 fetch 해야 하는데, 대상이 없어서 실패.
+```java
+@Query("SELECT c.content FROM Comment c JOIN FETCH c.user") // ⚠ `c`는 엔티티가 아님
+List<String> findContentWithUser();
+```
+
+✅ 해결 방안
+- fetch join은 반드시 엔티티 전체를 select 해야 동작함.
+```java
+@Query("SELECT c FROM Comment c JOIN FETCH c.user")
+List<Comment> findAllWithUser();
+```
+
+## 3번 에러
+`org.hibernate.loader.MultipleBagFetchException: cannot simultaneously fetch multiple bags`
+
+### 🔍 원인
+- Hibernate는 두 개 이상의 @OneToMany List(Bag)를 fetch join으로 동시에 가져올 수 없음.
+- 이유는 DB의 Cartesian Product(곱집합) 때문에 어떤 자식이 누구 소속인지 알 수 없게 됨.
+```java
+@Query("SELECT u FROM User u JOIN FETCH u.products JOIN FETCH u.comments") // ⚠ 둘 다 List
+List<User> findAllWithProductsAndComments();
+```
+### ✅ 해결 방안
+1. 하나를 Set으로 바꾸기(List + Set)
+```java
+@OneToMany(mappedBy = "user")
+private Set<Product> products;
+```
+2. 또는 하나만 fetch join 하고, 나머지는 @BatchSize 사용하여 N+1 최적화
+3. 아니면 쿼리를 2개로 분리해서 fetch
+
+### 📌 요약표
+| 에러 메시지                                   | 원인                   | 해결 방법              |
+| ---------------------------------------- | -------------------- | ------------------ |
+| `HHH000104`                              | 컬렉션 fetch join + 페이징 | 페이징 분리, batch size |
+| `query specified join fetching, but ...` | fetch 대상이 select에 없음 | 엔티티 전체를 select     |
+| `MultipleBagFetchException`              | 여러 List fetch join   | 하나를 Set으로, 쿼리 분리   |
+
+
+
+
+
+
+
 
 
