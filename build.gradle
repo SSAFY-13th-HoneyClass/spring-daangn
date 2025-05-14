@@ -33,8 +33,10 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 
-	// .env 파일을 읽게하는 라이브러리
-	implementation 'io.github.cdimascio:java-dotenv:5.2.2'
+//	// .env 파일을 읽게하는 라이브러리
+//	implementation 'io.github.cdimascio:java-dotenv:5.2.2'
+	// env파일 인식
+	implementation 'me.paulschwarz:spring-dotenv:3.0.0'
 }
 
 tasks.named('test') {
