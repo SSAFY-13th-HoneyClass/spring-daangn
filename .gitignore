@@ -1,3 +1,4 @@
+.env
 *#
 *.iml
 *.ipr
@@ -41,4 +42,3 @@ secrets.yml
 .sts4-cache
 
 .idea
-.env
