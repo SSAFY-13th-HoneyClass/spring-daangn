@@ -1,13 +1,19 @@
 > [!NOTE]
+> 
 > 리펙토링: 도메인 주도 설계(DDD) 스타일
+> 
 > 도메인별로 기능을 분리하여 유지보수가 용이한 MSA 스타일의 구조 도입 및 계층별 테스트 구현
 
 > [!NOTE]
+> 
 > 리펙토링: Lombok 사용
+> 
 > @Builder, @NoArgsConstructor, @Getter 등을 통해 코드가 매우 간결해지고 생산성이 눈에 띄게 향상
 
 > [!Important]
+> 
 > 리펙토링: User, Post 예약어
+> 
 > User, Post는 예약어로 사용될 가능성이 높기 때문에 되도록이면 사용하지 않는 것을 추천
 > 
 > 따라서 User → Member, Post → Board로 리펙토링 진행
