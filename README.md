@@ -75,3 +75,67 @@
 ## 🗂 프로젝트 구조
 
 - `.env` 파일을 만들어 환경변수 관리
+
+
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+
+# 3주차 과제
+
+## [N+1문제 TEST]
+
+### 1. laze로 그냥 불러왔을 때
+```java
+//레파지토리
+List<Sale> findAll();
+
+///테스트
+@Test
+@Transactional
+public void problem() {
+    List<Sale> sales = saleRepository.findAll();
+    System.out.println("sales : " + sales);
+    for (Sale sale : sales) {
+        System.out.println(sale.getUser().getNickname()); // ← 여기서 추가 쿼리 N번 발생
+    }
+}
+```
+ - select문이 22개 나오는 것을 알 수 있다. 
+![alt text](image.png)
+
+### 2. fetch로 불러왔을 때
+```java
+//레파지토리
+@Query("""
+  SELECT DISTINCT s FROM Sale s
+  JOIN FETCH s.user
+  JOIN FETCH s.category
+  JOIN FETCH s.status
+""")
+List<Sale> findAllWithUserCategoryStatus();
+
+///테스트
+@Test
+@Transactional
+public void solution() {
+    List<Sale> sales = saleRepository.findAllWithUserCategoryStatus();
+    for (Sale sale : sales) {
+        System.out.println(sale.getUser().getNickname());
+    }
+}
+```
+ - select문이 2개 나오는 것을 알 수 있다. 
+![alt text](image-1.png)
+
+
+## [service 테스트]
+- 채팅방 저장 및 삭제 테스트 
+![alt text](image-2.png)
+
+
+
