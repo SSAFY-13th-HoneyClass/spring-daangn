@@ -83,4 +83,16 @@ class CommentRepositoryTest {
             System.out.println(c.getMember().getEmail());
         }
     }
+
+    @Test
+    @DisplayName("JPQL Fetch Join을 통한 N+1 문제 해결 테스트")
+    void fetchJoinSolvesNPlusOne() {
+        List<Comment> comments = commentRepository.findWithMemberAndBoardByBoardId(1L);
+
+        for (Comment c : comments) {
+            // Lazy 설정된 member, board 접근 시에도 추가 쿼리 발생하지 않음
+            System.out.println("작성자 이메일: " + c.getMember().getEmail());
+            System.out.println("게시글 제목: " + c.getBoard().getTitle());
+        }
+    }
 }
