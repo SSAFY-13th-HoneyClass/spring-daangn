@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SaleLikeRepository extends JpaRepository<SaleLike, Long> {
-
+    void deleteBySaleNo(Long saleNo);
 }
 

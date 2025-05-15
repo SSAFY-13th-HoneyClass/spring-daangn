@@ -1,14 +1,13 @@
-package com.ssafy.daangn.repository;
+package com.ssafy.daangn.service;
 
 import com.ssafy.daangn.domain.User;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import com.ssafy.daangn.dto.UserResponseDto;
+import com.ssafy.daangn.dto.UserUpdateRequest;
+import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-@Repository
-public interface UserRepository extends JpaRepository<User, Long> {
-
+public interface UserService {
     // 기본 키(PK)로 조회 (상세 보기용)
     Optional<User> findByNo(Long no);
 
@@ -24,5 +23,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // 아이디 비밀번호로 로그인(로그인)
     Optional<User> findByIdAndPassword(String id, String password);
 
-}
+    User save(User user);
 
+    UserResponseDto update(Long no, UserUpdateRequest request);
+
+    boolean delete(String id);
+
+
+}
