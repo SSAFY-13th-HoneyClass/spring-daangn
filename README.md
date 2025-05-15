@@ -1,12 +1,17 @@
-# 서비스 코드 작성
+# 지난주 보완 및 서비스 작성
 
 ## 리펙토링
 
 ### 도메인 주도 설계(DDD) 스타일
 - 도메인별로 기능을 분리하여 유지보수가 용이한 MSA 스타일의 구조 도입 및 계층별 테스트 구현
 
+![image](https://github.com/user-attachments/assets/471dc02c-b6c8-456d-ae41-9a7b26754d2f)
+
 ### Lombok 사용
 - @Builder, @NoArgsConstructor, @Getter 등을 통해 코드가 매우 간결해지고 생산성이 눈에 띄게 향상
+
+![image](https://github.com/user-attachments/assets/f47e613a-825f-43a1-b97c-8538fa7d432b)
+
 
 ### User, Post 예약어
 - User, Post는 예약어로 사용될 가능성이 높기 때문에 되도록이면 사용하지 않는 것을 추천
@@ -19,6 +24,9 @@
 - Repository 계층의 JPA 연관관계 매핑, 쿼리 메서드 유효성, N+1 문제 여부 확인
 - Service 계층의 비즈니스 로직 흐름 및 유효성 검증
 - DTO ↔ Entity 변환 및 예외 처리 동작 확인
+
+![image](https://github.com/user-attachments/assets/5ef8a670-3b45-46c8-b3dc-979a6f971ab9)
+
 
 ## 테스트 구성 방식
 
@@ -40,13 +48,52 @@
 | Favorite      | 복합키(member + board) 조회 및 삭제, 중복 좋아요 방지           |
 | DirectMessage | 수신자 기준 조회, 송수신자 조합 조회, 기본 필드(null 방지) 확인 |
 
+### 게시글 내에서 부모 없는 댓글만 조회할 때
+![image](https://github.com/user-attachments/assets/7fd6a9a3-c73a-44b6-b61c-a1460f5850ef)
+
+### 기존 코드 테스트
+
+![image](https://github.com/user-attachments/assets/db3d8e34-2594-4109-a06d-20fba6073dde)
+
 > [!NOTE]
 >
 > `em.clear()` 호출 후 Lazy 연관 접근 → N+1 발생 여부 확인 가능
 > 
-> 테스트용 데이터는 `@BeforeEach` 또는 테스트 메서드 내부에서 명확히 설정
-> 
-> `@DataJpaTest`는 자동 롤백되므로 테스트 간 독립성이 보장됨
+
+```java
+List<Comment> comments = commentRepository.findByBoard_BoardIdAndIsDeletedFalse(1L);
+for (Comment c : comments) {
+    // 연관된 Member를 접근 → 쿼리 추가 발생
+    // N+1 : 부모 엔티티 1개 조회 시 자식 엔티티를 N번 쿼리
+    System.out.println(c.getMember().getEmail());
+}
+```
+- findByBoard_BoardIdAndIsDeletedFalse() → 댓글 목록 쿼리 1회 실행
+- 루프 안에서 getMember() 호출 → 댓글 수만큼 select * from members where member_id=? 발생
+  - 즉, 1 (댓글 목록) + N (각 댓글의 멤버 조회)
+
+### N+1 탐지용 테스트 코드
+```java
+@Test
+@DisplayName("N+1 테스트용 - 댓글 조회 시 member 또는 board에 대한 join 필요성 확인")
+void checkNPlusOneIssue() {
+    List<Comment> comments = commentRepository.findByBoard_BoardIdAndIsDeletedFalse(1L);
+    for (Comment c : comments) {
+        // member는 LAZY 이므로 이 접근 시 개별 쿼리 발생 (N+1 문제 유발 가능)
+        System.out.println(c.getMember().getEmail());
+    }
+}
+```
+
+### 해결 방법 : JPQL Fetch Join
+```java
+@Query("SELECT c FROM Comment c JOIN FETCH c.member WHERE c.board.boardId = :boardId AND c.isDeleted = false")
+List<Comment> findWithMemberByBoardId(@Param("boardId") Long boardId);
+```
+
+### 문제 해결 테스트
+
+![image](https://github.com/user-attachments/assets/3b34ee30-2118-4852-a92a-0ca5b070275d)
 
 ---
 
