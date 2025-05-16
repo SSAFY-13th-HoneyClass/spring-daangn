@@ -2,6 +2,7 @@ package org.example.springboot.repository;
 
 import org.example.springboot.domain.Post;
 import org.example.springboot.domain.User;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -24,9 +25,13 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query("SELECT p FROM Post p")
     List<Post> findAllPosts();
 
-    // N+1 문제 해결용 메서드 추가
+    // N+1 문제 해결용 메서드 추가 - Fetch Join 방식
     @Query("SELECT p FROM Post p JOIN FETCH p.user")
     List<Post> findAllPostsWithUser();
+
+    // N+1 문제 해결용 메서드 추가 - Entity Graph 방식
+    @EntityGraph(attributePaths = {"user"})
+    List<Post> findAll();
 
     // 단일 게시물 조회 시 N+1 문제 해결
     @Query("SELECT p FROM Post p JOIN FETCH p.user WHERE p.postId = :postId")

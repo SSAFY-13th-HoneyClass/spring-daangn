@@ -180,4 +180,39 @@ public class PostService {
         log.debug("Completed DTO conversion for all posts");
         return result;
     }
+
+    /**
+     * N+1 문제 해결한 게시물 목록 조회 - Entity Graph 방식
+     */
+    @Transactional(readOnly = true)
+    public List<PostDto.ListResponse> getAllPostsWithEntityGraph() {
+        log.debug("Starting getAllPostsWithEntityGraph method");
+        
+        // Entity Graph를 사용해 게시글과 사용자 정보를 한 번에 조회
+        List<Post> posts = postRepository.findAll();
+        log.debug("Fetched {} posts with users using entity graph", posts.size());
+        
+        List<PostDto.ListResponse> result = new ArrayList<>();
+        
+        for (Post post : posts) {
+            log.debug("Creating DTO for post ID: {}", post.getPostId());
+            
+            // 이미 User 정보가 로딩되어 있으므로 추가 쿼리 발생하지 않음
+            User user = post.getUser();
+            
+            PostDto.ListResponse dto = PostDto.ListResponse.builder()
+                    .postId(post.getPostId())
+                    .title(post.getTitle())
+                    .status(post.getStatus())
+                    .userId(user.getUserId())
+                    .nickname(user.getNickname()) // Entity Graph로 이미 로딩되어 있음
+                    .createdAt(post.getCreatedAt())
+                    .build();
+                    
+            result.add(dto);
+        }
+        
+        log.debug("Completed DTO conversion for all posts using entity graph");
+        return result;
+    }
 }

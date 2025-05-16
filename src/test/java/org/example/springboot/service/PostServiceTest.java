@@ -12,6 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -139,5 +142,74 @@ public class PostServiceTest {
         assertThatThrownBy(() -> postService.updatePostStatus(post.getPostId(), "예약중", otherUser.getUserId()))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("게시물 수정 권한이 없습니다.");
+    }
+
+    @Test
+    @DisplayName("게시물 판매 상태 변경 테스트")
+    public void testPostStatusUpdate() {
+        // given: 2명의 사용자가 각각 3개의 게시글을 작성하는 상황
+        System.out.println("\n===== 테스트 데이터 준비 =====");
+        List<User> users = new ArrayList<>();
+
+        // 2명의 사용자 생성
+        for (int i = 0; i < 2; i++) {
+            User user = User.builder()
+                    .email("user" + i + "@example.com")
+                    .password("password" + i)
+                    .phone("010-1111-111" + i)
+                    .name("사용자" + i)
+                    .profile("안녕하세요 사용자" + i + "입니다.")
+                    .nickname("닉네임" + i)
+                    .profileImgPath("/images/profile" + i + ".jpg")
+                    .role("USER")
+                    .build();
+
+            users.add(userRepository.save(user));
+        }
+
+        // 각 사용자별로 3개의 게시글 생성 (총 6개)
+        for (int i = 0; i < users.size(); i++) {
+            User user = users.get(i);
+
+            for (int j = 0; j < 3; j++) {
+                Post post = Post.builder()
+                        .user(user)
+                        .title("게시글 " + i + "-" + j)
+                        .content("게시글 내용 " + i + "-" + j)
+                        .status("판매중")
+                        .build();
+
+                postRepository.save(post);
+            }
+        }
+
+        System.out.println("===== 테스트 데이터 준비 완료 =====");
+        System.out.println("총 사용자 수: " + users.size());
+        System.out.println("총 게시글 수: " + postRepository.count());
+
+        // when: 게시글 상태 변경
+        System.out.println("\n===== 판매 상태 변경 테스트 =====");
+
+        // 첫 번째 사용자의 첫 번째 게시글 상태 변경
+        Post firstPost = postRepository.findByUser(users.get(0)).get(0);
+        postService.updatePostStatus(firstPost.getPostId(), "판매완료", users.get(0).getUserId());
+
+        // 두 번째 사용자의 첫 번째 게시글 상태 변경
+        Post secondPost = postRepository.findByUser(users.get(1)).get(0);
+        postService.updatePostStatus(secondPost.getPostId(), "예약중", users.get(1).getUserId());
+
+        // then: 상태별 게시글 조회 및 검증
+        List<Post> sellingPosts = postRepository.findByStatus("판매중");
+        List<Post> reservedPosts = postRepository.findByStatus("예약중");
+        List<Post> soldPosts = postRepository.findByStatus("판매완료");
+
+        System.out.println("판매중 게시글 수: " + sellingPosts.size());
+        System.out.println("예약중 게시글 수: " + reservedPosts.size());
+        System.out.println("판매완료 게시글 수: " + soldPosts.size());
+
+        // 상태별 게시글 수 확인
+        assertThat(sellingPosts.size()).isEqualTo(4); // 전체 6개 중 2개 상태 변경
+        assertThat(reservedPosts.size()).isEqualTo(1);
+        assertThat(soldPosts.size()).isEqualTo(1);
     }
 }

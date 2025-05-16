@@ -15,13 +15,8 @@ import jakarta.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 @SpringBootTest
 public class PostServiceNPlus1Test {
-
-    @Autowired
-    private PostService postService;
 
     @Autowired
     private UserRepository userRepository;
@@ -91,11 +86,17 @@ public class PostServiceNPlus1Test {
         entityManager.clear();
         System.out.println("----- 영속성 컨텍스트 초기화 완료 -----");
         
-        // 트랜잭션을 분리하여 N+1 문제 해결 케이스를 명확히 보이도록 함
+        // Fetch Join 해결 방법 테스트
         demonstrateNPlus1Solution();
         
-        // 나머지 테스트...
-        testPostStatusUpdate(users);
+        // 영속성 컨텍스트 초기화
+        System.out.println("\n----- 영속성 컨텍스트 초기화 -----");
+        entityManager.flush();
+        entityManager.clear();
+        System.out.println("----- 영속성 컨텍스트 초기화 완료 -----");
+        
+        // Entity Graph 해결 방법 테스트
+        demonstrateEntityGraphSolution();
     }
     
     // N+1 문제를 명확하게 보여주는 메서드
@@ -128,9 +129,9 @@ public class PostServiceNPlus1Test {
         System.out.println("\nN+1 문제 발생: 게시글 조회 쿼리 1번 + 사용자 조회 쿼리 " + posts.size() + "번 = 총 " + (1 + posts.size()) + "번 쿼리 실행");
     }
     
-    // N+1 문제 해결 방법을 보여주는 메서드
+    // Fetch Join을 사용한 N+1 문제 해결 방법
     private void demonstrateNPlus1Solution() {
-        System.out.println("\n\n===== N+1 문제 해결 케이스 =====");
+        System.out.println("\n\n===== N+1 문제 해결 케이스 1: Fetch Join =====");
         System.out.println("findAllPostsWithUser() 메서드 호출 - Fetch Join으로 게시글과 사용자 함께 조회 쿼리 1번 실행");
         System.out.println("SQL쿼리 예상: SELECT p.*, u.* FROM posts p JOIN users u ON p.user_id = u.user_id");
 
@@ -157,31 +158,32 @@ public class PostServiceNPlus1Test {
         System.out.println("\nN+1 문제 해결: Fetch Join으로 단 1번의 쿼리로 모든 데이터 조회 완료");
     }
     
-    @Transactional
-    public void testPostStatusUpdate(List<User> users) {
-        // 판매 상태 변경 후 테스트
-        System.out.println("\n\n===== 판매 상태 변경 테스트 =====");
+    // Entity Graph를 사용한 N+1 문제 해결 방법
+    private void demonstrateEntityGraphSolution() {
+        System.out.println("\n\n===== N+1 문제 해결 케이스 2: Entity Graph =====");
+        System.out.println("findAll() 메서드 호출 - Entity Graph로 게시글과 사용자 함께 조회 쿼리 1번 실행");
+        System.out.println("SQL쿼리 예상: SELECT p.*, u.* FROM posts p LEFT JOIN users u ON p.user_id = u.user_id");
 
-        // 첫 번째 사용자의 첫 번째 게시글 상태 변경
-        Post firstPost = postRepository.findByUser(users.get(0)).get(0);
-        postService.updatePostStatus(firstPost.getPostId(), "판매완료", users.get(0).getUserId());
+        // Entity Graph를 사용하여 게시글과 사용자 정보를 한 번에 조회
+        List<Post> posts = postRepository.findAll();
+        System.out.println("게시글과 사용자 정보 조회 완료: " + posts.size() + "개");
+        
+        System.out.println("\n----- 이제 각 게시글의 사용자 정보를 조회하지만 추가 쿼리 없음 -----");
+        System.out.println("Entity Graph로 모든 사용자 정보가 로딩되어 있으므로 추가 쿼리 발생하지 않음");
 
-        // 두 번째 사용자의 첫 번째 게시글 상태 변경
-        Post secondPost = postRepository.findByUser(users.get(1)).get(0);
-        postService.updatePostStatus(secondPost.getPostId(), "예약중", users.get(1).getUserId());
+        // 각 게시글의 사용자 정보에 접근해도 추가 쿼리가 발생하지 않음 (이미 로딩됨)
+        for (int i = 0; i < posts.size(); i++) {
+            Post post = posts.get(i);
+            System.out.println("\n=== [" + (i+1) + "/" + posts.size() + "] 게시글 ID: " + post.getPostId() + " 사용자 정보 접근 시작 ===");
+            System.out.println("이미 로딩된 사용자 정보에 접근 (추가 SQL 쿼리 없음):");
+            
+            // 이미 로딩된 사용자 정보에 접근 (추가 쿼리 없음)
+            String nickname = post.getUser().getNickname();
+            
+            System.out.println("게시글: " + post.getTitle() + ", 작성자: " + nickname);
+            System.out.println("=== 게시글 ID: " + post.getPostId() + " 사용자 정보 접근 완료 ===");
+        }
 
-        // 상태별 게시글 조회
-        List<Post> sellingPosts = postRepository.findByStatus("판매중");
-        List<Post> reservedPosts = postRepository.findByStatus("예약중");
-        List<Post> soldPosts = postRepository.findByStatus("판매완료");
-
-        System.out.println("판매중 게시글 수: " + sellingPosts.size());
-        System.out.println("예약중 게시글 수: " + reservedPosts.size());
-        System.out.println("판매완료 게시글 수: " + soldPosts.size());
-
-        // 상태별 게시글 수 확인
-        assertThat(sellingPosts.size()).isEqualTo(13); // 전체 15개 중 2개 상태 변경
-        assertThat(reservedPosts.size()).isEqualTo(1);
-        assertThat(soldPosts.size()).isEqualTo(1);
+        System.out.println("\nN+1 문제 해결: Entity Graph로 단 1번의 쿼리로 모든 데이터 조회 완료");
     }
 }

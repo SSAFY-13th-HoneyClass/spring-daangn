@@ -25,13 +25,5 @@ spring:
 logging:
   level:
     org.hibernate.SQL: debug
-    org.hibernate.type.descriptor.sql: trace
     org.hibernate.orm.jdbc.bind: trace
-    org.hibernate.engine.transaction.internal.TransactionImpl: debug
-    org.hibernate.engine.jdbc.internal.JdbcCoordinatorImpl: trace
-    org.hibernate.engine.jdbc.batch.internal.BatchingBatch: debug
-    org.hibernate.resource.jdbc.internal.ResourceRegistryStandardImpl: trace
-    org.hibernate.resource.jdbc.internal.LogicalConnectionManagedImpl: debug
-    org.hibernate.type: trace
-    org.hibernate.stat: debug
     org.example.springboot.service: debug 
