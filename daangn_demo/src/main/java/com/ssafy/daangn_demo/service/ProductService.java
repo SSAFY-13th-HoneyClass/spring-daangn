@@ -13,6 +13,10 @@ public class ProductService {
 
     private final ProductRepository productRepository;
 
+    public void create(ProductEntity productEntity) {
+        productRepository.save(productEntity);
+    }
+
     public List<ProductEntity> getByWriter(Long writerId) {
         return productRepository.findAllByWriterId(writerId);
     }
