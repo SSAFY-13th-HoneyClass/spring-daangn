@@ -77,8 +77,8 @@ public class PostRepositoryJPATest {
 
         // when
 //        List<Post> posts = postRepository.findAll(); //N+1 Test
-        List<Post> posts = postRepository.findPostbyFetchJoin(); //N+1 solve1
-
+//        List<Post> posts = postRepository.findPostbyFetchJoin(); //N+1 solve1
+        List<Post> posts = postRepository.findAll(); //N+1 solve2
 
         // then
         for (Post post : posts) {

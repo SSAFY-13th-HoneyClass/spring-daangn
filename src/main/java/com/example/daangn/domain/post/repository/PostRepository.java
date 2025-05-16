@@ -22,5 +22,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query("select p from Post p left join fetch p.user")
     List<Post> findPostbyFetchJoin();
 
-
+    @Override
+    @EntityGraph(attributePaths = {"user"})
+    List<Post> findAll();
 }
