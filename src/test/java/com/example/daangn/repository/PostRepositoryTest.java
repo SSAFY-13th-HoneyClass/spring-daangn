@@ -1,7 +1,9 @@
 package com.example.daangn.repository;
 
-import com.example.daangn.domain.Post;
-import com.example.daangn.domain.User;
+import com.example.daangn.domain.post.entity.Post;
+import com.example.daangn.domain.post.repository.PostRepository;
+import com.example.daangn.domain.user.entity.User;
+import com.example.daangn.domain.user.repository.UsersRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
