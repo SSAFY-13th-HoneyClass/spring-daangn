@@ -21,4 +21,8 @@ public class ProductService {
         return productRepository.findAllByWriterId(writerId);
     }
 
+    public List<ProductEntity> getAll() {
+        return productRepository.findAll();
+    }
+
 }
