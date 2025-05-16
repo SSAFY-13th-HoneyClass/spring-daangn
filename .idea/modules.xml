@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/spring-daangn.iml" filepath="$PROJECT_DIR$/.idea/spring-daangn.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/spring-daangn.main.iml" filepath="$PROJECT_DIR$/.idea/modules/spring-daangn.main.iml" />
     </modules>
   </component>
 </project>

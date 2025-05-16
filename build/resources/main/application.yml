@@ -12,7 +12,9 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        default_batch_fetch_size: 100  # BatchSize 설정으로 N+1 문제 완화
 
 logging:
   level:
     org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql: trace  # 쿼리 변수값 확인 가능

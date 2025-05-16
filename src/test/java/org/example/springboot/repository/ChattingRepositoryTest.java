@@ -1,5 +1,6 @@
 package org.example.springboot.repository;
 
+import jakarta.persistence.EntityManager;
 import org.example.springboot.domain.Chatting;
 import org.example.springboot.domain.ChattingRoom;
 import org.example.springboot.domain.Post;

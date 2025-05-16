@@ -58,4 +58,9 @@ public class Post {
     @Builder.Default
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<Photo> photos = new ArrayList<>();
+
+    // 게시물 상태 업데이트 메서드
+    public void updateStatus(String status) {
+        this.status = status;
+    }
 }
