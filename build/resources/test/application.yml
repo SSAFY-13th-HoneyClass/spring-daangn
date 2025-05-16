@@ -1,0 +1,37 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/daangn?createDatabaseIfNotExist=true
+    username: ssafy
+    password: ssafy
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+        generate_statistics: true
+        jdbc:
+          batch_size: 10
+        order_inserts: true
+        order_updates: true
+        type:
+          descriptor:
+            sql: trace
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql: trace
+    org.hibernate.orm.jdbc.bind: trace
+    org.hibernate.engine.transaction.internal.TransactionImpl: debug
+    org.hibernate.engine.jdbc.internal.JdbcCoordinatorImpl: trace
+    org.hibernate.engine.jdbc.batch.internal.BatchingBatch: debug
+    org.hibernate.resource.jdbc.internal.ResourceRegistryStandardImpl: trace
+    org.hibernate.resource.jdbc.internal.LogicalConnectionManagedImpl: debug
+    org.hibernate.type: trace
+    org.hibernate.stat: debug
+    org.example.springboot.service: debug 
