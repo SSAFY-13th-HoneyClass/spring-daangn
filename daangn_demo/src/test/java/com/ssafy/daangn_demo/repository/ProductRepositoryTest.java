@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
 
@@ -47,7 +48,7 @@ class ProductRepositoryTest {
     }
 
     @Test
-    void 상품목록조회(){
+    void 상품목록조회() {
         //given
         UserEntity user = new UserEntity();
         user.setEmail("abcd@gmail.com");
@@ -85,5 +86,4 @@ class ProductRepositoryTest {
         //then
         assertThat(list.size()).isEqualTo(3);
     }
-
 }
