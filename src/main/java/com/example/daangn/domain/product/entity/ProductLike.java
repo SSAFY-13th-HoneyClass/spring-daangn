@@ -8,6 +8,7 @@ import lombok.*;
 @Entity
 @Table(name = "ProductLikes")
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

@@ -3,7 +3,7 @@ package com.example.daangn.repository;
 import com.example.daangn.domain.post.entity.Post;
 import com.example.daangn.domain.post.repository.PostRepository;
 import com.example.daangn.domain.user.entity.User;
-import com.example.daangn.domain.user.repository.UsersRepository;
+import com.example.daangn.domain.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,7 +29,7 @@ public class PostRepositoryTest {
     private PostRepository postRepository;
 
     @Autowired
-    private UsersRepository usersRepository;
+    private UserRepository usersRepository;
 
     private User testUser;
 

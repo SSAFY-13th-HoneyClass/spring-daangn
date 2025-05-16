@@ -4,10 +4,7 @@ import com.example.daangn.domain.chat.entity.Chatting;
 import com.example.daangn.domain.location.entity.Location;
 import com.example.daangn.domain.user.entity.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -15,7 +12,8 @@ import java.util.List;
 
 @Entity
 @Table(name = "Products")
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

@@ -7,6 +7,7 @@ import lombok.*;
 @Entity
 @Table(name = "ProductImages")
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
