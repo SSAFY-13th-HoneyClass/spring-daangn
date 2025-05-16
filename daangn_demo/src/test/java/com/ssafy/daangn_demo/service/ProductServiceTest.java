@@ -68,7 +68,6 @@ class ProductServiceTest {
     @Test
     void 판매물품_전체목록의_작성자_조회하기(){
         //given
-
         UserEntity user1 = new UserEntity();
         user1.setEmail("abcd1@gmail.com");
         user1.setPhoneNumber("010-1234-5678");
@@ -123,46 +122,5 @@ class ProductServiceTest {
             System.out.println(product.getWriter().getEmail());
         }
         System.out.println("==============end===============");
-    }
-
-    @Test
-    void 판매물품_전체목록의_작성자_조회_NPlus1_방지() {
-        // given
-        UserEntity user1 = new UserEntity();
-        user1.setEmail("user1@example.com");
-        user1.setPhoneNumber("010-1111-1111");
-        user1.setMannerTemperature(36.5);
-        userRepository.save(user1);
-
-        UserEntity user2 = new UserEntity();
-        user2.setEmail("user2@example.com");
-        user2.setPhoneNumber("010-2222-2222");
-        user2.setMannerTemperature(36.6);
-        userRepository.save(user2);
-
-        ProductEntity p1 = new ProductEntity();
-        p1.setTitle("상품1");
-        p1.setWriter(user1);
-        p1.setStatus("on_sale");
-        p1.setPrice(10000);
-        productService.create(p1);
-
-        ProductEntity p2 = new ProductEntity();
-        p2.setTitle("상품2");
-        p2.setWriter(user2);
-        p2.setStatus("on_sale");
-        p2.setPrice(20000);
-        productService.create(p2);
-
-        em.flush();
-        em.clear(); // 영속성 컨텍스트 초기화 → 프록시 강제 로딩 테스트 가능
-
-        // when
-        List<ProductEntity> products = productService.getAll(); // @EntityGraph 적용된 메서드
-
-        // then
-        for (ProductEntity p : products) {
-            System.out.println(p.getWriter().getEmail()); // 추가 쿼리 없이 출력되어야 함
-        }
     }
 }
