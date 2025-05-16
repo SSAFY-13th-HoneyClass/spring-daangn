@@ -58,7 +58,10 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<CommentDTO> getProductComments(Long productId) {
-        return commentRepository.findAllByProduct_Id(productId);
+        return commentRepository.findAllByProduct_Id(productId)
+                .stream()
+                .map(CommentDTO::from)
+                .collect(Collectors.toList());
     }
 
     // 추가 메소드: 댓글을 DTO로 변환
