@@ -61,7 +61,7 @@ public class PostRepositoryJPATest {
     }
 
     @Test
-    @DisplayName("Post 엔티티, User 엔티티 저장 및 조회 테스트 / JPA N+1 Test")
+    @DisplayName("[JPA N+1 Test] Post 엔티티, User 엔티티 저장 및 조회 테스트")
     void saveAndFindTest() {
         // given
         Post post1 = createPost("첫 번째 게시글", "첫 번째 내용입니다.", "공지사항", testUser1);
