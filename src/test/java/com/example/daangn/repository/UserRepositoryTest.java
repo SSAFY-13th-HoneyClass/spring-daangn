@@ -24,19 +24,19 @@ public class UserRepositoryTest {
     void saveUsers() {
         // given
         User user1 = User.builder()
-                .nickname("홍정인")
+                .name("홍정인")
                 .email("sss@ss.ss")
                 .password("1234")
                 .role(Role.ADMIN)
                 .build();
         User user2 = User.builder()
-                .nickname("이휘")
+                .name("이휘")
                 .email("hwi@w.w")
                 .password("1234")
                 .role(Role.USER)
                 .build();
         User user3 = User.builder()
-                .nickname("이주현")
+                .name("이주현")
                 .email("math@m.m")
                 .password("1234")
                 .role(Role.USER)
@@ -49,7 +49,7 @@ public class UserRepositoryTest {
         Optional<User> found = userRepository.findByEmail("sss@ss.ss");
         // then
         assertThat(found).isPresent();
-        assertThat(found.get().getNickname()).isEqualTo("홍정인");
+        assertThat(found.get().getName()).isEqualTo("홍정인");
         assertThat(found.get().getRole()).isEqualTo(Role.ADMIN);
     }
 }
