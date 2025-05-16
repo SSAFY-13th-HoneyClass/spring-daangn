@@ -34,6 +34,10 @@ public class UserService {
 
     /** 새로운 유저 추가 (회원가입)*/
     public User join(User user) {
+        //Security 적용 전이라 간단한 회원 비교 로직 작성
+        if(userRepository.existsById(user.getId())) {
+            return null;
+        }
         return userRepository.save(user);
     }
 
