@@ -28,7 +28,7 @@
 ### 문제 발생 예시
 >[!info] PostRepository와 UserRepository 사용
 
-==테스트 코드==
+- 테스트 코드
 1. 사전 작업 : 테스트용 사용자 2명 생성
 ```Java
 @BeforeEach  
@@ -87,7 +87,7 @@ public void setup(){
     }
 ```
 
-==결과==
+- 결과
 - 첫 번째 게시글 불러오기 (정상)
   ![[n+1 test2.png]]
 - 첫 번째 게시글과 연관된 user 불러오기 (문제)
@@ -98,13 +98,13 @@ public void setup(){
 ### 해결 방법1
 > 1. fech join을 사용하여 해결하자!
 
-==jpql 코드==
+- jpql 코드
 ```Java
 @Query("select p from Post p left join fetch p.user")  
 List<Post> findPostbyFetchJoin();
 ```
 
-==테스트 코드(수정)==
+- 테스트 코드(수정)
 ```Java
     @Test  
     @DisplayName("[JPA N+1 Test] Post 엔티티, User 엔티티 저장 및 조회 테스트")  
@@ -134,7 +134,7 @@ List<Post> findPostbyFetchJoin();
     }
 ```
 
-==결과==
+- 결과
 ```
 2025-05-16T19:39:24.677+09:00 DEBUG 15308 --- [    Test worker] org.hibernate.SQL                        : 
     select
@@ -216,14 +216,14 @@ post.getTeam().getName() = Test User2
 ### 해결 방법2
 > 1. @EntityGraph을 사용하여 해결하자!
 
-==jpql 코드==
+- jpql 코드
 ```Java
 @Override  
 @EntityGraph(attributePaths = {"user"})  
 List<Post> findAll();
 ```
 
-==테스트 코드(수정)==
+- 테스트 코드(수정)
 ```Java
     @Test  
     @DisplayName("[JPA N+1 Test] Post 엔티티, User 엔티티 저장 및 조회 테스트")  
@@ -253,7 +253,7 @@ List<Post> findAll();
     }
 ```
 
-==결과==
+- 결과
 ```
 2025-05-16T19:45:15.795+09:00 DEBUG 16568 --- [    Test worker] org.hibernate.SQL                        : 
     select
@@ -349,7 +349,7 @@ post.getTeam().getName() = Test User2
 ### 검증 예시
 >[!info] UserService에 대하여 테스트를 진행하였습니다.
 
-==간단 회원 가입 검증==
+- 간단 회원 가입 검증
 ```Java
 /** 새로운 유저 추가 (회원가입)*/  
 public User join(User user) {  
@@ -361,7 +361,7 @@ public User join(User user) {
 }
 ```
 
-==테스트 코드==
+- 테스트 코드
 1. 사전 작업
 ```Java
 @BeforeEach  
@@ -411,7 +411,7 @@ public void test(){
 }
 ```
 
-==결과==
+- 결과
 ![[service test.png]]
 -> 동일한 ID로 회원가입을 시도했기에 existsById에서 true값을 받아 null을 인식함
 
