@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -20,9 +21,14 @@ public class UserEntity {
     private AreaEntity area;
 
     @OneToMany(mappedBy = "writer")
-    private List<ProductEntity> products;
+    private List<ProductEntity> products = new ArrayList<>();
 
     private String email;
     private String phoneNumber;
     private Double mannerTemperature;
+
+    public void addProduct(ProductEntity product) {
+        products.add(product);
+        product.setWriter(this);
+    }
 }
