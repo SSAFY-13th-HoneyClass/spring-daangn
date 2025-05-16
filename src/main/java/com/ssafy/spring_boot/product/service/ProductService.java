@@ -1,6 +1,7 @@
 package com.ssafy.spring_boot.product.service;
 
 import com.ssafy.spring_boot.category.dto.CategoryDTO;
+import com.ssafy.spring_boot.comment.dto.CommentDTO;
 import com.ssafy.spring_boot.image.dto.ImageDTO;
 import com.ssafy.spring_boot.product.dto.ProductDTO;
 
@@ -43,5 +44,5 @@ public interface ProductService {
      * @param productId 댓글을 가져올 상품 ID
      * @return 댓글 목록
      */
-    List<Comment> getProductComments(Long productId);
+    List<CommentDTO> getProductComments(Long productId);
 }

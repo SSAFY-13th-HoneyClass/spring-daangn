@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface CommentRepository extends JpaRepository<Comment,Integer> {
     List<Comment> findAllByProduct_Id(Long productId);
+    List<Comment> findAllByProductIdOrderByCreateAtAsc(Long productId);
 }

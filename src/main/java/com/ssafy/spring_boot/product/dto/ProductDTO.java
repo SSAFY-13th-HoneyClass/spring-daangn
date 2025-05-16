@@ -1,6 +1,6 @@
 package com.ssafy.spring_boot.product.dto;
 
-
+import com.ssafy.spring_boot.product.domain.Product;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -33,4 +33,29 @@ public class ProductDTO {
 
     private Integer regionId;
     private String regionName;
+
+    // Entity -> DTO 변환 메소드 추가
+    public static ProductDTO from(Product product) {
+        return ProductDTO.builder()
+                .id(product.getId())
+                .title(product.getTitle())
+                .thumbnail(product.getThumbnail())
+                .description(product.getDescription())
+                .price(product.getPrice())
+                .createdAt(product.getCreatedAt())
+                .dumpTime(product.getDumpTime())
+                .isReserved(product.getIsReserved())
+                .isCompleted(product.getIsCompleted())
+                .isNegotiable(product.getIsNegotiable())
+                .chatCount(product.getChatCount())
+                .viewCount(product.getViewCount())
+                .favoriteCount(product.getFavoriteCount())
+                .sellerId(product.getSeller().getId())
+                .sellerNickname(product.getSeller().getNickname())
+                .categoryId(product.getCategory().getId())
+                .categoryName(product.getCategory().getType())
+                .regionId(product.getRegion().getId())
+                .regionName(product.getRegion().getName())
+                .build();
+    }
 }
