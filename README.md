@@ -88,3 +88,35 @@
 ![image](https://github.com/user-attachments/assets/4fddfc7f-0751-4338-9cd7-7825af0817bb)
 
 
+# 3. N+1 문제 테스트
+
+* N+1 문제 테스트
+
+JPA에서 발생할 수 있는 N+1 문제**를 확인하고, fetch join을 통해 이를 해결하는 과정을 테스트.
+
+* 테스트 목적
+
+- 기본 findAll()호출 시 지연 로딩으로 인해 N+1 쿼리 발생 여부 확인
+- fetch join을 활용해서 N+1 문제 해결 여부 확인
+
+* 테스트 방식
+
+- @BeforeEach로 5명의 사용자와 게시글 15개를 생성
+- findAll()실행 후 getSeller().getNickname()호출 → N+1 발생 확인
+- findAllWithSeller()실행 (fetch join 적용) → 1번의 쿼리로 해결 확인
+
+* 실행 결과
+
+- N+1 발생
+<img width="654" alt="image" src="https://github.com/user-attachments/assets/25da804a-aeb0-47a4-bc56-f8bec570ad44" />
+<img width="535" alt="image" src="https://github.com/user-attachments/assets/34f2c92b-fb84-4fc1-b5f6-9a3accad0c54" />
+
+- N+1 해결
+
+<img width="661" alt="image" src="https://github.com/user-attachments/assets/917aef8a-ddd4-4cd2-aabb-b71fda3578a0" />
+<img width="535" alt="image" src="https://github.com/user-attachments/assets/32a619a0-1a7a-4491-bffc-1ab6d500ef5b" />
+<img width="513" alt="image" src="https://github.com/user-attachments/assets/c64c511f-d6a9-408e-95ce-0941fe793c0b" />
+
+
+  
+
