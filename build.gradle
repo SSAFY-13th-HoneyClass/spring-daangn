@@ -30,9 +30,6 @@ dependencies {
     // MySQL Connector 의존성에 명시적 버전 추가
     runtimeOnly 'com.mysql:mysql-connector-j'
 
-    // 테스트용 H2 데이터베이스
-    testRuntimeOnly 'com.h2database:h2'
-
     // Lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
@@ -41,6 +38,8 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.junit.jupiter:junit-jupiter-api'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+    // H2 데이터베이스 추가 (테스트용 내장 DB)
+    testRuntimeOnly 'com.h2database:h2'
 }
 
 tasks.named('test') {
