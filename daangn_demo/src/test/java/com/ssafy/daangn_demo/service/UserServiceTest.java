@@ -1,35 +1,36 @@
-package com.ssafy.daangn_demo.repository;
+package com.ssafy.daangn_demo.service;
 
 import com.ssafy.daangn_demo.entity.ProductEntity;
 import com.ssafy.daangn_demo.entity.UserEntity;
+import com.ssafy.daangn_demo.repository.ProductRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 
 
-@DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class ProductRepositoryTest {
+@SpringBootTest
+@Transactional
+class UserServiceTest {
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 
     @Autowired
     private ProductRepository productRepository;
 
     @Test
-    void 상품등록() {
+    void ID로_유저를_찾고_작성한_판매물품을_가져울_수_있다() {
         //given
         UserEntity user = new UserEntity();
         user.setEmail("abcd@gmail.com");
         user.setPhoneNumber("010-1234-5678");
         user.setMannerTemperature(36.7);
-        userRepository.save(user);
+        userService.create(user);
 
         ProductEntity product1 = new ProductEntity();
         product1.setWriter(user);
@@ -38,30 +39,7 @@ class ProductRepositoryTest {
         product1.setPrice(10000);
         product1.setStatus("on_sale");
         productRepository.save(product1);
-
-        //when
-        ProductEntity result = productRepository.findById(product1.getId()).get();
-
-        //then
-        assertThat(result).isEqualTo(product1);
-    }
-
-    @Test
-    void 상품목록조회() {
-        //given
-        UserEntity user = new UserEntity();
-        user.setEmail("abcd@gmail.com");
-        user.setPhoneNumber("010-1234-5678");
-        user.setMannerTemperature(36.7);
-        userRepository.save(user);
-
-        ProductEntity product1 = new ProductEntity();
-        product1.setWriter(user);
-        product1.setTitle("제목1");
-        product1.setDescription("내용1");
-        product1.setPrice(10000);
-        product1.setStatus("on_sale");
-        productRepository.save(product1);
+        user.addProduct(product1);
 
         ProductEntity product2 = new ProductEntity();
         product2.setWriter(user);
@@ -70,6 +48,7 @@ class ProductRepositoryTest {
         product2.setPrice(10000);
         product2.setStatus("on_sale");
         productRepository.save(product2);
+        user.addProduct(product2);
 
         ProductEntity product3 = new ProductEntity();
         product3.setWriter(user);
@@ -78,11 +57,13 @@ class ProductRepositoryTest {
         product3.setPrice(10000);
         product3.setStatus("on_sale");
         productRepository.save(product3);
+        user.addProduct(product3);
 
         //when
-        List<ProductEntity> list = productRepository.findAllByWriterId(user.getId());
+        UserEntity user2 = userService.getById(user.getId());
+        List<ProductEntity> products = user2.getProducts();
 
         //then
-        assertThat(list.size()).isEqualTo(3);
+        assertThat(products.size()).isEqualTo(3);
     }
 }
