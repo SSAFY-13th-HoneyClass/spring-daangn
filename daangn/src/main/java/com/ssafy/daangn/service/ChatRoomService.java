@@ -1,16 +1,20 @@
-package com.ssafy.daangn.repository;
+package com.ssafy.daangn.service;
 
 import com.ssafy.daangn.domain.ChatRoom;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import com.ssafy.daangn.dto.ChatRoomDto;
 
 import java.util.List;
 
-@Repository
-public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
+public interface ChatRoomService {
+
+    ChatRoom save(ChatRoomDto chatRoom);
+
+//    ChatRoom update(ChatRoom chatRoom);
+
+    void delete(ChatRoomDto chatRoom);
 
 
-    // ① 판매자 기준
+        // ① 판매자 기준
     List<ChatRoom> findBySellerNoOrderByUpdatedAtAsc(Long sellerNo);
 
     // ② 구매자 기준
@@ -22,10 +26,4 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
     // ④ 상품 + 구매자 기준
     List<ChatRoom> findBySaleNoAndBuyerNoOrderByUpdatedAtAsc(Long saleNo, Long buyerNo);
 
-    void deleteBySaleNo(Long saleNo);
-
-    List<ChatRoom> findBySaleNo(Long sellerNo);
-
-
 }
-

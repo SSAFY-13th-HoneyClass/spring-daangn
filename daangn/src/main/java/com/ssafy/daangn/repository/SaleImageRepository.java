@@ -9,5 +9,7 @@ import java.util.List;
 @Repository
 public interface SaleImageRepository extends JpaRepository<SaleImage, Long> {
     List<SaleImage> findBySaleNo(Long no);
+    void deleteBySaleNo(Long no);
+
 }
 

@@ -37,6 +37,18 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
             @Param("distance") double maxDistanceKm
     );
 
+    Sale findByNo(long no);
+
+    @Query("""
+      SELECT DISTINCT s FROM Sale s
+      JOIN FETCH s.user
+      JOIN FETCH s.category
+      JOIN FETCH s.status
+    """)
+    List<Sale> findAllWithUserCategoryStatus();
+
+
+    List<Sale> findAll();
 
 }
 

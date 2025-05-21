@@ -1,4 +1,4 @@
-package com.ssafy.daangn.domain;
+package com.ssafy.daangn.dto;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -10,7 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
-public class User {
+public class UserDto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
