@@ -21,7 +21,7 @@ public class User {
     @GeneratedValue
     private Long userId;
 
-    private String nickname;
+    private String name;
     @Column(nullable = false, unique = true)
     private String email;
     @Column(nullable = false)
