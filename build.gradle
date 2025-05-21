@@ -18,13 +18,29 @@ repositories {
 }
 
 dependencies {
+	// 웹 서버 및 REST API 개발
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+
+	// Spring Data JPA (Hibernate + 트랜잭션 + EntityManager)
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+	// MySQL JDBC 드라이버 (실제 운영/개발 DB 연결용)
 	runtimeOnly 'com.mysql:mysql-connector-j'
+
+	// Lombok (컴파일 타임에서 Getter/Setter 등 자동 생성)
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+
+	// 테스트: 단위 및 통합 테스트 지원
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	// 테스트: JUnit 플랫폼 런처 (IDE 연동용)
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	// 테스트: 인메모리 DB (H2) for @DataJpaTest 등
 	testImplementation 'com.h2database:h2'
 }
+
 
 tasks.named('test') {
 	useJUnitPlatform()
