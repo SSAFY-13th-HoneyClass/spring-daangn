@@ -37,6 +37,8 @@ dependencies {
 //	implementation 'io.github.cdimascio:java-dotenv:5.2.2'
 	// env파일 인식
 	implementation 'me.paulschwarz:spring-dotenv:3.0.0'
+	// swagger
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
 }
 
 tasks.named('test') {
