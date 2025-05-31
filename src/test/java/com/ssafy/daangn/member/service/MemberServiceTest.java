@@ -49,6 +49,10 @@ class MemberServiceTest {
                 .profileUrl(dto.getProfileUrl())
                 .build();
 
+        // @PrePersist에서 처리되는 값 수동 설정
+        member.markDeleted(); // false → true (의도에 따라 생략 가능)
+        member.getClass().getDeclaredFields(); // 이 라인은 필요 없음, 단순 참고
+
         when(memberRepository.findByEmailAndIsDeletedFalse(dto.getEmail()))
                 .thenReturn(Optional.empty());
         when(memberRepository.save(any(Member.class)))
@@ -58,4 +62,5 @@ class MemberServiceTest {
         assertThat(result.getEmail()).isEqualTo("hong@example.com");
         verify(memberRepository).save(any(Member.class));
     }
+
 }

@@ -31,14 +31,17 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 
-	// 테스트: 단위 및 통합 테스트 지원
+	// 인메모리 DB (H2) for @DataJpaTest 등
+	runtimeOnly 'com.h2database:h2'
+
+	// Swagger 사용
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
+
+		// 테스트: 단위 및 통합 테스트 지원
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
 	// 테스트: JUnit 플랫폼 런처 (IDE 연동용)
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
-	// 테스트: 인메모리 DB (H2) for @DataJpaTest 등
-	testImplementation 'com.h2database:h2'
 }
 
 

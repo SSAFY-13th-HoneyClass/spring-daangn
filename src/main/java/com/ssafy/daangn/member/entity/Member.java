@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,7 +21,7 @@ import lombok.Setter;
 @Table(name = "members")
 @Getter
 @Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
 public class Member {
@@ -40,30 +41,30 @@ public class Member {
 
     private String profileUrl;
 
-    @Builder.Default
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
     @Column(nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime updatedAt;
 
-    @Builder.Default
     @Column(nullable = false)
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    private Boolean isDeleted;
 
-    @Builder.Default
-    @Column(nullable = false)
-    private Boolean isDeleted = false;
-
-    public void markDeleted() {
-        this.isDeleted = true;
-    }
-
+    // 엔티티 저장 시 초기값
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+        this.updatedAt = this.createdAt;
+        this.isDeleted = false;
     }
 
+    // 엔티티 수정 시 갱신
     @PreUpdate
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
+    }
+
+    public void markDeleted() {
+        this.isDeleted = true;
     }
 }

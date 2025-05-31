@@ -25,10 +25,11 @@ class MemberRepositoryTest {
                 .email("test@example.com")
                 .password("pass")
                 .build();
-        memberRepository.save(member);
+        memberRepository.saveAndFlush(member); // @PrePersist 보장
 
-        Optional<Member> found = memberRepository.findByEmail("test@example.com");
+        Optional<Member> found = memberRepository.findByEmailAndIsDeletedFalse("test@example.com");
         assertThat(found).isPresent();
+        assertThat(found.get().getEmail()).isEqualTo("test@example.com");
     }
 
     @Test
@@ -39,8 +40,10 @@ class MemberRepositoryTest {
                 .email("active@example.com")
                 .password("pass")
                 .build();
-        memberRepository.save(member);
+        memberRepository.saveAndFlush(member); // @PrePersist 보장
 
-        assertThat(memberRepository.findByIsDeletedFalse()).isNotEmpty();
+        assertThat(memberRepository.findByIsDeletedFalse())
+            .extracting("email")
+            .contains("active@example.com");
     }
 }
