@@ -3,11 +3,39 @@ package com.ssafy.spring_boot.product.service;
 import com.ssafy.spring_boot.category.dto.CategoryDTO;
 import com.ssafy.spring_boot.comment.dto.CommentDTO;
 import com.ssafy.spring_boot.image.dto.ImageDTO;
+import com.ssafy.spring_boot.product.dto.ProductCreateRequestDTO;
 import com.ssafy.spring_boot.product.dto.ProductDTO;
 
 import java.util.List;
 
 public interface ProductService {
+
+    /**
+     * 새로운 상품 등록
+     * @param requestDTO 상품 생성 요청 DTO
+     * @return 생성된 상품 정보
+     */
+    ProductDTO createProduct(ProductCreateRequestDTO requestDTO);
+
+    /**
+     * 모든 상품 목록 조회
+     * @return 전체 상품 목록
+     */
+    List<ProductDTO> getAllProducts();
+
+    /**
+     * 특정 상품 삭제
+     * @param productId 삭제할 상품 ID
+     */
+    void deleteProduct(Long productId);
+
+    /**
+     * 특정 상품 수정
+     * @param productId 수정할 상품 ID
+     * @param requestDTO 수정할 상품 정보
+     * @return 수정된 상품 정보
+     */
+    ProductDTO updateProduct(Long productId, ProductCreateRequestDTO requestDTO);
 
     /**
      * 특정 상품의 상세 정보를 조회
