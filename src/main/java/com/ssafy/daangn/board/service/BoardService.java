@@ -25,8 +25,8 @@ public class BoardService {
 
     @Transactional
     public BoardResponseDto createBoard(BoardRequestDto dto) {
-        Member member = memberRepository.findById(dto.getMemberId())
-                .orElseThrow(() -> new IllegalArgumentException("Member not found"));
+        Member member = memberRepository.findByMemberIdAndIsDeletedFalse(dto.getMemberId())
+                .orElseThrow(() -> new IllegalArgumentException("Member not found or deleted"));
 
         Board board = Board.builder()
                 .member(member)
@@ -36,14 +36,15 @@ public class BoardService {
 
         return BoardResponseDto.from(boardRepository.save(board));
     }
+
     public List<BoardResponseDto> getAllBoards() {
-        return boardRepository.findAll().stream()
+        return boardRepository.findByIsDeletedFalse().stream()
                 .map(BoardResponseDto::from)
                 .collect(Collectors.toList());
     }
 
-    public List<BoardResponseDto> getActiveBoards() {
-        return boardRepository.findByIsDeletedFalse().stream()
+    public List<BoardResponseDto> getDeletedBoards() {
+        return boardRepository.findByIsDeletedTrue().stream()
                 .map(BoardResponseDto::from)
                 .collect(Collectors.toList());
     }
@@ -59,4 +60,23 @@ public class BoardService {
                 .map(BoardResponseDto::from)
                 .collect(Collectors.toList());
     }
+
+    @Transactional
+    public void deleteBoard(Long boardId) {
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new IllegalArgumentException("Board not found"));
+        board.setIsDeleted(true);
+    }
+
+    @Transactional
+    public BoardResponseDto updateBoard(Long boardId, BoardRequestDto dto) {
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new IllegalArgumentException("Board not found"));
+
+        if (dto.getTitle() != null) board.setTitle(dto.getTitle());
+        if (dto.getContent() != null) board.setContent(dto.getContent());
+
+        return BoardResponseDto.from(board);
+    }
+
 }
