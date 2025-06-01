@@ -15,9 +15,6 @@ import com.ssafy.daangn.comment.entity.Comment;
 import com.ssafy.daangn.member.entity.Member;
 import com.ssafy.daangn.member.repository.MemberRepository;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-
 @DataJpaTest
 class CommentRepositoryTest {
 
@@ -30,69 +27,43 @@ class CommentRepositoryTest {
     @Autowired
     private MemberRepository memberRepository;
 
-    @PersistenceContext
-    private EntityManager em;
-
     @Test
-    @DisplayName("대댓글 포함 댓글 저장 및 부모-자식 연관관계 테스트")
-    void saveAndLoadCommentsWithParent() {
+    @DisplayName("게시글 ID로 댓글 목록을 조회한다")
+    void findByBoardId() {
         Member member = memberRepository.save(Member.builder()
                 .membername("user")
-                .email("user@x.com")
-                .password("123")
+                .email("user@test.com")
+                .password("pass")
                 .build());
 
         Board board = boardRepository.save(Board.builder()
                 .member(member)
-                .title("board")
+                .title("title")
                 .content("content")
                 .build());
 
-        Comment parent = commentRepository.save(Comment.builder()
+        Comment comment = commentRepository.save(Comment.builder()
                 .member(member)
                 .board(board)
-                .content("부모 댓글")
+                .content("댓글입니다.")
                 .build());
 
-        Comment child = commentRepository.save(Comment.builder()
-                .member(member)
-                .board(board)
-                .parent(parent)
-                .content("자식 댓글")
-                .build());
-
-        em.clear(); // Lazy loading 확인
-        Comment foundChild = commentRepository.findById(child.getCommentId()).orElseThrow();
-
-        assertThat(foundChild.getParent().getContent()).isEqualTo("부모 댓글");
+        List<Comment> result = commentRepository.findByBoard_BoardIdAndIsDeletedFalse(board.getBoardId());
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getContent()).isEqualTo("댓글입니다.");
     }
 
     @Test
-    @DisplayName("게시글 기반 루트 댓글 조회 테스트")
-    void findRootCommentsByBoard() {
-        List<Comment> roots = commentRepository.findByBoard_BoardIdAndParentIsNullAndIsDeletedFalse(1L);
-        assertThat(roots).isNotNull();
-    }
+    @DisplayName("루트 댓글만 조회한다")
+    void findRootComments() {
+        Member member = memberRepository.save(Member.builder().membername("root").email("r@r.com").password("1234").build());
+        Board board = boardRepository.save(Board.builder().member(member).title("t").content("c").build());
 
-    @Test
-    @DisplayName("N+1 테스트용 - 댓글 조회 시 member 또는 board에 대한 join 필요성 확인")
-    void checkNPlusOneIssue() {
-        List<Comment> comments = commentRepository.findByBoard_BoardIdAndIsDeletedFalse(1L);
-        for (Comment c : comments) {
-            // Lazy로 설정한 member, board 접근 시 N+1 가능성 확인
-            System.out.println(c.getMember().getEmail());
-        }
-    }
+        Comment root = commentRepository.save(Comment.builder().member(member).board(board).content("root").build());
+        Comment child = commentRepository.save(Comment.builder().member(member).board(board).parent(root).content("child").build());
 
-    @Test
-    @DisplayName("JPQL Fetch Join을 통한 N+1 문제 해결 테스트")
-    void fetchJoinSolvesNPlusOne() {
-        List<Comment> comments = commentRepository.findWithMemberAndBoardByBoardId(1L);
-
-        for (Comment c : comments) {
-            // Lazy 설정된 member, board 접근 시에도 추가 쿼리 발생하지 않음
-            System.out.println("작성자 이메일: " + c.getMember().getEmail());
-            System.out.println("게시글 제목: " + c.getBoard().getTitle());
-        }
+        List<Comment> result = commentRepository.findByBoard_BoardIdAndParentIsNullAndIsDeletedFalse(board.getBoardId());
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getContent()).isEqualTo("root");
     }
 }
