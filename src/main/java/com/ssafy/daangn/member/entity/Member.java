@@ -22,8 +22,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
-@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE) // 외부에서 직접 생성 제한
+@Builder(access = AccessLevel.PRIVATE)            // builder도 외부에서 못 쓰게
 public class Member {
 
     @Id
@@ -50,7 +50,6 @@ public class Member {
     @Column(nullable = false)
     private Boolean isDeleted;
 
-    // 엔티티 저장 시 초기값
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
@@ -58,7 +57,6 @@ public class Member {
         this.isDeleted = false;
     }
 
-    // 엔티티 수정 시 갱신
     @PreUpdate
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
@@ -66,5 +64,18 @@ public class Member {
 
     public void markDeleted() {
         this.isDeleted = true;
+    }
+
+    // 정적 팩토리 메서드
+    public static Member of(String membername, String email, String password, String profileUrl) {
+        Member member = new Member();
+        member.membername = membername;
+        member.email = email;
+        member.password = password;
+        member.profileUrl = profileUrl;
+        member.isDeleted = false;
+        member.createdAt = LocalDateTime.now();
+        member.updatedAt = member.createdAt;
+        return member;
     }
 }

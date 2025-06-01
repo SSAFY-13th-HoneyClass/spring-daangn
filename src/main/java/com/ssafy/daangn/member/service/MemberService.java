@@ -28,12 +28,12 @@ public class MemberService {
             throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
         }
 
-        Member member = Member.builder()
-                .membername(dto.getMembername())
-                .email(dto.getEmail())
-                .password(dto.getPassword())
-                .profileUrl(dto.getProfileUrl())
-                .build();
+        Member member = Member.of(
+            dto.getMembername(),
+            dto.getEmail(),
+            dto.getPassword(),
+            dto.getProfileUrl()
+        );        
 
         return MemberResponseDto.from(memberRepository.save(member));
     }
