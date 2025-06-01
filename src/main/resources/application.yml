@@ -19,3 +19,15 @@ logging:
     org.hibernate.SQL: debug # 실행되는 SQL 쿼리 출력
     org.hibernate.orm.jdbc.bind: trace # SQL 쿼리 파라미터 출력
     org.example.springboot.service: debug # 서비스 레이어 로깅
+
+# Swagger UI 설정
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
+    doc-expansion: none
+  api-docs:
+    path: /v3/api-docs
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json

@@ -63,4 +63,31 @@ public class Post {
     public void updateStatus(String status) {
         this.status = status;
     }
+    
+    // 게시물 제목 업데이트 메서드
+    public void updateTitle(String title) {
+        if (title != null && !title.trim().isEmpty()) {
+            this.title = title;
+        }
+    }
+    
+    // 게시물 내용 업데이트 메서드
+    public void updateContent(String content) {
+        if (content != null && !content.trim().isEmpty()) {
+            this.content = content;
+        }
+    }
+    
+    // 게시물 정보 일괄 업데이트 메서드
+    public void updatePost(String title, String content, String status) {
+        if (title != null && !title.trim().isEmpty()) {
+            this.title = title;
+        }
+        if (content != null && !content.trim().isEmpty()) {
+            this.content = content;
+        }
+        if (status != null && !status.trim().isEmpty()) {
+            this.status = status;
+        }
+    }
 }
