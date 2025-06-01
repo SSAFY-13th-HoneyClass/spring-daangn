@@ -139,3 +139,28 @@ public void solution() {
 
 
 
+
+# 4주차 과제
+## swagger
+![alt text](image-4.png)
+
+## 중고거래 게시판 테스트
+- 이미지와 같이 들어가는 경우 swagger로 테스트가 잘 안되어서 post는 postman 사용하여 테스트 진행.
+
+### post요청 보냄.
+![alt text](image-5.png)
+
+### 로컬에 이미지 잘 들어간거 확인 가능
+![alt text](image-6.png)
+
+### 다시 조회 시 화긴 가능
+![alt text](image-7.png)
+
+
+### delete요청
+![alt text](image-8.png)
+- 이미지도 함께 삭제 됨.
+
+
+### 커스텀 에러 처리
+![alt text](image-3.png)
