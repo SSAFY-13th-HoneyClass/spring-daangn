@@ -12,7 +12,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import com.ssafy.daangn.board.entity.Board;
 import com.ssafy.daangn.board.repository.BoardRepository;
 import com.ssafy.daangn.directmessage.entity.DirectMessage;
-import com.ssafy.daangn.directmessage.entity.DirectMessageRoom;
+import com.ssafy.daangn.directmessageroom.entity.DirectMessageRoom;
+import com.ssafy.daangn.directmessageroom.repository.DirectMessageRoomRepository;
 import com.ssafy.daangn.member.entity.Member;
 import com.ssafy.daangn.member.repository.MemberRepository;
 

@@ -1,4 +1,4 @@
-package com.ssafy.daangn.directmessage.entity;
+package com.ssafy.daangn.directmessageroom.entity;
 
 import java.time.LocalDateTime;
 

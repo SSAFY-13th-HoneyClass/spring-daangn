@@ -2,6 +2,7 @@ package com.ssafy.daangn.directmessage.entity;
 
 import java.time.LocalDateTime;
 
+import com.ssafy.daangn.directmessageroom.entity.DirectMessageRoom;
 import com.ssafy.daangn.member.entity.Member;
 
 import jakarta.persistence.Column;

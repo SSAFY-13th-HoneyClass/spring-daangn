@@ -1,4 +1,4 @@
-package com.ssafy.daangn.directmessage.service;
+package com.ssafy.daangn.directmessageroom.service;
 
 import java.util.List;
 import java.util.Optional;
@@ -9,9 +9,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ssafy.daangn.board.entity.Board;
 import com.ssafy.daangn.board.repository.BoardRepository;
-import com.ssafy.daangn.directmessage.dto.response.DirectMessageRoomResponseDto;
-import com.ssafy.daangn.directmessage.entity.DirectMessageRoom;
-import com.ssafy.daangn.directmessage.repository.DirectMessageRoomRepository;
+import com.ssafy.daangn.directmessageroom.dto.response.DirectMessageRoomResponseDto;
+import com.ssafy.daangn.directmessageroom.entity.DirectMessageRoom;
+import com.ssafy.daangn.directmessageroom.repository.DirectMessageRoomRepository;
 import com.ssafy.daangn.member.entity.Member;
 import com.ssafy.daangn.member.repository.MemberRepository;
 

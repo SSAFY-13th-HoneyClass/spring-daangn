@@ -1,8 +1,8 @@
-package com.ssafy.daangn.directmessage.dto.response;
+package com.ssafy.daangn.directmessageroom.dto.response;
 
 import java.time.LocalDateTime;
 
-import com.ssafy.daangn.directmessage.entity.DirectMessageRoom;
+import com.ssafy.daangn.directmessageroom.entity.DirectMessageRoom;
 
 import lombok.Builder;
 import lombok.Getter;

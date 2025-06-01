@@ -14,7 +14,7 @@ import com.ssafy.daangn.board.entity.Board;
 import com.ssafy.daangn.board.repository.BoardRepository;
 import com.ssafy.daangn.directmessage.dto.request.DirectMessageRequestDto;
 import com.ssafy.daangn.directmessage.dto.response.DirectMessageResponseDto;
-import com.ssafy.daangn.directmessage.repository.DirectMessageRoomRepository;
+import com.ssafy.daangn.directmessageroom.repository.DirectMessageRoomRepository;
 import com.ssafy.daangn.member.entity.Member;
 import com.ssafy.daangn.member.repository.MemberRepository;
 

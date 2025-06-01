@@ -1,4 +1,4 @@
-package com.ssafy.daangn.directmessage.controller;
+package com.ssafy.daangn.directmessageroom.controller;
 
 import java.util.List;
 
@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ssafy.daangn.directmessage.dto.response.DirectMessageRoomResponseDto;
-import com.ssafy.daangn.directmessage.service.DirectMessageRoomService;
+import com.ssafy.daangn.directmessageroom.dto.response.DirectMessageRoomResponseDto;
+import com.ssafy.daangn.directmessageroom.service.DirectMessageRoomService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
