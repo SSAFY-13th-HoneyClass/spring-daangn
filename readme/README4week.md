@@ -119,4 +119,154 @@ springdoc-openapi 는 아직 이 변경사항을 반영하지 못했다고 한�
 
 - 정상적으로 잘 작동한다.
 
+# Global Exception
+
+```java
+package com.ssafy.spring_boot.common.exception;
+
+import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
+
+import java.time.LocalDateTime;
+
+@Slf4j
+@RestControllerAdvice // 다시 활성화
+public class GlobalExceptionHandler {
+
+    /**
+     * EntityNotFoundException 처리
+     */
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleEntityNotFoundException(
+            EntityNotFoundException ex, WebRequest request) {
+
+        log.error("EntityNotFoundException: {}", ex.getMessage());
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.NOT_FOUND.value())
+                .error("Not Found")
+                .message(ex.getMessage())
+                .path(request.getDescription(false).replace("uri=", ""))
+                .build();
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
+    /**
+     * IllegalArgumentException 처리
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(
+            IllegalArgumentException ex, WebRequest request) {
+
+        log.error("IllegalArgumentException: {}", ex.getMessage());
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error("Bad Request")
+                .message(ex.getMessage())
+                .path(request.getDescription(false).replace("uri=", ""))
+                .build();
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    /**
+     * RuntimeException 처리 (일반적인 런타임 예외)
+     */
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ErrorResponse> handleRuntimeException(
+            RuntimeException ex, WebRequest request) {
+
+        log.error("RuntimeException: {}", ex.getMessage(), ex);
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .error("Internal Server Error")
+                .message("서버 내부 오류가 발생했습니다.")
+                .path(request.getDescription(false).replace("uri=", ""))
+                .build();
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+    }
+
+    /**
+     * Exception 처리 (모든 예외의 최상위 핸들러)
+     */
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleGlobalException(
+            Exception ex, WebRequest request) {
+
+        log.error("Unexpected Exception: {}", ex.getMessage(), ex);
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .error("Internal Server Error")
+                .message("예상치 못한 오류가 발생했습니다.")
+                .path(request.getDescription(false).replace("uri=", ""))
+                .build();
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+    }
+}
+```
+- 서비스단에서 발생하는 오류를 던져주면 위에 만들어둔 GlobalExceptionHandler를 이용해 예외처리를 해줍니다.
+
+```java
+    @Override
+    @Transactional
+    public ProductDTO getProductDetail(Long productId) {
+        Product product = productRepository.findByIdWithAll(productId)
+                .orElseThrow(() -> new EntityNotFoundException("상품을 찾을 수 없습니다. ID: " + productId));
+
+        // 조회수 증가
+        product.setViewCount(product.getViewCount() + 1);
+        productRepository.save(product);
+
+        return ProductDTO.from(product);
+    }
+```
+
+![img_3.png](img_3.png)
+
+# 정적 팩토리 메서드란
+- 객체 생성을 담당하는 static 메서드, 생성자 대신 객체를 생성
+- User.from(dto) 또는 UserDTO.from(entity)
+
+이전에 서비스를 만들때 이미 사용해 둔 상태여서 이번주차에서는 업데이트 하지 않고 그대로 사용하였다.
+```java
+    // Entity -> DTO 변환 메소드 추가
+    public static ProductDTO from(Product product) {
+        return ProductDTO.builder()
+                .id(product.getId())
+                .title(product.getTitle())
+                .thumbnail(product.getThumbnail())
+                .description(product.getDescription())
+                .price(product.getPrice())
+                .createdAt(product.getCreatedAt())
+                .dumpTime(product.getDumpTime())
+                .isReserved(product.getIsReserved())
+                .isCompleted(product.getIsCompleted())
+                .isNegotiable(product.getIsNegotiable())
+                .chatCount(product.getChatCount())
+                .viewCount(product.getViewCount())
+                .favoriteCount(product.getFavoriteCount())
+                .sellerId(product.getSeller().getId())
+                .sellerNickname(product.getSeller().getNickname())
+                .categoryId(product.getCategory().getId())
+                .categoryName(product.getCategory().getType())
+                .regionId(product.getRegion().getId())
+                .regionName(product.getRegion().getName())
+                .build();
+    }
+```
 
