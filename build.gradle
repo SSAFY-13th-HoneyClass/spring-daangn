@@ -37,7 +37,7 @@ dependencies {
 	// Swagger 사용
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
 
-		// 테스트: 단위 및 통합 테스트 지원
+	// 테스트: 단위 및 통합 테스트 지원
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
 	// 테스트: JUnit 플랫폼 런처 (IDE 연동용)
