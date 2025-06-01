@@ -23,7 +23,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE) // 외부에서 직접 생성 제한
-@Builder(access = AccessLevel.PRIVATE)            // builder도 외부에서 못 쓰게
+@Builder(access = AccessLevel.PUBLIC)
 public class Member {
 
     @Id
@@ -50,6 +50,7 @@ public class Member {
     @Column(nullable = false)
     private Boolean isDeleted;
 
+    // JPA persist 시점에 기본값 설정
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
@@ -57,25 +58,28 @@ public class Member {
         this.isDeleted = false;
     }
 
+    // JPA update 시점에 수정 시간 갱신
     @PreUpdate
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
 
+    // 소프트 삭제 처리
     public void markDeleted() {
         this.isDeleted = true;
     }
 
-    // 정적 팩토리 메서드
+    // 정적 팩토리 메서드 - builder 대신 사용 가능
     public static Member of(String membername, String email, String password, String profileUrl) {
-        Member member = new Member();
-        member.membername = membername;
-        member.email = email;
-        member.password = password;
-        member.profileUrl = profileUrl;
-        member.isDeleted = false;
-        member.createdAt = LocalDateTime.now();
-        member.updatedAt = member.createdAt;
-        return member;
+        LocalDateTime now = LocalDateTime.now();
+        return Member.builder()
+                .membername(membername)
+                .email(email)
+                .password(password)
+                .profileUrl(profileUrl)
+                .isDeleted(false)
+                .createdAt(now)
+                .updatedAt(now)
+                .build();
     }
 }

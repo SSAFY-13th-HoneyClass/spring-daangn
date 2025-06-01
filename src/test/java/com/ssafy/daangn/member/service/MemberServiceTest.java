@@ -3,73 +3,61 @@ package com.ssafy.daangn.member.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.BDDMockito.given;
 
 import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.Mockito;
 
 import com.ssafy.daangn.member.dto.request.MemberRequestDto;
 import com.ssafy.daangn.member.dto.response.MemberResponseDto;
 import com.ssafy.daangn.member.entity.Member;
 import com.ssafy.daangn.member.repository.MemberRepository;
 
-@ExtendWith(MockitoExtension.class)
 class MemberServiceTest {
 
-    @Mock
     private MemberRepository memberRepository;
-
-    @InjectMocks
     private MemberService memberService;
 
-    private Member member;
-
     @BeforeEach
-    void setup() {
-        member = Member.builder()
-                .memberId(1L)
-                .membername("홍길동")
-                .email("hong@example.com")
-                .password("password")
-                .profileUrl("url")
-                .isDeleted(false)
-                .build();
+    void setUp() {
+        memberRepository = Mockito.mock(MemberRepository.class);
+        memberService = new MemberService(memberRepository);
     }
 
     @Test
-    void createMember_성공() {
+    @DisplayName("회원 생성 - 성공")
+    void createMember_success() {
         MemberRequestDto dto = new MemberRequestDto();
         dto.setMembername("홍길동");
         dto.setEmail("hong@example.com");
-        dto.setPassword("password");
-        dto.setProfileUrl("url");
+        dto.setPassword("pw1234");
+        dto.setProfileUrl("https://img.jpg");
 
-        when(memberRepository.findByEmailAndIsDeletedFalse(dto.getEmail()))
-                .thenReturn(Optional.empty());
-        when(memberRepository.save(any(Member.class)))
-                .thenReturn(member);
+        given(memberRepository.findByEmailAndIsDeletedFalse(dto.getEmail()))
+                .willReturn(Optional.empty());
+
+        Member saved = Member.of(dto.getMembername(), dto.getEmail(), dto.getPassword(), dto.getProfileUrl());
+        given(memberRepository.save(any(Member.class))).willReturn(saved);
 
         MemberResponseDto result = memberService.createMember(dto);
 
         assertThat(result.getEmail()).isEqualTo("hong@example.com");
-        verify(memberRepository).save(any(Member.class));
+        assertThat(result.getMembername()).isEqualTo("홍길동");
     }
 
     @Test
-    void createMember_중복이메일_예외() {
+    @DisplayName("회원 생성 - 실패 (중복 이메일)")
+    void createMember_duplicateEmail() {
         MemberRequestDto dto = new MemberRequestDto();
-        dto.setEmail("hong@example.com");
+        dto.setEmail("exist@example.com");
 
-        when(memberRepository.findByEmailAndIsDeletedFalse(dto.getEmail()))
-                .thenReturn(Optional.of(member));
+        given(memberRepository.findByEmailAndIsDeletedFalse(dto.getEmail()))
+                .willReturn(Optional.of(Member.of("기존", dto.getEmail(), "pw", null)));
 
         assertThatThrownBy(() -> memberService.createMember(dto))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -77,84 +65,106 @@ class MemberServiceTest {
     }
 
     @Test
-    void getAllMembers_정상조회() {
-        when(memberRepository.findByIsDeletedFalse())
-                .thenReturn(List.of(member));
+    @DisplayName("삭제되지 않은 전체 회원 조회")
+    void getAllMembers() {
+        Member m1 = Member.of("a", "a@example.com", "pw", null);
+        Member m2 = Member.of("b", "b@example.com", "pw", null);
 
-        List<MemberResponseDto> results = memberService.getAllMembers();
+        given(memberRepository.findByIsDeletedFalse()).willReturn(List.of(m1, m2));
 
-        assertThat(results).hasSize(1);
-        assertThat(results.get(0).getEmail()).isEqualTo("hong@example.com");
+        List<MemberResponseDto> result = memberService.getAllMembers();
+
+        assertThat(result).hasSize(2);
     }
 
     @Test
-    void getMemberById_존재함() {
-        when(memberRepository.findByMemberIdAndIsDeletedFalse(1L))
-                .thenReturn(Optional.of(member));
+    @DisplayName("Soft Deleted 회원 목록 조회")
+    void getDeletedMembers() {
+        Member m1 = Member.of("삭제된 유저", "del@example.com", "pw", null);
+        m1.markDeleted();
+
+        given(memberRepository.findByIsDeletedTrue()).willReturn(List.of(m1));
+
+        List<MemberResponseDto> result = memberService.getDeletedMembers();
+
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getEmail()).isEqualTo("del@example.com");
+    }
+
+    @Test
+    @DisplayName("회원 ID로 조회 - 성공")
+    void getMemberById_success() {
+        Member member = Member.of("이몽룡", "lee@example.com", "pw", null);
+
+        given(memberRepository.findByMemberIdAndIsDeletedFalse(1L))
+                .willReturn(Optional.of(member));
 
         MemberResponseDto result = memberService.getMemberById(1L);
 
-        assertThat(result.getMemberId()).isEqualTo(1L);
+        assertThat(result.getMembername()).isEqualTo("이몽룡");
     }
 
     @Test
-    void getMemberById_없음_예외() {
-        when(memberRepository.findByMemberIdAndIsDeletedFalse(2L))
-                .thenReturn(Optional.empty());
+    @DisplayName("회원 ID로 조회 - 실패")
+    void getMemberById_fail() {
+        given(memberRepository.findByMemberIdAndIsDeletedFalse(1L))
+                .willReturn(Optional.empty());
 
-        assertThatThrownBy(() -> memberService.getMemberById(2L))
+        assertThatThrownBy(() -> memberService.getMemberById(1L))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("존재하지 않는 회원입니다.");
     }
 
     @Test
-    void deleteMember_정상삭제() {
-        when(memberRepository.findByMemberIdAndIsDeletedFalse(1L))
-                .thenReturn(Optional.of(member));
+    @DisplayName("회원 정보 수정 - 성공")
+    void updateMember_success() {
+        Member member = Member.of("원래이름", "origin@example.com", "pw", null);
 
-        memberService.deleteMember(1L);
+        given(memberRepository.findByMemberIdAndIsDeletedFalse(1L))
+                .willReturn(Optional.of(member));
+        given(memberRepository.findByEmailAndIsDeletedFalse("new@example.com"))
+                .willReturn(Optional.empty());
 
-        assertThat(member.getIsDeleted()).isTrue();
-    }
-
-    @Test
-    void updateMember_정상수정() {
         MemberRequestDto dto = new MemberRequestDto();
-        dto.setMembername("이순신");
+        dto.setMembername("새이름");
         dto.setEmail("new@example.com");
         dto.setPassword("newpw");
-        dto.setProfileUrl("newUrl");
-
-        when(memberRepository.findByMemberIdAndIsDeletedFalse(1L))
-                .thenReturn(Optional.of(member));
-        when(memberRepository.findByEmailAndIsDeletedFalse("new@example.com"))
-                .thenReturn(Optional.empty());
+        dto.setProfileUrl("https://img.png");
 
         MemberResponseDto result = memberService.updateMember(1L, dto);
 
-        assertThat(result.getMembername()).isEqualTo("이순신");
+        assertThat(result.getMembername()).isEqualTo("새이름");
         assertThat(result.getEmail()).isEqualTo("new@example.com");
-        assertThat(result.getProfileUrl()).isEqualTo("newUrl");
     }
 
     @Test
-    void updateMember_이메일중복_예외() {
-        Member other = Member.builder()
-                .memberId(2L)
-                .email("duplicate@example.com")
-                .isDeleted(false)
-                .build();
+    @DisplayName("회원 정보 수정 - 실패 (중복 이메일)")
+    void updateMember_duplicateEmail() {
+        Member member = Member.of("기존", "origin@example.com", "pw", null);
+
+        given(memberRepository.findByMemberIdAndIsDeletedFalse(1L))
+                .willReturn(Optional.of(member));
+        given(memberRepository.findByEmailAndIsDeletedFalse("dup@example.com"))
+                .willReturn(Optional.of(Member.of("다른", "dup@example.com", "pw", null)));
 
         MemberRequestDto dto = new MemberRequestDto();
-        dto.setEmail("duplicate@example.com");
-
-        when(memberRepository.findByMemberIdAndIsDeletedFalse(1L))
-                .thenReturn(Optional.of(member));
-        when(memberRepository.findByEmailAndIsDeletedFalse("duplicate@example.com"))
-                .thenReturn(Optional.of(other));
+        dto.setEmail("dup@example.com");
 
         assertThatThrownBy(() -> memberService.updateMember(1L, dto))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("이미 사용 중인 이메일입니다.");
+    }
+
+    @Test
+    @DisplayName("회원 삭제 (Soft Delete)")
+    void deleteMember() {
+        Member member = Member.of("삭제할회원", "delete@example.com", "pw", null);
+
+        given(memberRepository.findByMemberIdAndIsDeletedFalse(1L))
+                .willReturn(Optional.of(member));
+
+        memberService.deleteMember(1L);
+
+        assertThat(member.getIsDeleted()).isTrue();
     }
 }
