@@ -8,7 +8,7 @@
 
 ## 🗂️ ERD
 
-![alt text](daangn_erd.png)
+![alt text](/image/daangn_erd.png)
 
 ## 🧩 주요 기능
 
@@ -106,7 +106,7 @@ public void problem() {
 }
 ```
  - select문이 22개 나오는 것을 알 수 있다. 
-![alt text](image.png)
+![alt text](/image/image.png)
 
 ### 2. fetch로 불러왔을 때
 ```java
@@ -130,37 +130,37 @@ public void solution() {
 }
 ```
  - select문이 2개 나오는 것을 알 수 있다. 
-![alt text](image-1.png)
+![alt text](/image/image-1.png)
 
 
 ## [service 테스트]
 - 채팅방 저장 및 삭제 테스트 
-![alt text](image-2.png)
+![alt text](/image/image-2.png)
 
 
 
 
 # 4주차 과제
 ## swagger
-![alt text](image-4.png)
+![alt text](/image/image-4.png)
 
 ## 중고거래 게시판 테스트
 - 이미지와 같이 들어가는 경우 swagger로 테스트가 잘 안되어서 post는 postman 사용하여 테스트 진행.
 
 ### post요청 보냄.
-![alt text](image-5.png)
+![alt text](/image/image-5.png)
 
 ### 로컬에 이미지 잘 들어간거 확인 가능
-![alt text](image-6.png)
+![alt text](/image/image-6.png)
 
 ### 다시 조회 시 화긴 가능
-![alt text](image-7.png)
+![alt text](/image/image-7.png)
 
 
 ### delete요청
-![alt text](image-8.png)
+![alt text](/image/image-8.png)
 - 이미지도 함께 삭제 됨.
 
 
 ### 커스텀 에러 처리
-![alt text](image-3.png)
+![alt text](/image/image-3.png)
