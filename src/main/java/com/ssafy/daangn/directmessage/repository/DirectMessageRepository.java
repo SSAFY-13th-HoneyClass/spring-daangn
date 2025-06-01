@@ -5,9 +5,8 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.ssafy.daangn.directmessage.entity.DirectMessage;
-import com.ssafy.daangn.member.entity.Member;
+import com.ssafy.daangn.directmessage.entity.DirectMessageRoom;
 
 public interface DirectMessageRepository extends JpaRepository<DirectMessage, Long> {
-    List<DirectMessage> findByReceiver(Member receiver);
-    List<DirectMessage> findBySenderAndReceiver(Member sender, Member receiver);
+    List<DirectMessage> findByRoomOrderByCreatedAtAsc(DirectMessageRoom room);
 }

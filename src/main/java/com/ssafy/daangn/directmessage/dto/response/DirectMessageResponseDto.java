@@ -11,6 +11,7 @@ import lombok.Getter;
 @Builder
 public class DirectMessageResponseDto {
     private Long messageId;
+    private Long roomId;
     private Long senderId;
     private Long receiverId;
     private String content;
@@ -20,6 +21,7 @@ public class DirectMessageResponseDto {
     public static DirectMessageResponseDto from(DirectMessage dm) {
         return DirectMessageResponseDto.builder()
                 .messageId(dm.getMessageId())
+                .roomId(dm.getRoom().getRoomId())
                 .senderId(dm.getSender().getMemberId())
                 .receiverId(dm.getReceiver().getMemberId())
                 .content(dm.getContent())
