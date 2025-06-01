@@ -23,6 +23,7 @@ public class BoardService {
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
 
+    // 게시글 생성
     @Transactional
     public BoardResponseDto createBoard(BoardRequestDto dto) {
         Member member = memberRepository.findByMemberIdAndIsDeletedFalse(dto.getMemberId())
@@ -37,30 +38,35 @@ public class BoardService {
         return BoardResponseDto.from(boardRepository.save(board));
     }
 
+    // 삭제되지 않은 게시글 전체 조회
     public List<BoardResponseDto> getAllBoards() {
         return boardRepository.findByIsDeletedFalse().stream()
                 .map(BoardResponseDto::from)
                 .collect(Collectors.toList());
     }
 
+    // 삭제된 게시글 전체 조회
     public List<BoardResponseDto> getDeletedBoards() {
         return boardRepository.findByIsDeletedTrue().stream()
                 .map(BoardResponseDto::from)
                 .collect(Collectors.toList());
     }
 
+    // 특정 회원이 작성한 게시글 조회
     public List<BoardResponseDto> getBoardsByMember(Long memberId) {
         return boardRepository.findByMember_MemberIdAndIsDeletedFalse(memberId).stream()
                 .map(BoardResponseDto::from)
                 .collect(Collectors.toList());
     }
 
+    // 제목에 키워드가 포함된 게시글 검색
     public List<BoardResponseDto> searchBoardsByTitle(String keyword) {
         return boardRepository.findByTitleContainingAndIsDeletedFalse(keyword).stream()
                 .map(BoardResponseDto::from)
                 .collect(Collectors.toList());
     }
 
+    // 게시글 삭제 (isDeleted 플래그 true로 설정)
     @Transactional
     public void deleteBoard(Long boardId) {
         Board board = boardRepository.findById(boardId)
@@ -68,6 +74,7 @@ public class BoardService {
         board.setIsDeleted(true);
     }
 
+    // 게시글 수정
     @Transactional
     public BoardResponseDto updateBoard(Long boardId, BoardRequestDto dto) {
         Board board = boardRepository.findById(boardId)

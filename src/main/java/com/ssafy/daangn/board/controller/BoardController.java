@@ -22,9 +22,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/boards")
+@RequestMapping("/api/v1/board")
 @RequiredArgsConstructor
-@Tag(name = "Board", description = "게시글 관련 API입니다.")
+@Tag(name = "Board", description = "게시글 관련 API")
 public class BoardController {
 
     private final BoardService boardService;
