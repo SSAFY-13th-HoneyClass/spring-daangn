@@ -31,16 +31,37 @@ public class BoardPhotoService {
         BoardPhoto photo = BoardPhoto.builder()
                 .board(board)
                 .url(dto.getUrl())
-                .photoOrder(dto.getPhotoOrder())
                 .build();
 
         return BoardPhotoResponseDto.from(boardPhotoRepository.save(photo));
     }
 
+    public BoardPhotoResponseDto getPhotoById(Long photoId) {
+        BoardPhoto photo = boardPhotoRepository.findById(photoId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 사진을 찾을 수 없습니다."));
+        return BoardPhotoResponseDto.from(photo);
+    }    
+
     public List<BoardPhotoResponseDto> getPhotosByBoard(Long boardId) {
-        return boardPhotoRepository.findByBoard_BoardIdOrderByPhotoOrder(boardId)
-                .stream()
+        return boardPhotoRepository.findByBoard_BoardIdOrderByCreatedAtAsc(boardId).stream()
                 .map(BoardPhotoResponseDto::from)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void deletePhoto(Long photoId) {
+        boardPhotoRepository.deleteById(photoId);
+    }
+
+    @Transactional
+    public BoardPhotoResponseDto updatePhoto(Long photoId, BoardPhotoRequestDto dto) {
+        BoardPhoto photo = boardPhotoRepository.findById(photoId)
+                .orElseThrow(() -> new IllegalArgumentException("Photo not found"));
+
+        if (dto.getUrl() != null) {
+            photo.setUrl(dto.getUrl());
+        }
+
+        return BoardPhotoResponseDto.from(photo);
     }
 }
