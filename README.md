@@ -78,6 +78,29 @@
 | DELETE | `/api/v1/member/{memberId}` | 회원 삭제 (soft delete)                    |
 | PATCH  | `/api/v1/member/{memberId}` | 회원 정보 수정                             |
 
+> [!NOTE]
+> - 기본적인 CRUD 및 전체 조회와 특정값 조회가 필요한 부분은 따로 작성하였다.
+
+> [!IMPORTANT]
+> API 주소에 `v1`을 작성한 이유 : 버전 관리, 안정성, 유지보수성↑
+> 
+> 1. 향후 변경에 대비한 유연성 확보
+> - 기존 클라이언트를 깨뜨리지 않고 새로운 버전(`v2`, `v3`) API 도입 가능
+> 예
+> - `/api/v1/member` ← 현재 버전
+> - `/api/v2/member` ← 향후 구조 변경된 새 API
+> 
+> 2. 하위 호환성 유지
+> - `v1`을 사용하는 기존 앱이나 프론트엔드가 그대로 동작 가능
+> - 새 버전(`v2`)에서만 새로운 필드나 구조 도입 가능
+> 
+> 3. API 문서와 테스트 분리 용이
+> - Swagger 문서, 테스트 케이스 등을 API 버전에 따라 구분해 관리할 수 있어 구조적으로 깔끔함
+> 
+> 4. 운영 및 배포 관리에 유리
+> - 점진적 마이그레이션이 가능하므로 운영 리스크를 줄일 수 있음
+> - 새 버전에서 오류 발생 시 기존 버전으로 빠르게 롤백 가능
+
 # Global Exception Handling
 
 - 전역 예외 처리(Global Exception Handling) 를 통해 예외 발생 시 클라이언트에 일관된 형태의 JSON 응답을 반환
@@ -90,6 +113,8 @@
   | `IllegalArgumentException` | 잘못된 파라미터 등 클라이언트 잘못으로 인한 예외 | 400 (Bad Request) |
   | `RuntimeException` | 예상하지 못한 런타임 오류 | 500 (Internal Server Error) |
   | `Exception` | 기타 모든 예외 | 500 (Internal Server Error) |
+> [!NOTE]
+> 추후 개발하며 상황에 따른 Exception을 더 세분화!
 
 ```json
 // 예시: IllegalArgumentException 발생 시 응답
