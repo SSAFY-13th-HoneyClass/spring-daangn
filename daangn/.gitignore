@@ -16,6 +16,7 @@
 gradle-app.setting
 
 ### Project ###
+/uploads/
 .env
 HELP.md
 MANIFEST.MF
