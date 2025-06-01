@@ -9,8 +9,10 @@
 - 기존 방 존재 시 재활용 로직 적용
 
 # API 작성
+## Swagger
+![swagger-ui_index html](https://github.com/user-attachments/assets/48102802-bfb5-4e6a-9d1d-a1ca62093d13)
 
-## BoardController
+### BoardController
 
 | 메서드 | URL                                | 설명                                      |
 | ------ | ---------------------------------- | ----------------------------------------- |
@@ -22,7 +24,7 @@
 | DELETE | `/api/v1/board/{boardId}`          | 게시글 soft delete                        |
 | PATCH  | `/api/v1/board/{boardId}`          | 게시글 제목/내용 수정                     |
 
-## BoardPhotoController
+### BoardPhotoController
 
 | 메서드 | URL                                   | 설명                  |
 | ------ | ------------------------------------- | --------------------- |
@@ -31,7 +33,7 @@
 | GET    | `/api/v1/board-photo/board/{boardId}` | 게시글 사진 목록 조회 |
 | DELETE | `/api/v1/board-photo/{photoId}`       | 게시글 사진 삭제      |
 
-## CommentController
+### CommentController
 
 | 메서드 | URL                                        | 설명                         |
 | ------ | ------------------------------------------ | ---------------------------- |
@@ -42,14 +44,14 @@
 | DELETE | `/api/v1/comment/{commentId}`              | 댓글 삭제 (soft delete)      |
 | PATCH  | `/api/v1/comment/{commentId}`              | 댓글 수정                    |
 
-## DirectMessageController
+### DirectMessageController
 
 | 메서드 | URL                          | 설명                          |
 | ------ | ---------------------------- | ----------------------------- |
 | POST   | `/api/v1/dm/board/{boardId}` | 게시글 기반 DM 전송           |
 | GET    | `/api/v1/dm/room/{roomId}`   | 특정 DM 방의 메시지 목록 조회 |
 
-## DirectMessageRoomController
+### DirectMessageRoomController
 
 | 메서드 | URL                                                                       | 설명                                        |
 | ------ | ------------------------------------------------------------------------- | ------------------------------------------- |
@@ -57,7 +59,7 @@
 | GET    | `/api/v1/dm/room/board/{boardId}/sender/{senderId}/receiver/{receiverId}` | 1:1 DM 방 조회 또는 생성                    |
 | GET    | `/api/v1/dm/room/member/{memberId}`                                       | 내가 참여한 전체 DM 방 목록 조회            |
 
-## FavoriteController
+### FavoriteController
 
 | 메서드 | URL                                            | 설명                                   |
 | ------ | ---------------------------------------------- | -------------------------------------- |
@@ -67,7 +69,7 @@
 | GET    | `/api/v1/favorite/board/{boardId}`             | 게시글 좋아요한 회원 목록 조회         |
 | GET    | `/api/v1/favorite/board/{boardId}/count`       | 게시글 좋아요 수 조회                  |
 
-## MemberController
+### MemberController
 
 | 메서드 | URL                         | 설명                                       |
 | ------ | --------------------------- | ------------------------------------------ |
@@ -100,6 +102,49 @@
 > 4. 운영 및 배포 관리에 유리
 > - 점진적 마이그레이션이 가능하므로 운영 리스크를 줄일 수 있음
 > - 새 버전에서 오류 발생 시 기존 버전으로 빠르게 롤백 가능
+
+## 실행화면
+### 회원 생성
+![swagger-ui_index html](https://github.com/user-attachments/assets/e0d8d945-3e15-4207-a419-f20eafd02368)
+![swagger-ui_index html](https://github.com/user-attachments/assets/9b2fac4f-9423-46cf-8498-820ee56033dc)
+
+### 게시글 생성
+![swagger-ui_index html](https://github.com/user-attachments/assets/946501f8-fd53-4aa9-b4a4-3ef262644481)
+![swagger-ui_index html](https://github.com/user-attachments/assets/ac2213ed-f51f-4f65-87cb-c4d8f5dead74)
+
+## 댓글 생성
+![swagger-ui_index html](https://github.com/user-attachments/assets/bb275d0f-ec30-4cad-85ea-06895982bfca)
+![swagger-ui_index html](https://github.com/user-attachments/assets/435edddc-90eb-4ca9-88fc-2d4d2f0f513e)
+
+# 정적 팩토리 메서드
+- 기존에는 외부에서 Member.builder().xxx().build() 형태로 직접 생성했기 때문에, createdAt, updatedAt, isDeleted 등의 기본 필드 설정이 누락 가능
+- 생성 시점의 일관된 기본값을 강제하고, 의미 있는 이름(of)을 통해 코드 가독성 향상과 의도 표현력 증가
+
+## 적용 예(Member.of())
+Member.java
+```java
+public static Member of(String membername, String email, String password, String profileUrl) {
+    LocalDateTime now = LocalDateTime.now();
+    return Member.builder()
+            .membername(membername)
+            .email(email)
+            .password(password)
+            .profileUrl(profileUrl)
+            .isDeleted(false)
+            .createdAt(now)
+            .updatedAt(now)
+            .build();
+}
+```
+MemberService.java
+```java
+Member member = Member.of(
+    dto.getMembername(),
+    dto.getEmail(),
+    dto.getPassword(),
+    dto.getProfileUrl()
+);
+```
 
 # Global Exception Handling
 
