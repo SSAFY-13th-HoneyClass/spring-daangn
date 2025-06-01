@@ -2,28 +2,21 @@ package com.ssafy.daangn.service;
 
 import com.ssafy.daangn.domain.ChatRoom;
 import com.ssafy.daangn.dto.ChatRoomDto;
+import com.ssafy.daangn.dto.ChatRoomResponseDto;
 
 import java.util.List;
 
 public interface ChatRoomService {
 
-    ChatRoom save(ChatRoomDto chatRoom);
-
-//    ChatRoom update(ChatRoom chatRoom);
+    ChatRoomResponseDto save(ChatRoomDto chatRoom);
 
     void delete(ChatRoomDto chatRoom);
 
+    List<ChatRoomResponseDto> findBySellerNoOrderByUpdatedAtAsc(Long sellerNo);
 
-        // ① 판매자 기준
-    List<ChatRoom> findBySellerNoOrderByUpdatedAtAsc(Long sellerNo);
+    List<ChatRoomResponseDto> findByBuyerNoOrderByUpdatedAtAsc(Long buyerNo);
 
-    // ② 구매자 기준
-    List<ChatRoom> findByBuyerNoOrderByUpdatedAtAsc(Long buyerNo);
+    List<ChatRoomResponseDto> findBySaleNoOrderByUpdatedAtAsc(Long saleNo);
 
-    // ③ 상품 기준
-    List<ChatRoom> findBySaleNoOrderByUpdatedAtAsc(Long saleNo);
-
-    // ④ 상품 + 구매자 기준
-    List<ChatRoom> findBySaleNoAndBuyerNoOrderByUpdatedAtAsc(Long saleNo, Long buyerNo);
-
+    List<ChatRoomResponseDto> findBySaleNoAndBuyerNoOrderByUpdatedAtAsc(Long saleNo, Long buyerNo);
 }

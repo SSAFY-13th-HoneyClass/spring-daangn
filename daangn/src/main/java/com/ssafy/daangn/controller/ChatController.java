@@ -1,11 +1,10 @@
-
-// ChatController.java
 package com.ssafy.daangn.controller;
 
 import com.ssafy.daangn.domain.ChatMessage;
 import com.ssafy.daangn.domain.ChatRoom;
 import com.ssafy.daangn.dto.ChatMessageDto;
 import com.ssafy.daangn.dto.ChatRoomDto;
+import com.ssafy.daangn.dto.ChatRoomResponseDto;
 import com.ssafy.daangn.service.ChatRoomService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -36,7 +35,7 @@ public class ChatController {
     @PostMapping("/room")
     public ResponseEntity<?> createChatRoom(@RequestBody ChatRoomDto chatRoomDto) {
         try {
-            ChatRoom chatRoom = chatRoomService.save(chatRoomDto);
+            ChatRoomResponseDto chatRoom = chatRoomService.save(chatRoomDto);
             return ResponseEntity.ok(chatRoom);
         } catch (Exception e) {
             log.error("채팅방 생성 실패: {}", e.getMessage());
@@ -62,38 +61,38 @@ public class ChatController {
 
     @Operation(summary = "판매자 채팅방 목록", description = "판매자가 참여중인 채팅방 목록을 조회합니다.")
     @GetMapping("/rooms/seller/{sellerNo}")
-    public ResponseEntity<List<ChatRoom>> getChatRoomsBySeller(
+    public ResponseEntity<List<ChatRoomResponseDto>> getChatRoomsBySeller(
             @Parameter(description = "판매자 번호") @PathVariable Long sellerNo) {
 
-        List<ChatRoom> chatRooms = chatRoomService.findBySellerNoOrderByUpdatedAtAsc(sellerNo);
+        List<ChatRoomResponseDto> chatRooms = chatRoomService.findBySellerNoOrderByUpdatedAtAsc(sellerNo);
         return ResponseEntity.ok(chatRooms);
     }
 
     @Operation(summary = "구매자 채팅방 목록", description = "구매자가 참여중인 채팅방 목록을 조회합니다.")
     @GetMapping("/rooms/buyer/{buyerNo}")
-    public ResponseEntity<List<ChatRoom>> getChatRoomsByBuyer(
+    public ResponseEntity<List<ChatRoomResponseDto>> getChatRoomsByBuyer(
             @Parameter(description = "구매자 번호") @PathVariable Long buyerNo) {
 
-        List<ChatRoom> chatRooms = chatRoomService.findByBuyerNoOrderByUpdatedAtAsc(buyerNo);
+        List<ChatRoomResponseDto> chatRooms = chatRoomService.findByBuyerNoOrderByUpdatedAtAsc(buyerNo);
         return ResponseEntity.ok(chatRooms);
     }
 
     @Operation(summary = "상품별 채팅방 목록", description = "특정 상품의 채팅방 목록을 조회합니다.")
     @GetMapping("/rooms/sale/{saleNo}")
-    public ResponseEntity<List<ChatRoom>> getChatRoomsBySale(
+    public ResponseEntity<List<ChatRoomResponseDto>> getChatRoomsBySale(
             @Parameter(description = "상품 번호") @PathVariable Long saleNo) {
 
-        List<ChatRoom> chatRooms = chatRoomService.findBySaleNoOrderByUpdatedAtAsc(saleNo);
+        List<ChatRoomResponseDto> chatRooms = chatRoomService.findBySaleNoOrderByUpdatedAtAsc(saleNo);
         return ResponseEntity.ok(chatRooms);
     }
 
     @Operation(summary = "특정 채팅방 조회", description = "상품번호와 구매자번호로 채팅방을 조회합니다.")
     @GetMapping("/room")
-    public ResponseEntity<List<ChatRoom>> getChatRoom(
+    public ResponseEntity<List<ChatRoomResponseDto>> getChatRoom(
             @Parameter(description = "상품 번호") @RequestParam Long saleNo,
             @Parameter(description = "구매자 번호") @RequestParam Long buyerNo) {
 
-        List<ChatRoom> chatRooms = chatRoomService.findBySaleNoAndBuyerNoOrderByUpdatedAtAsc(saleNo, buyerNo);
+        List<ChatRoomResponseDto> chatRooms = chatRoomService.findBySaleNoAndBuyerNoOrderByUpdatedAtAsc(saleNo, buyerNo);
         return ResponseEntity.ok(chatRooms);
     }
 }
