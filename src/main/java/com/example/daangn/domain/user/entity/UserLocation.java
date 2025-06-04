@@ -30,6 +30,7 @@ public class UserLocation {
     @JoinColumn(name = "location_id")
     private Location location;
 
+    @Column(name = "location_range")  // 예약어 피하기
     private Integer range;
 
     private Boolean rep;

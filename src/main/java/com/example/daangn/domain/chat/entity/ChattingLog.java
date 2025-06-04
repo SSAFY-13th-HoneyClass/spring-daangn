@@ -31,6 +31,7 @@ public class ChattingLog {
     @CurrentTimestamp
     private LocalDateTime created;
 
+    @Column(name = "is_checked")  // 예약어 피하기
     private Boolean check;
 
     private String content;
