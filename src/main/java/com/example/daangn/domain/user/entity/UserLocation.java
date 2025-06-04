@@ -7,7 +7,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "UserLocations")
+@Table(name = "user_locations")
 @Getter
 @Setter
 @Builder
@@ -20,11 +20,11 @@ public class UserLocation {
     private Long uluid;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "location_id", nullable = false)
+    @JoinColumn(name = "location_id")
     private Location location;
 
     private Integer range;
@@ -33,5 +33,6 @@ public class UserLocation {
 
     private Boolean auth;
 
+    @Column(name = "lastest_auth")
     private LocalDateTime lastestAuth;
 }

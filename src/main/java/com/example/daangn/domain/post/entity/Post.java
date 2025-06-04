@@ -3,13 +3,14 @@ package com.example.daangn.domain.post.entity;
 import com.example.daangn.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CurrentTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "Posts")
+@Table(name = "posts")
 @Getter
 @Setter
 @Builder
@@ -22,27 +23,27 @@ public class Post {
     private Long puid;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(nullable = false)
     private String subject;
 
-    @Column(nullable = false)
     private String title;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
+    @Column(name = "post_loaction")
     private String postLocation;
 
+    @Column(name = "post_vote")
     private Boolean postVote;
 
+    @Column(name = "post_tag")
     private String postTag;
 
     private Boolean hot;
 
-    @Column(nullable = false)
+    @CurrentTimestamp
     private LocalDateTime created;
 
     private Integer views;

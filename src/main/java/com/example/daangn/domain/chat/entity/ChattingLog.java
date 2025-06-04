@@ -3,11 +3,12 @@ package com.example.daangn.domain.chat.entity;
 import com.example.daangn.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CurrentTimestamp;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "ChattingLogs")
+@Table(name = "chatting_logs")
 @Getter
 @Setter
 @Builder
@@ -20,21 +21,20 @@ public class ChattingLog {
     private Long cluid;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "chatting_id", nullable = false)
+    @JoinColumn(name = "chatting_id")
     private Chatting chatting;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(nullable = false)
+    @CurrentTimestamp
     private LocalDateTime created;
 
-    @Column(name = "`check`")
     private Boolean check;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
+    @Column(name = "content_type")
     private String contentType;
 }

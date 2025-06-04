@@ -5,7 +5,7 @@ import lombok.*;
 
 
 @Entity
-@Table(name = "ProductImages")
+@Table(name = "product_images")
 @Getter
 @Setter
 @Builder
@@ -18,9 +18,9 @@ public class ProductImage {
     private Long piuid;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "puid", nullable = false)
+    @JoinColumn(name = "puid")
     private Product product;
 
-    @Column(nullable = false)
+    @Column(name = "product_img")
     private String productImg;
 }

@@ -6,7 +6,7 @@ import lombok.*;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "Locations")
+@Table(name = "locations")
 @Getter
 @Setter
 @Builder
@@ -18,18 +18,15 @@ public class Location {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long luid;
 
-    @Column(nullable = false)
     private String si;
 
-    @Column(nullable = false)
     private String gugun;
 
-    @Column(nullable = false)
     private String location;
 
-    @Column(nullable = false, precision = 10, scale = 7)
+    @Column(precision = 10, scale = 7)
     private BigDecimal lat;
 
-    @Column(nullable = false, precision = 10, scale = 7)
+    @Column(precision = 10, scale = 7)
     private BigDecimal lng;
 }

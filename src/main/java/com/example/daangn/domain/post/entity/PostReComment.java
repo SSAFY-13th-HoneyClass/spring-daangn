@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "PostReComments")
+@Table(name = "post_re_comments")
 @Getter
 @Setter
 @Builder
@@ -20,17 +20,16 @@ public class PostReComment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long prcuid;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
     private Integer likes;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id", nullable = false)
+    @JoinColumn(name = "post_id")
     private Post post;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private User user;
 
     @OneToMany(mappedBy = "recomment", cascade = CascadeType.ALL, orphanRemoval = true)
