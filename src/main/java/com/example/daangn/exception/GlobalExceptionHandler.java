@@ -14,9 +14,10 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 
 /**
  * Controller 내에서 발생하는 Exception에 대해서 Catch하여 응답값(Response)을 보내주는 기능을 수행
+ * SpringDoc OpenAPI와의 호환성을 위해 특정 패키지만 대상으로 제한
  */
 @Slf4j
-@RestControllerAdvice
+@RestControllerAdvice(basePackages = "com.example.daangn.controller")
 public class GlobalExceptionHandler {
 
     private final HttpStatus HTTP_STATUS_OK = HttpStatus.OK;
@@ -96,13 +97,19 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * [Exception] 모든 Exception 경우 발생
+     * [Exception] 모든 Exception 경우 발생 (SpringDoc 관련 예외는 제외)
      *
      * @param ex Exception
      * @return ResponseEntity<ErrorResponse>
      */
     @ExceptionHandler(Exception.class)
     protected final ResponseEntity<ErrorResponse> handleAllExceptions(Exception ex) {
+        // SpringDoc 관련 예외는 처리하지 않음
+        if (ex.getClass().getPackage() != null &&
+                ex.getClass().getPackage().getName().startsWith("org.springdoc")) {
+            throw new RuntimeException(ex);
+        }
+
         log.error("Exception", ex);
         final ErrorResponse response = ErrorResponse.of(ErrorCode.INTERNAL_SERVER_ERROR, ex.getMessage());
         return new ResponseEntity<>(response, HTTP_STATUS_OK);
