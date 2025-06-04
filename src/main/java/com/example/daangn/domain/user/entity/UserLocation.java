@@ -3,8 +3,11 @@ package com.example.daangn.domain.user.entity;
 import com.example.daangn.domain.location.entity.Location;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "user_locations")
