@@ -3,8 +3,11 @@ package com.example.daangn.config;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.List;
 
 /**
  * Swagger OpenAPI 설정 클래스
@@ -26,6 +29,11 @@ public class SwaggerConfig {
                         .version("v1.0.0")
                         .contact(new Contact()
                                 .name("DaangnClone Team")
-                                .email("contact@daangnclone.com")));
+                                .email("contact@daangnclone.com")))
+                .servers(List.of(
+                        new Server()
+                                .url("http://localhost:8080")
+                                .description("로컬 개발 서버")
+                ));
     }
 }
