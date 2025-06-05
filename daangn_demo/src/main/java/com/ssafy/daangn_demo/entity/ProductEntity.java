@@ -1,5 +1,6 @@
 package com.ssafy.daangn_demo.entity;
 
+import com.ssafy.daangn_demo.dto.request.ProductRequest;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,4 +31,15 @@ public class ProductEntity {
     private String description;
     private int price;
     private String status;
+
+    public static ProductEntity from(ProductRequest productRequest, UserEntity writer, CategoryEntity category, AreaEntity area) {
+        ProductEntity productEntity = new ProductEntity();
+        productEntity.writer = writer;
+        productEntity.category = category;
+        productEntity.area = area;
+        productEntity.title = productRequest.getTitle();
+        productEntity.description = productRequest.getDescription();
+        productEntity.price = productRequest.getPrice();
+        return productEntity;
+    }
 }
