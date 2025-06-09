@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "PostImages")
+@Table(name = "post_images")
 @Getter
 @Setter
 @Builder
@@ -17,9 +17,9 @@ public class PostImage {
     private Long piuid;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id", nullable = false)
+    @JoinColumn(name = "post_id")
     private Post post;
 
-    @Column(nullable = false)
+    @Column(name = "post_img")
     private String postImg;
 }

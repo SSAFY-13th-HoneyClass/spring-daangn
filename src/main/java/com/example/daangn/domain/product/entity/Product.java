@@ -5,13 +5,14 @@ import com.example.daangn.domain.location.entity.Location;
 import com.example.daangn.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CurrentTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "Products")
+@Table(name = "products")
 @Getter
 @Setter
 @Builder
@@ -24,30 +25,30 @@ public class Product {
     private Long puid;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "location_id", nullable = false)
+    @JoinColumn(name = "location_id")
     private Location location;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(nullable = false)
     private String title;
 
     private String category;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
+    @Column(name = "deal_type")
     private String dealType;
 
     private Integer price;
 
-    @Column(nullable = false)
+    @CurrentTimestamp
     private LocalDateTime created;
 
     private Integer views;
 
+    @Column(name = "is_sell")
     private Boolean isSell;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)

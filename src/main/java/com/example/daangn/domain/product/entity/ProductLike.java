@@ -6,7 +6,7 @@ import lombok.*;
 
 
 @Entity
-@Table(name = "ProductLikes")
+@Table(name = "product_likes")
 @Getter
 @Setter
 @Builder
@@ -19,10 +19,10 @@ public class ProductLike {
     private Long pluid;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false)
+    @JoinColumn(name = "product_id")
     private Product product;
 }

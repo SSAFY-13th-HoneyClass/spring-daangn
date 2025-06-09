@@ -6,7 +6,7 @@ import lombok.*;
 
 
 @Entity
-@Table(name = "PostEmpathys")
+@Table(name = "post_empathys")
 @Getter
 @Setter
 @Builder
@@ -21,10 +21,10 @@ public class PostEmpathy {
     private Integer empathy;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id", nullable = false)
+    @JoinColumn(name = "post_id")
     private Post post;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private User user;
 }

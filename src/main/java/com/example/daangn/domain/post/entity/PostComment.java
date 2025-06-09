@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "PostComments")
+@Table(name = "post_comments")
 @Getter
 @Setter
 @Builder
@@ -21,14 +21,13 @@ public class PostComment {
     private Long pcuid;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id", nullable = false)
+    @JoinColumn(name = "post_id")
     private Post post;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
     private Integer likes;

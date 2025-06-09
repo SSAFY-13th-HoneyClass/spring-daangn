@@ -2,12 +2,15 @@ package com.example.daangn.domain.user.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CurrentTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Table(name = "Users")
+@Table(name = "users")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -19,7 +22,6 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uuid;
 
-    @Column(nullable = false)
     private String id;
 
     private String password;
@@ -28,17 +30,20 @@ public class User {
 
     private String nickname;
 
-    @Column(nullable = false)
     private String phone;
 
+    @Column(name = "profile_img")
     private String profileImg;
 
     private BigDecimal manner;
 
     private LocalDateTime lastest;
 
+    @CurrentTimestamp
     private LocalDateTime created;
 
-    @Column(nullable = false)
     private String role;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserLocation> userLocations = new ArrayList<>();
 }
