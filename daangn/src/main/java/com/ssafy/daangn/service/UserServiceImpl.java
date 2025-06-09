@@ -3,8 +3,8 @@ package com.ssafy.daangn.service;
 import com.ssafy.daangn.domain.User;
 import com.ssafy.daangn.dto.UserResponseDto;
 import com.ssafy.daangn.dto.UserUpdateRequest;
+import com.ssafy.daangn.exception.UserNotFoundException;
 import com.ssafy.daangn.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,8 +50,9 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public UserResponseDto update(Long no, UserUpdateRequest request) {
+        // ✅ 예외를 던지면 GlobalExceptionHandler가 처리
         User user = userRepository.findByNo(no)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다. ID: " + no));
 
         User updatedUser = user.toBuilder()
                 .name(request.getName())
@@ -66,7 +67,9 @@ public class UserServiceImpl implements UserService {
                 .longitude(request.getLongitude())
                 .build();
 
-        return new UserResponseDto(userRepository.save(updatedUser));
+        User saved = userRepository.save(updatedUser);
+        // ✅ 정적 팩토리 메서드 사용
+        return UserResponseDto.from(saved);
     }
 
     @Override

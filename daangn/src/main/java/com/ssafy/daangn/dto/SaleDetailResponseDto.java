@@ -5,23 +5,23 @@ import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
-
-@Setter
 @Getter
+@Setter
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
 public class SaleDetailResponseDto {
-    private Long no; // 거래 PK
-    private User user; // 판매자
-    private Category category; // 카테고리 (문자열 PK)
-    private SaleStatus status; // 거래 상태 (문자열 PK)
-    private String title; // 게시글 제목
-    private String content; // 내용
-    private Long price; // 가격
-    private Double discount; // 할인율
-    private Boolean isPriceSuggestible; // 제안 가능 여부
-    private String thumbnail; // 썸네일 URL
+    private Long no;
+    private Long userNo; // ✅ 엔티티 대신 ID
+    private String userNickname; // ✅ 필요한 정보만 추출
+    private String category;
+    private String status;
+    private String title;
+    private String content;
+    private Long price;
+    private Double discount;
+    private Boolean isPriceSuggestible;
+    private String thumbnail;
     private Integer viewCount;
     private Integer likeCount;
     private Integer chatCount;
@@ -29,13 +29,14 @@ public class SaleDetailResponseDto {
     private String addressDetail;
     private Double latitude;
     private Double longitude;
-    private List<SaleImage> imageUrlList;
+    private List<String> imageUrlList; // ✅ 이미지 URL만 전달
 
     public SaleDetailResponseDto(Sale sale, List<SaleImage> saleImages) {
         this.no = sale.getNo();
-        this.user = sale.getUser();
-        this.category = sale.getCategory();
-        this.status = sale.getStatus();
+        this.userNo = sale.getUser().getNo(); // ✅ Lazy 접근 가능: readOnly = true + 즉시 접근
+        this.userNickname = sale.getUser().getNickname(); // ✅ 필요한 데이터만
+        this.category = sale.getCategory().getName(); // ✅ Category 대신 이름
+        this.status = sale.getStatus().getName();     // ✅ SaleStatus 대신 이름
         this.title = sale.getTitle();
         this.content = sale.getContent();
         this.price = sale.getPrice();
@@ -49,7 +50,10 @@ public class SaleDetailResponseDto {
         this.addressDetail = sale.getAddressDetail();
         this.latitude = sale.getLatitude();
         this.longitude = sale.getLongitude();
-        this.imageUrlList = saleImages;
 
+        this.imageUrlList = new ArrayList<>();
+        for (SaleImage image : saleImages) {
+            this.imageUrlList.add(image.getImageUrl()); // ✅ 엔티티가 아닌 값만 담기
+        }
     }
 }

@@ -9,15 +9,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
-
 @Service
 public class FileServiceImpl implements FileService {
 
-    private final String uploadDir = "/uploads"; // 실제 저장 경로
-    private final String baseUrl = "/Users/ijuhyeon/juhyeon/computer/SSAFY/JAVA/springstudy/spring-daangn"; // 접근 경로 (프론트가 접근 가능해야 함)
+    private final String uploadDir = "/Users/ijuhyeon/juhyeon/computer/SSAFY/JAVA/springstudy/spring-daangn/uploads"; // 절대 경로로 수정
+    private final String baseUrl = "/uploads"; // 프론트에서 접근 가능한 URL 경로
 
     @Override
     public String upload(MultipartFile file) {
+
         if (file.isEmpty()) {
             throw new IllegalArgumentException("파일이 비어있습니다.");
         }
@@ -27,21 +27,18 @@ public class FileServiceImpl implements FileService {
         Path savePath = Paths.get(uploadDir, savedName);
 
         try {
-            file.transferTo(savePath);
+            Files.createDirectories(savePath.getParent()); // 디렉토리 없으면 생성
+            file.transferTo(savePath); // 실제 저장
         } catch (IOException e) {
-            throw new RuntimeException("파일 저장 실패", e);
+            throw new RuntimeException("파일 저장 실패", e); // 예외 출력 개선해도 좋음
         }
 
-        // URL 생성해서 반환
-        return baseUrl + "/" + savedName;
+        return baseUrl + "/" + savedName; // 접근 가능한 URL로 반환
     }
 
     @Override
     public void delete(String fileUrl) {
-        // 1. 파일명 추출
-        String filename = Paths.get(URI.create(fileUrl).getPath()).getFileName().toString();
-
-        // 2. 파일 경로
+        String filename = Paths.get(fileUrl).getFileName().toString(); // ✅ URI 사용 안함
         Path filePath = Paths.get(uploadDir, filename);
 
         try {
