@@ -129,7 +129,7 @@ JPA 관련 테스팅을 해야하기 때문에 @DataJpaTest 또는 @SpringBootTe
 
 ## 먼저 결과부터
 
-![img_2.png](img_2.png)
+![img_2.png](../img_2.png)
 
 - 5개 뿐이었는데 속도가 2배이상 차이가난다…
 
@@ -434,7 +434,7 @@ Hibernate: select i1_0.id,i1_0.image_url,i1_0.`order`,i1_0.product_id from image
 2. 존재하지 않는 상품 조회 시 예외 발생
 3. 상품 이미지 목록 조회
 
-![img_3.png](img_3.png)
+![img_3.png](../img_3.png)
 
 ## UserServiceImpl 테스트
 
@@ -443,4 +443,4 @@ Hibernate: select i1_0.id,i1_0.image_url,i1_0.`order`,i1_0.product_id from image
 3. 사용자가 등록한 상품 목록 조회
 4. 사용자 관심 상품 ID 목록 조회
 
-![img_4.png](img_4.png)
+![img_4.png](../img_4.png)
