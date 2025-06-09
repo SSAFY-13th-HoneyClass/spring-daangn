@@ -23,6 +23,7 @@ public class UserEntity {
     @OneToMany(mappedBy = "writer")
     private List<ProductEntity> products = new ArrayList<>();
 
+    private String name;
     private String email;
     private String phoneNumber;
     private Double mannerTemperature;
