@@ -12,42 +12,45 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import com.ssafy.daangn.board.entity.Board;
 import com.ssafy.daangn.board.repository.BoardRepository;
 import com.ssafy.daangn.boardphoto.entity.BoardPhoto;
-import com.ssafy.daangn.member.entity.Member;
-import com.ssafy.daangn.member.repository.MemberRepository;
 
 @DataJpaTest
 class BoardPhotoRepositoryTest {
 
     @Autowired
-    private BoardPhotoRepository boardPhotoRepository;
-
-    @Autowired
     private BoardRepository boardRepository;
 
     @Autowired
-    private MemberRepository memberRepository;
+    private BoardPhotoRepository boardPhotoRepository;
 
     @Test
-    @DisplayName("게시글 ID로 사진을 정렬된 순서로 조회")
-    void findByBoardIdOrderByPhotoOrder() {
-        Member member = memberRepository.save(Member.builder()
-                .membername("user")
-                .email("test@example.com")
-                .password("1234")
-                .build());
-
+    @DisplayName("게시글 ID로 생성 시각 순으로 사진을 조회한다")
+    void findByBoard_BoardIdOrderByCreatedAtAsc() {
+        // given
         Board board = boardRepository.save(Board.builder()
-                .member(member)
-                .title("Test")
-                .content("Content")
+                .title("테스트 게시글")
+                .content("테스트 내용")
+                .isDeleted(false)
                 .build());
 
-        boardPhotoRepository.save(BoardPhoto.builder().board(board).url("url1").photoOrder(2).build());
-        boardPhotoRepository.save(BoardPhoto.builder().board(board).url("url2").photoOrder(1).build());
+        BoardPhoto photo1 = BoardPhoto.builder()
+                .board(board)
+                .url("https://img.com/first.jpg")
+                .build();
 
-        List<BoardPhoto> photos = boardPhotoRepository.findByBoard_BoardIdOrderByPhotoOrder(board.getBoardId());
+        BoardPhoto photo2 = BoardPhoto.builder()
+                .board(board)
+                .url("https://img.com/second.jpg")
+                .build();
 
-        assertThat(photos).hasSize(2);
-        assertThat(photos.get(0).getPhotoOrder()).isEqualTo(1);
+        boardPhotoRepository.save(photo1);
+        boardPhotoRepository.save(photo2);
+
+        // when
+        List<BoardPhoto> result = boardPhotoRepository.findByBoard_BoardIdOrderByCreatedAtAsc(board.getBoardId());
+
+        // then
+        assertThat(result).hasSize(2);
+        assertThat(result.get(0).getUrl()).isEqualTo("https://img.com/first.jpg");
+        assertThat(result.get(1).getUrl()).isEqualTo("https://img.com/second.jpg");
     }
 }

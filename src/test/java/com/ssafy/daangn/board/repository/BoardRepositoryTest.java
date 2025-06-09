@@ -13,9 +13,6 @@ import com.ssafy.daangn.board.entity.Board;
 import com.ssafy.daangn.member.entity.Member;
 import com.ssafy.daangn.member.repository.MemberRepository;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-
 @DataJpaTest
 class BoardRepositoryTest {
 
@@ -25,43 +22,115 @@ class BoardRepositoryTest {
     @Autowired
     private MemberRepository memberRepository;
 
-    @PersistenceContext
-    private EntityManager em;
-
     @Test
-    @DisplayName("게시글 저장 및 연관된 유저 확인")
-    void saveAndLoadBoard() {
-        Member member = Member.builder()
-                .membername("user1")
-                .email("user1@example.com")
-                .password("1234")
-                .build();
-        memberRepository.save(member);
+    @DisplayName("삭제되지 않은 게시글 조회")
+    void findByIsDeletedFalseTest() {
+        Member member = memberRepository.save(Member.builder()
+                .membername("사용자")
+                .email("test@example.com")
+                .password("pw")
+                .build());
 
-        Board board = Board.builder()
+        Board activeBoard = boardRepository.save(Board.builder()
+                .title("게시글1")
+                .content("내용")
                 .member(member)
-                .title("title")
-                .content("content")
-                .build();
-        boardRepository.save(board);
+                .isDeleted(false)
+                .build());
 
-        em.clear(); // 영속성 컨텍스트 초기화 → Lazy Loading 확인용
+        Board deletedBoard = boardRepository.save(Board.builder()
+                .title("삭제된 게시글")
+                .content("삭제됨")
+                .member(member)
+                .isDeleted(true)
+                .build());
 
-        Board found = boardRepository.findById(board.getBoardId()).orElseThrow();
-        assertThat(found.getMember().getEmail()).isEqualTo("user1@example.com"); // Lazy loading 정상 동작 여부 확인
+        List<Board> result = boardRepository.findByIsDeletedFalse();
+        assertThat(result).contains(activeBoard);
+        assertThat(result).doesNotContain(deletedBoard);
     }
 
     @Test
-    @DisplayName("isDeleted = false 조건으로 게시글 필터링 조회")
-    void findByIsDeletedFalse() {
-        List<Board> boards = boardRepository.findByIsDeletedFalse();
-        assertThat(boards).isNotNull();
+    @DisplayName("삭제된 게시글 조회")
+    void findByIsDeletedTrueTest() {
+        Member member = memberRepository.save(Member.builder()
+                .membername("사용자")
+                .email("del@example.com")
+                .password("pw")
+                .build());
+
+        boardRepository.save(Board.builder()
+                .title("보이는 게시글")
+                .content("보임")
+                .member(member)
+                .isDeleted(false)
+                .build());
+
+        Board deletedBoard = boardRepository.save(Board.builder()
+                .title("삭제된")
+                .content("숨김")
+                .member(member)
+                .isDeleted(true)
+                .build());
+
+        List<Board> result = boardRepository.findByIsDeletedTrue();
+        assertThat(result).hasSize(1).contains(deletedBoard);
     }
 
     @Test
-    @DisplayName("제목 키워드 포함 검색 (isDeleted=false)")
-    void searchByTitleContaining() {
-        List<Board> boards = boardRepository.findByTitleContainingAndIsDeletedFalse("title");
-        assertThat(boards).isNotNull();
+    @DisplayName("회원의 게시글 조회 (삭제되지 않은)")
+    void findByMemberIdAndIsDeletedFalseTest() {
+        Member member = memberRepository.save(Member.builder()
+                .membername("홍길동")
+                .email("hong@domain.com")
+                .password("pw")
+                .build());
+
+        Board board1 = boardRepository.save(Board.builder()
+                .title("제목1")
+                .content("내용1")
+                .member(member)
+                .isDeleted(false)
+                .build());
+
+        Board board2 = boardRepository.save(Board.builder()
+                .title("제목2")
+                .content("내용2")
+                .member(member)
+                .isDeleted(true) // 삭제된 게시글은 포함되지 않아야 함
+                .build());
+
+        List<Board> result = boardRepository.findByMember_MemberIdAndIsDeletedFalse(member.getMemberId());
+
+        assertThat(result).contains(board1);
+        assertThat(result).doesNotContain(board2);
+    }
+
+    @Test
+    @DisplayName("제목 키워드 포함 게시글 검색")
+    void findByTitleContainingTest() {
+        Member member = memberRepository.save(Member.builder()
+                .membername("검색자")
+                .email("search@x.com")
+                .password("pw")
+                .build());
+
+        Board board1 = boardRepository.save(Board.builder()
+                .title("테스트 게시글")
+                .content("내용")
+                .member(member)
+                .isDeleted(false)
+                .build());
+
+        boardRepository.save(Board.builder()
+                .title("삭제된 테스트")
+                .content("내용")
+                .member(member)
+                .isDeleted(true) // 삭제된 게시글은 포함되지 않아야 함
+                .build());
+
+        List<Board> results = boardRepository.findByTitleContainingAndIsDeletedFalse("테스트");
+
+        assertThat(results).hasSize(1).contains(board1);
     }
 }

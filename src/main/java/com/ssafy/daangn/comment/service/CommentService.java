@@ -49,12 +49,6 @@ public class CommentService {
         return CommentResponseDto.fromEntity(commentRepository.save(comment));
     }
 
-    public List<CommentResponseDto> getAllComments() {
-        return commentRepository.findAll().stream()
-                .map(CommentResponseDto::fromEntity)
-                .collect(Collectors.toList());
-    }
-
     public List<CommentResponseDto> getCommentsByBoard(Long boardId) {
         return commentRepository.findByBoard_BoardIdAndIsDeletedFalse(boardId).stream()
                 .map(CommentResponseDto::fromEntity)
@@ -72,4 +66,25 @@ public class CommentService {
                 .map(CommentResponseDto::fromEntity)
                 .collect(Collectors.toList());
     }
+
+    @Transactional
+    public void deleteComment(Long commentId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
+        comment.markDeleted();
+    }
+
+    @Transactional
+    public CommentResponseDto updateComment(Long commentId, CommentRequestDto dto) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
+
+        if (dto.getContent() != null) {
+            comment.setContent(dto.getContent());
+        }
+
+        // updatedAt은 @PreUpdate로 자동 갱신됨
+        return CommentResponseDto.fromEntity(comment);
+    }
+
 }

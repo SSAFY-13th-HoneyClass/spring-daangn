@@ -1,5 +1,7 @@
 package com.ssafy.daangn.boardphoto.entity;
 
+import java.time.LocalDateTime;
+
 import com.ssafy.daangn.board.entity.Board;
 
 import jakarta.persistence.Column;
@@ -10,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,6 +40,11 @@ public class BoardPhoto {
     @Column(nullable = false, length = 500)
     private String url;
 
-    @Column(nullable = false)
-    private Integer photoOrder = 1;
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 }

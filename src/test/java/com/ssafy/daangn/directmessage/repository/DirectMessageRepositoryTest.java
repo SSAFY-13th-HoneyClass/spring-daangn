@@ -9,69 +9,39 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import com.ssafy.daangn.board.entity.Board;
+import com.ssafy.daangn.board.repository.BoardRepository;
 import com.ssafy.daangn.directmessage.entity.DirectMessage;
+import com.ssafy.daangn.directmessageroom.entity.DirectMessageRoom;
+import com.ssafy.daangn.directmessageroom.repository.DirectMessageRoomRepository;
 import com.ssafy.daangn.member.entity.Member;
 import com.ssafy.daangn.member.repository.MemberRepository;
 
 @DataJpaTest
-class DirectMessageRepositoryTest {
+public class DirectMessageRepositoryTest {
 
     @Autowired
     private DirectMessageRepository dmRepository;
-
+    @Autowired
+    private DirectMessageRoomRepository roomRepository;
     @Autowired
     private MemberRepository memberRepository;
+    @Autowired
+    private BoardRepository boardRepository;
 
     @Test
-    @DisplayName("받는 사람 기준으로 메시지 목록 조회")
-    void findByReceiver() {
-        Member sender = memberRepository.save(Member.builder()
-                .membername("보낸이")
-                .email("sender@x.com")
-                .password("pw")
-                .build());
+    @DisplayName("DM 저장 및 채팅방 기준 조회")
+    void saveAndFindByRoom() {
+        Member sender = memberRepository.save(Member.builder().email("sender@example.com").membername("Sender").build());
+        Member receiver = memberRepository.save(Member.builder().email("receiver@example.com").membername("Receiver").build());
+        Board board = boardRepository.save(Board.builder().title("Test Board").content("Test").member(sender).build());
+        DirectMessageRoom room = roomRepository.save(DirectMessageRoom.builder().board(board).sender(sender).receiver(receiver).build());
 
-        Member receiver = memberRepository.save(Member.builder()
-                .membername("받는이")
-                .email("receiver@x.com")
-                .password("pw")
-                .build());
+        DirectMessage dm = DirectMessage.builder().room(room).sender(sender).receiver(receiver).content("Hello").build();
+        dmRepository.save(dm);
 
-        dmRepository.save(DirectMessage.builder()
-                .sender(sender)
-                .receiver(receiver)
-                .content("hello")
-                .build());
-
-        List<DirectMessage> list = dmRepository.findByReceiver(receiver);
-
-        assertThat(list).hasSize(1);
-        assertThat(list.get(0).getContent()).isEqualTo("hello");
-    }
-
-    @Test
-    @DisplayName("보낸 사람과 받는 사람 기준으로 메시지 조회")
-    void findBySenderAndReceiver() {
-        Member sender = memberRepository.save(Member.builder()
-                .membername("보낸이")
-                .email("sender2@x.com")
-                .password("pw")
-                .build());
-
-        Member receiver = memberRepository.save(Member.builder()
-                .membername("받는이")
-                .email("receiver2@x.com")
-                .password("pw")
-                .build());
-
-        dmRepository.save(DirectMessage.builder()
-                .sender(sender)
-                .receiver(receiver)
-                .content("hi")
-                .build());
-
-        List<DirectMessage> list = dmRepository.findBySenderAndReceiver(sender, receiver);
-
-        assertThat(list).isNotEmpty();
+        List<DirectMessage> messages = dmRepository.findByRoomOrderByCreatedAtAsc(room);
+        assertThat(messages).hasSize(1);
+        assertThat(messages.get(0).getContent()).isEqualTo("Hello");
     }
 }

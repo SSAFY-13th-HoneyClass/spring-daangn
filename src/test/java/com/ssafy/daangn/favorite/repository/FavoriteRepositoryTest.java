@@ -2,6 +2,7 @@ package com.ssafy.daangn.favorite.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
@@ -34,21 +35,25 @@ class FavoriteRepositoryTest {
     private EntityManager em;
 
     @Test
-    @DisplayName("회원과 게시글 기준으로 좋아요 저장 및 중복 확인")
-    void saveAndFindFavorite() {
+    @DisplayName("회원과 게시글로 좋아요 저장 및 조회")
+    void saveAndFindByMemberAndBoard() {
         Member member = memberRepository.save(Member.builder()
-                .membername("홍길동")
-                .email("hong@example.com")
-                .password("pass")
+                .membername("user1")
+                .email("user1@example.com")
+                .password("pw")
                 .build());
 
         Board board = boardRepository.save(Board.builder()
                 .member(member)
-                .title("Title")
-                .content("Content")
+                .title("게시글 제목")
+                .content("내용")
                 .build());
 
-        Favorite favorite = Favorite.builder().member(member).board(board).build();
+        Favorite favorite = Favorite.builder()
+                .member(member)
+                .board(board)
+                .build();
+
         favoriteRepository.save(favorite);
 
         Optional<Favorite> found = favoriteRepository.findByMemberAndBoard(member, board);
@@ -56,24 +61,80 @@ class FavoriteRepositoryTest {
     }
 
     @Test
-    @DisplayName("좋아요 삭제 테스트")
-    void deleteFavorite() {
+    @DisplayName("특정 게시글에 눌린 좋아요 전체 조회")
+    void findByBoard() {
+        Member member1 = memberRepository.save(Member.builder()
+                .membername("user1")
+                .email("user1@example.com")
+                .password("pw")
+                .build());
+
+        Member member2 = memberRepository.save(Member.builder()
+                .membername("user2")
+                .email("user2@example.com")
+                .password("pw")
+                .build());
+
+        Board board = boardRepository.save(Board.builder()
+                .member(member1)
+                .title("같은 게시글")
+                .content("내용")
+                .build());
+
+        favoriteRepository.save(Favorite.builder().member(member1).board(board).build());
+        favoriteRepository.save(Favorite.builder().member(member2).board(board).build());
+
+        List<Favorite> favorites = favoriteRepository.findByBoard(board);
+        assertThat(favorites).hasSize(2);
+    }
+
+    @Test
+    @DisplayName("특정 회원이 좋아요한 게시글 전체 조회")
+    void findByMember() {
         Member member = memberRepository.save(Member.builder()
-                .membername("유저")
-                .email("test@x.com")
+                .membername("user")
+                .email("user@example.com")
+                .password("pw")
+                .build());
+
+        Board board1 = boardRepository.save(Board.builder()
+                .member(member)
+                .title("제목1")
+                .content("내용1")
+                .build());
+
+        Board board2 = boardRepository.save(Board.builder()
+                .member(member)
+                .title("제목2")
+                .content("내용2")
+                .build());
+
+        favoriteRepository.save(Favorite.builder().member(member).board(board1).build());
+        favoriteRepository.save(Favorite.builder().member(member).board(board2).build());
+
+        List<Favorite> favorites = favoriteRepository.findByMember(member);
+        assertThat(favorites).hasSize(2);
+    }
+
+    @Test
+    @DisplayName("회원이 누른 좋아요 삭제")
+    void deleteByMemberAndBoard() {
+        Member member = memberRepository.save(Member.builder()
+                .membername("user")
+                .email("user@example.com")
                 .password("pw")
                 .build());
 
         Board board = boardRepository.save(Board.builder()
                 .member(member)
-                .title("제목")
+                .title("삭제 대상")
                 .content("내용")
                 .build());
 
-        Favorite favorite = Favorite.builder().member(member).board(board).build();
-        favoriteRepository.save(favorite);
-
+        favoriteRepository.save(Favorite.builder().member(member).board(board).build());
         favoriteRepository.deleteByMemberAndBoard(member, board);
-        assertThat(favoriteRepository.findByMemberAndBoard(member, board)).isEmpty();
+
+        Optional<Favorite> deleted = favoriteRepository.findByMemberAndBoard(member, board);
+        assertThat(deleted).isEmpty();
     }
 }

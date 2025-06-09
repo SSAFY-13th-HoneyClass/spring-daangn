@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,9 +21,9 @@ import lombok.Setter;
 @Table(name = "members")
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE) // 외부에서 직접 생성 제한
+@Builder(access = AccessLevel.PUBLIC)
 public class Member {
 
     @Id
@@ -40,30 +41,45 @@ public class Member {
 
     private String profileUrl;
 
-    @Builder.Default
-    @Column(nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 
-    @Builder.Default
     @Column(nullable = false)
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    private LocalDateTime updatedAt;
 
-    @Builder.Default
     @Column(nullable = false)
-    private Boolean isDeleted = false;
+    private Boolean isDeleted;
 
+    // JPA persist 시점에 기본값 설정
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = this.createdAt;
+        this.isDeleted = false;
+    }
+
+    // JPA update 시점에 수정 시간 갱신
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    // 소프트 삭제 처리
     public void markDeleted() {
         this.isDeleted = true;
     }
 
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
+    // 정적 팩토리 메서드 - builder 대신 사용 가능
+    public static Member of(String membername, String email, String password, String profileUrl) {
+        LocalDateTime now = LocalDateTime.now();
+        return Member.builder()
+                .membername(membername)
+                .email(email)
+                .password(password)
+                .profileUrl(profileUrl)
+                .isDeleted(false)
+                .createdAt(now)
+                .updatedAt(now)
+                .build();
     }
 }

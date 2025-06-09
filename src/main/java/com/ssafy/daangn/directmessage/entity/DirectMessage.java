@@ -2,6 +2,7 @@ package com.ssafy.daangn.directmessage.entity;
 
 import java.time.LocalDateTime;
 
+import com.ssafy.daangn.directmessageroom.entity.DirectMessageRoom;
 import com.ssafy.daangn.member.entity.Member;
 
 import jakarta.persistence.Column;
@@ -22,16 +23,16 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "direct_messages")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class DirectMessage {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long messageId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "room_id", nullable = false)
+    private DirectMessageRoom room;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sender_id", nullable = false)
@@ -50,10 +51,6 @@ public class DirectMessage {
     @Builder.Default
     @Column(nullable = false)
     private Boolean isRead = false;
-
-    @Builder.Default
-    @Column(nullable = false)
-    private Boolean isDeleted = false;
 
     @PrePersist
     protected void onCreate() {

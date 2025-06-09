@@ -2,141 +2,221 @@
 
 ## 리펙토링
 
-### 도메인 주도 설계(DDD) 스타일
-- 도메인별로 기능을 분리하여 유지보수가 용이한 MSA 스타일의 구조 도입 및 계층별 테스트 구현
+### DirectMessage와 DirectMessageRoom 기능 분리
 
-![image](https://github.com/user-attachments/assets/471dc02c-b6c8-456d-ae41-9a7b26754d2f)
+- DirectMessageRoom, DirectMessage 엔티티 설계 및 JPA 매핑
+- 게시글 기반 1:1 채팅방 자동 생성 로직 구현
+- 기존 방 존재 시 재활용 로직 적용
 
-### Lombok 사용
-- @Builder, @NoArgsConstructor, @Getter 등을 통해 코드가 매우 간결해지고 생산성이 눈에 띄게 향상
+# API 작성
+## Swagger
+![swagger-ui_index html](https://github.com/user-attachments/assets/48102802-bfb5-4e6a-9d1d-a1ca62093d13)
 
-![image](https://github.com/user-attachments/assets/f47e613a-825f-43a1-b97c-8538fa7d432b)
+### BoardController
 
+| 메서드 | URL                                | 설명                                      |
+| ------ | ---------------------------------- | ----------------------------------------- |
+| POST   | `/api/v1/board`                    | 게시글 생성                               |
+| GET    | `/api/v1/board`                    | 전체 게시글 조회 (삭제되지 않은 게시글만) |
+| GET    | `/api/v1/board/deleted`            | 삭제된 게시글 목록 조회                   |
+| GET    | `/api/v1/board/member/{memberId}`  | 특정 회원의 게시글 목록 조회              |
+| GET    | `/api/v1/board/search?keyword=xxx` | 게시글 제목 검색                          |
+| DELETE | `/api/v1/board/{boardId}`          | 게시글 soft delete                        |
+| PATCH  | `/api/v1/board/{boardId}`          | 게시글 제목/내용 수정                     |
 
-### User, Post 예약어
-- User, Post는 예약어로 사용될 가능성이 높기 때문에 되도록이면 사용하지 않는 것을 추천
-- 따라서 User → Member, Post → Board로 리펙토링 진행
+### BoardPhotoController
+
+| 메서드 | URL                                   | 설명                  |
+| ------ | ------------------------------------- | --------------------- |
+| POST   | `/api/v1/board-photo`                 | 게시글 사진 등록      |
+| GET    | `/api/v1/board-photo/{photoId}`       | 특정 사진 단건 조회   |
+| GET    | `/api/v1/board-photo/board/{boardId}` | 게시글 사진 목록 조회 |
+| DELETE | `/api/v1/board-photo/{photoId}`       | 게시글 사진 삭제      |
+
+### CommentController
+
+| 메서드 | URL                                        | 설명                         |
+| ------ | ------------------------------------------ | ---------------------------- |
+| POST   | `/api/v1/comment`                          | 댓글 또는 대댓글 생성        |
+| GET    | `/api/v1/comment/board/{boardId}`          | 게시글의 모든 댓글 조회      |
+| GET    | `/api/v1/comment/board/{boardId}/root`     | 게시글의 루트 댓글 조회      |
+| GET    | `/api/v1/comment/parent/{parentCommentId}` | 특정 부모 댓글의 대댓글 조회 |
+| DELETE | `/api/v1/comment/{commentId}`              | 댓글 삭제 (soft delete)      |
+| PATCH  | `/api/v1/comment/{commentId}`              | 댓글 수정                    |
+
+### DirectMessageController
+
+| 메서드 | URL                          | 설명                          |
+| ------ | ---------------------------- | ----------------------------- |
+| POST   | `/api/v1/dm/board/{boardId}` | 게시글 기반 DM 전송           |
+| GET    | `/api/v1/dm/room/{roomId}`   | 특정 DM 방의 메시지 목록 조회 |
+
+### DirectMessageRoomController
+
+| 메서드 | URL                                                                       | 설명                                        |
+| ------ | ------------------------------------------------------------------------- | ------------------------------------------- |
+| GET    | `/api/v1/dm/room/board/{boardId}/member/{memberId}`                       | 특정 게시글에서 내가 참여한 DM 방 목록 조회 |
+| GET    | `/api/v1/dm/room/board/{boardId}/sender/{senderId}/receiver/{receiverId}` | 1:1 DM 방 조회 또는 생성                    |
+| GET    | `/api/v1/dm/room/member/{memberId}`                                       | 내가 참여한 전체 DM 방 목록 조회            |
+
+### FavoriteController
+
+| 메서드 | URL                                            | 설명                                   |
+| ------ | ---------------------------------------------- | -------------------------------------- |
+| POST   | `/api/v1/favorite`                             | 좋아요 토글 (추가/삭제)                |
+| GET    | `/api/v1/favorite/status?memberId=1&boardId=2` | 특정 회원이 게시글에 좋아요했는지 확인 |
+| GET    | `/api/v1/favorite/member/{memberId}`           | 회원이 좋아요한 게시글 목록 조회       |
+| GET    | `/api/v1/favorite/board/{boardId}`             | 게시글 좋아요한 회원 목록 조회         |
+| GET    | `/api/v1/favorite/board/{boardId}/count`       | 게시글 좋아요 수 조회                  |
+
+### MemberController
+
+| 메서드 | URL                         | 설명                                       |
+| ------ | --------------------------- | ------------------------------------------ |
+| POST   | `/api/v1/member`            | 회원 생성                                  |
+| GET    | `/api/v1/member`            | 전체 회원 목록 조회 (삭제되지 않은 회원만) |
+| GET    | `/api/v1/member/deleted`    | 삭제된 회원 목록 조회                      |
+| GET    | `/api/v1/member/{memberId}` | 특정 회원 상세 조회                        |
+| DELETE | `/api/v1/member/{memberId}` | 회원 삭제 (soft delete)                    |
+| PATCH  | `/api/v1/member/{memberId}` | 회원 정보 수정                             |
+
+> [!NOTE]
+> - 기본적인 CRUD 및 전체 조회와 특정값 조회가 필요한 부분은 따로 작성하였다.
+
+> [!IMPORTANT]
+> API 주소에 `v1`을 작성한 이유 : 버전 관리, 안정성, 유지보수성↑
+> 
+> 1. 향후 변경에 대비한 유연성 확보
+> - 기존 클라이언트를 깨뜨리지 않고 새로운 버전(`v2`, `v3`) API 도입 가능
+> 예
+> - `/api/v1/member` ← 현재 버전
+> - `/api/v2/member` ← 향후 구조 변경된 새 API
+> 
+> 2. 하위 호환성 유지
+> - `v1`을 사용하는 기존 앱이나 프론트엔드가 그대로 동작 가능
+> - 새 버전(`v2`)에서만 새로운 필드나 구조 도입 가능
+> 
+> 3. API 문서와 테스트 분리 용이
+> - Swagger 문서, 테스트 케이스 등을 API 버전에 따라 구분해 관리할 수 있어 구조적으로 깔끔함
+> 
+> 4. 운영 및 배포 관리에 유리
+> - 점진적 마이그레이션이 가능하므로 운영 리스크를 줄일 수 있음
+> - 새 버전에서 오류 발생 시 기존 버전으로 빠르게 롤백 가능
+
+## 실행화면
+### 회원 생성
+![swagger-ui_index html](https://github.com/user-attachments/assets/e0d8d945-3e15-4207-a419-f20eafd02368)
+![swagger-ui_index html](https://github.com/user-attachments/assets/9b2fac4f-9423-46cf-8498-820ee56033dc)
+
+### 게시글 생성
+![swagger-ui_index html](https://github.com/user-attachments/assets/946501f8-fd53-4aa9-b4a4-3ef262644481)
+![swagger-ui_index html](https://github.com/user-attachments/assets/ac2213ed-f51f-4f65-87cb-c4d8f5dead74)
+
+## 댓글 생성
+![swagger-ui_index html](https://github.com/user-attachments/assets/bb275d0f-ec30-4cad-85ea-06895982bfca)
+![swagger-ui_index html](https://github.com/user-attachments/assets/435edddc-90eb-4ca9-88fc-2d4d2f0f513e)
+
+# 정적 팩토리 메서드
+- 기존에는 외부에서 Member.builder().xxx().build() 형태로 직접 생성했기 때문에, createdAt, updatedAt, isDeleted 등의 기본 필드 설정이 누락 가능
+- 생성 시점의 일관된 기본값을 강제하고, 의미 있는 이름(of)을 통해 코드 가독성 향상과 의도 표현력 증가
+
+## 적용 예(Member.of())
+Member.java
+```java
+public static Member of(String membername, String email, String password, String profileUrl) {
+    LocalDateTime now = LocalDateTime.now();
+    return Member.builder()
+            .membername(membername)
+            .email(email)
+            .password(password)
+            .profileUrl(profileUrl)
+            .isDeleted(false)
+            .createdAt(now)
+            .updatedAt(now)
+            .build();
+}
+```
+MemberService.java
+```java
+Member member = Member.of(
+    dto.getMembername(),
+    dto.getEmail(),
+    dto.getPassword(),
+    dto.getProfileUrl()
+);
+```
+
+# Global Exception Handling
+
+- 전역 예외 처리(Global Exception Handling) 를 통해 예외 발생 시 클라이언트에 일관된 형태의 JSON 응답을 반환
+
+## GlobalExceptionHandler
+
+- @RestControllerAdvice를 활용하여 예외를 처리
+  | 예외 타입 | 설명 | HTTP 상태코드 |
+  | -------------------------- | --------------------------- | --------------------------- |
+  | `IllegalArgumentException` | 잘못된 파라미터 등 클라이언트 잘못으로 인한 예외 | 400 (Bad Request) |
+  | `RuntimeException` | 예상하지 못한 런타임 오류 | 500 (Internal Server Error) |
+  | `Exception` | 기타 모든 예외 | 500 (Internal Server Error) |
+> [!NOTE]
+> 추후 개발하며 상황에 따른 Exception을 더 세분화!
+
+```json
+// 예시: IllegalArgumentException 발생 시 응답
+{
+  "success": false,
+  "data": null,
+  "message": "존재하지 않는 회원입니다."
+}
+```
+
+## ApiResponseDto
+
+- ApiResponseDto<T>는 API 응답을 표준 구조로 래핑
+  | 필드 | 설명 |
+  | --------- | ------------------------------ |
+  | `success` | 요청 처리 성공 여부 (`true` / `false`) |
+  | `data` | 처리 결과 데이터 (성공 시) |
+  | `message` | 오류 메시지 (실패 시) |
+
+```java
+// 성공 응답 예시
+return ResponseEntity.ok(ApiResponseDto.success(responseData));
+
+// 실패 응답 예시
+return ResponseEntity.badRequest().body(ApiResponseDto.fail("오류 메시지"));
+```
+
+> [!NOTE]
+> 적용 효과
+>
+> - 프론트엔드에서는 응답 구조를 일관되게 처리 가능
+> - 예상치 못한 오류를 서버에서 로깅하며, 사용자에게는 깔끔한 메시지 전달
+> - Swagger 문서에도 통일된 응답 포맷 적용 가능
 
 # 테스트
 
-## 테스트 목적
+## Controller 통합 테스트
 
-- Repository 계층의 JPA 연관관계 매핑, 쿼리 메서드 유효성, N+1 문제 여부 확인
-- Service 계층의 비즈니스 로직 흐름 및 유효성 검증
-- DTO ↔ Entity 변환 및 예외 처리 동작 확인
+- @SpringBootTest와 @AutoConfigureMockMvc를 활용하여 실제 컨트롤러에 HTTP 요청을 보내는 방식으로 테스트를 진행
 
-![image](https://github.com/user-attachments/assets/5ef8a670-3b45-46c8-b3dc-979a6f971ab9)
+### 테스트 목적
 
+- 요청 → 서비스 → 리포지토리 → DB 흐름 검증
+- 잘못된 입력, 비정상 요청, 예외 처리도 함께 검증 가능
+- Swagger 문서와 실제 API 응답이 일치하는지 검증
 
-## 테스트 구성 방식
+### 테스트 클래스
 
-| 계층       | 테스트 방법                                     | 설명                                |
-| ---------- | ----------------------------------------------- | ----------------------------------- |
-| Repository | `@DataJpaTest`                                  | H2 DB를 이용한 슬라이스 테스트      |
-| Service    | `@ExtendWith(MockitoExtension.class)` + Mockito | Mock 객체를 활용한 순수 단위 테스트 |
-
-## 테스트 항목
-
-### Repository 테스트
-
-| 도메인        | 검증 항목                                                       |
-| ------------- | --------------------------------------------------------------- |
-| Board         | `isDeleted` 필터링, 제목 키워드 검색, Lazy 연관관계 접근        |
-| Comment       | 부모-자식 연관관계, 대댓글 조회, N+1 의심 영역 확인             |
-| Member        | 이메일 중복 확인, 삭제된 회원 제외 쿼리                         |
-| BoardPhoto    | 게시글 ID 기준 정렬 조회, Board 연관관계 매핑                   |
-| Favorite      | 복합키(member + board) 조회 및 삭제, 중복 좋아요 방지           |
-| DirectMessage | 수신자 기준 조회, 송수신자 조합 조회, 기본 필드(null 방지) 확인 |
-
-### 게시글 내에서 부모 없는 댓글만 조회할 때
-![image](https://github.com/user-attachments/assets/7fd6a9a3-c73a-44b6-b61c-a1460f5850ef)
-
-### 기존 코드 테스트
-
-![image](https://github.com/user-attachments/assets/db3d8e34-2594-4109-a06d-20fba6073dde)
+| 테스트 클래스                     | 설명                           |
+| --------------------------------- | ------------------------------ |
+| `BoardControllerTest`             | 게시글 API의 CRUD 테스트       |
+| `BoardPhotoControllerTest`        | 게시글 사진 업로드/삭제 테스트 |
+| `CommentControllerTest`           | 댓글/대댓글 관련 API 테스트    |
+| `FavoriteControllerTest`          | 좋아요 토글, 조회 API 테스트   |
+| `MemberControllerTest`            | 회원 생성/수정/삭제 등 테스트  |
+| `DirectMessageControllerTest`     | DM 전송/조회 테스트            |
+| `DirectMessageRoomControllerTest` | DM 방 생성/조회 테스트         |
 
 > [!NOTE]
->
-> `em.clear()` 호출 후 Lazy 연관 접근 → N+1 발생 여부 확인 가능
-> 
-
-```java
-List<Comment> comments = commentRepository.findByBoard_BoardIdAndIsDeletedFalse(1L);
-for (Comment c : comments) {
-    // 연관된 Member를 접근 → 쿼리 추가 발생
-    // N+1 : 부모 엔티티 1개 조회 시 자식 엔티티를 N번 쿼리
-    System.out.println(c.getMember().getEmail());
-}
-```
-- findByBoard_BoardIdAndIsDeletedFalse() → 댓글 목록 쿼리 1회 실행
-- 루프 안에서 getMember() 호출 → 댓글 수만큼 select * from members where member_id=? 발생
-  - 즉, 1 (댓글 목록) + N (각 댓글의 멤버 조회)
-
-### N+1 탐지용 테스트 코드
-```java
-@Test
-@DisplayName("N+1 테스트용 - 댓글 조회 시 member 또는 board에 대한 join 필요성 확인")
-void checkNPlusOneIssue() {
-    List<Comment> comments = commentRepository.findByBoard_BoardIdAndIsDeletedFalse(1L);
-    for (Comment c : comments) {
-        // member는 LAZY 이므로 이 접근 시 개별 쿼리 발생 (N+1 문제 유발 가능)
-        System.out.println(c.getMember().getEmail());
-    }
-}
-```
-
-### 해결 방법 : JPQL Fetch Join
-```java
-@Query("SELECT c FROM Comment c JOIN FETCH c.member WHERE c.board.boardId = :boardId AND c.isDeleted = false")
-List<Comment> findWithMemberByBoardId(@Param("boardId") Long boardId);
-```
-
-### 문제 해결 테스트
-
-![image](https://github.com/user-attachments/assets/3b34ee30-2118-4852-a92a-0ca5b070275d)
-
----
-
-### Service 테스트
-
-| 도메인        | 검증 항목                                                         |
-| ------------- | ----------------------------------------------------------------- |
-| Board         | 게시글 생성 (Member 존재 확인), DTO 변환 흐름                     |
-| Comment       | 댓글 생성 (부모/자식 구분), Board/Member 유효성 검증              |
-| Member        | 이메일 중복 확인, 회원 저장 정상 흐름                             |
-| BoardPhoto    | 사진 추가 시 Board 존재 여부 확인, 사진 저장 및 DTO 응답 검증     |
-| Favorite      | 좋아요 등록 시 중복 확인, 취소 시 정확한 삭제 동작                |
-| DirectMessage | 메시지 전송 시 Sender/Receiver 존재 확인, 메시지 리스트 반환 검증 |
-
-> [!CAUTION]
->
-> Service 테스트는 순수 단위 테스트로 Repository 동작 자체는 가정(mock 처리)
-> 
-> `Optional.orElseThrow()`를 사용하는 경우 예외 케이스도 반드시 별도 테스트 필요
-> 
-> `@Builder.Default`나 Builder 누락 필드로 인한 오류 (`isDeleted`, `isRead`) 주의
-
-> [!NOTE]
-> @Mock 객체는 실제 DB가 아닌 stub/mock이므로 정확한 행동 설정이 중요
-> 
-> when(...).thenReturn(...) 구문으로 원하는 응답을 강제 지정해야 함
-> 
-> verify(...) 구문으로 Repository가 실제 호출되었는지 확인할 것
-> 
-> 예외 발생 조건 (orElseThrow)도 반드시 별도 테스트로 검증 필요
-
-# 정리
-
-### JPA 연관관계 테스트의 필요성
-- 단순 CRUD 테스트가 아닌, 연관관계를 고려한 테스트(N+1, FetchType 등)가 실제 운영 환경의 성능 이슈를 미리 예방할 수 있다는 점을 배웠다.
-- @DataJpaTest로 메모리 DB 기반의 경량 테스트가 매우 유용하다.
-
-> [!Important]
-> 
-> Hibernate Dialect 지정 실패
-> 
-> → 테스트용 설정 분리 (application-test.properties)
-> 
-> 그리고 테스트 클래스에 명시적으로 어노테이션 적용
-> 
-> `@ActiveProfiles("test")`
+> 다음 주의 Spring Security와 관련하여 인증 설정을 통한 보안 테스트 작성을 생각해보아야 할 것 같다.

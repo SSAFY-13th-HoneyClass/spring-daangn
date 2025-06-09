@@ -9,12 +9,15 @@ import com.ssafy.daangn.member.entity.Member;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
-    // 이메일로 조회
-    Optional<Member> findByEmail(String email);
+    // 삭제되지 않은 회원 중 이메일로 조회
+    Optional<Member> findByEmailAndIsDeletedFalse(String email);
 
-    // 삭제되지 않은 회원만 조회
+    // 삭제되지 않은 회원 전체 조회
     List<Member> findByIsDeletedFalse();
 
-    // 이메일 중복 확인 (삭제되지 않은 회원 기준)
-    Optional<Member> findByEmailAndIsDeletedFalse(String email);
+    // 삭제된 회원 전체 조회
+    List<Member> findByIsDeletedTrue();
+
+    // 삭제되지 않은 회원 중 ID로 조회
+    Optional<Member> findByMemberIdAndIsDeletedFalse(Long memberId);
 }
