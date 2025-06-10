@@ -42,8 +42,14 @@ public class User {
     @CurrentTimestamp
     private LocalDateTime created;
 
-    private String role;
+    @Enumerated(EnumType.STRING)
+    @Column(length = 10)
+    private Role role;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserLocation> userLocations = new ArrayList<>();
+
+    public enum Role {
+        ADMIN, USER
+    }
 }
