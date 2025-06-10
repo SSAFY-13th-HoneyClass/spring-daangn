@@ -63,3 +63,129 @@
   - 구현 복잡도 높음
   - 잘못 구성하면 보안에 취약해질 수 있음
 
+# ✏️한줄 요약
+- JWT : 서버 상태를 저장하지 않고, 서명된 토큰으로 인증을 처리하는 무상태 인증 방식
+- Access Token : 사용자가 인증되었음을 증명하며, API 요청 시 사용되는 짧은 수명의 토큰
+- Refresh Token : Access Token이 만료되었을 때 새로운 토큰을 발급받기 위해 사용하는 긴 수명의 토큰
+- 세션 : 로그인 정보를 서버가 관리하고, 클라이언트는 세션 ID만 쿠키로 전달하는 상태 기반 인증
+- 쿠키 : 인증 정보를 클라이언트의 쿠키에 저장하여 매 요청마다 자동 전송하는 방식
+- OAuth 2.0 : 제3자 애플리케이션이 사용자 대신 자원에 접근할 수 있도록 권한을 위임하는 인증 프레임워크
+
+# ❓Redis가 뭘까?
+
+Redis는 메모리 기반의 초고속 데이터 저장소로, 주로 캐시, 세션, 토큰, 랭킹 처리 등에 사용되는 NoSQL 데이터베이스
+
+## Redis는 주로 무엇에 사용하나?
+- Refresh Token 저장 : 클라이언트가 보낸 Refresh Token을 서버가 직접 검증 가능
+- Access Token 블랙리스트 관리 : 로그아웃한 토큰, 탈취된 토큰을 Redis에 블랙리스트로 등록해서 무효 처리
+- 세션 저장소 : 로그인 유지 세션을 Redis에 저장해서 서버간 공유 가능
+- 일시적 데이터 캐싱 : 자주 조회되는 데이터를 메모리 캐시로 저장
+
+## ❓왜 JWT 인증에서 Redis를 많이 쓸까?
+- Refresh Token을 Redis에 저장하면
+  - 탈취 방지 가능 ( 서버에서 유효성 판단 )
+  - 빠른 만료 처리 가능 (TTL 설정)
+  - 사용자 로그아웃 시 토큰 즉시 삭제 가능
+- AccessToken 블랙리스트도 Redis에 등록해서 무효화 체크 가능
+
+### RDB는 도서관 이라면 Redis는 작은 수첩
+
+## Redis를 사용할때 장점과 사용하지 않을 때의 단점
+- 장점 :
+  - 초고속 성능 : 메모리 기반이라 읽기/쓰기 속도가 매우 빠름
+  - TTL 설정 : 토큰 만료 시간을 Redis에서 직접 관리 가능
+  - 실시간 제어 : 로그아웃시 Refresh Token 즉시 삭제 가능
+  - 마이크로서비스 확장 : 서버간 세션/토큰 공유 용이
+  - 데이터 구조 다양 : List, Hash, Set 등 여러 구조를 지원해서 활용도 노음
+- 사용하지 않을 때 단점 : 
+  - Refresh Token 검증 불가 : 클라이언트가 보낸 Refresh Token을 서버가 검증할 방법이 없다.
+  - 토큰 강제 만료 어려움 : 로그아웃 해도 Refresh Token이 계속 유효 -> 사용자 제어 어려움
+  - 블랙리스트 불가 : Access Token이 탈취되어도 서버가 막을 방법이 없음
+  - 마이크로서비스 확장어려움 : 서버마다 세션/토큰 상태 관리 어려움
+
+# ❓NoSQL이란?
+
+- NoSQL(Not Only SSQL)은 전통적인 RDBMS와 달리 정해진 스키마 없이 유연하게 데이터를 저장하는 데이터베이스
+
+## NoSQL 특징
+- 스키마 없음 : 미리 테이블 구조를 정의할 필요 없음
+- 수평 확장 용이 : 데이터 양이 많아질수록 서버를 여러 대로 쉽게 나눌 수 있음
+- 다양한 유형 : key-value(Redis), Document (MongoDb), Column(Cassandra), Graph (Neo4j)
+- JOIN 없음 : 관계보다는 빠른 접근성과 유연한 저장을 중시
+
+# JWT를 적용해보자!
+
+## JWT 기본 흐름
+
+1. 회원가입
+2. 로그인 : Access + Refresh 토큰 발급
+3. 인증된 요청 : Access 토큰 포함
+4. Access 토큰 만료 시 : Refresh 토큰으로 재발급 요청
+5. 로그아웃 시 : Refresh 토큰 제거, Access 블랙리스트 등록
+
+## 필요한 작업 정리
+1. 의존성 추가 
+```groovy
+// build.gradle
+implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+```
+
+2. JWT 유틸 클래스 생성
+- JWT 생성, 파싱, 검증 로직 포함
+- JwtUtil 로 이름 설정
+```java
+public class JwtUtil {
+    public String createAccessToken(...) { ... }
+    public String createRefreshToken(...) { ... }
+    public Claims parseToken(String token) { ... }
+    public boolean isExpired(String token) { ... }
+}
+```
+
+3. 로그인/회원가입 API 구현
+- 로그인 시 : 
+  - Access Token, Refresh Token 발급
+  - Access Token은 클라이언트에 반환
+  - Refresh Token 은 Redis 또는 DB에 저장
+
+4. Redis 연동 (선택사항)
+- Refresh Token 관리 및 로그아웃 처리 등을 위해 사용
+- 의존성 추가, 설정 파일 작성
+
+5. 인증 필터 작성
+- OncePerRequestFilter를 상속하여 JWT 검증 필터 구현
+- 유효한 Access Token 이면 SecurityContext에 인증 정보 설정
+```java
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
+    protected void doFilterInternal(...) {
+        // 토큰 파싱 → 인증 성공 시 SecurityContextHolder 설정
+    }
+}
+```
+
+6. Srping Security 설정
+- 위에서 만든 필터를 Spring Security에 등록
+```java
+http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+```
+
+7. Access Token 재발급 API 구현
+- 클라이언트가 Refresh Token을 보내면
+  - 서버는 Redis에서 확인 후 
+  - 새로운 Access Toekn을 발급해 반환
+
+8. 로그아웃 API 구현
+- Refresh Toekn 삭제
+- Access Token을 Redis에 블랙리스트로 등록해 무효 처리
+
+## 역할별 클래스 정리
+| 계층           | 클래스 이름                              | 역할                          |
+| ------------ | ----------------------------------- | --------------------------- |
+| `security`   | `JwtAuthenticationFilter`           | 요청 필터링 시 JWT 검증             |
+| `security`   | `JwtTokenProvider`                  | JWT 생성, 검증 유틸               |
+| `controller` | `AuthController`                    | 로그인, 회원가입, 토큰 재발급, 로그아웃 API |
+| `service`    | `AuthService`                       | 비즈니스 로직 처리                  |
+| `repository` | `RefreshTokenRepository` (optional) | Redis 또는 DB 저장소             |
+| `config`     | `SecurityConfig`                    | Spring Security 설정          |
