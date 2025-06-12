@@ -17,19 +17,18 @@ public class UserRequestDto {
     private String phone;
     private String profileImg;
     private BigDecimal manner;
-    private String role;
+    private User.Role role;
 
-
-    public static User toEntity(UserRequestDto dto) {
+    public User toEntity() {
         return User.builder()
-                .id(dto.getId())
-                .password(dto.getPassword())
-                .name(dto.getName())
-                .nickname(dto.getNickname())
-                .phone(dto.getPhone())
-                .profileImg(dto.getProfileImg())
-                .manner(dto.getManner() != null ? dto.getManner() : new BigDecimal("36.5"))
-                .role(dto.getRole() != null ? dto.getRole() : "USER")
+                .id(id)
+                .password(password)
+                .name(name)
+                .nickname(nickname)
+                .phone(phone)
+                .profileImg(profileImg)
+                .manner(manner)
+                .role(role != null ? role : User.Role.USER)
                 .build();
     }
 }

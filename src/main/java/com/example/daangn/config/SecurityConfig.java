@@ -1,6 +1,8 @@
 package com.example.daangn.config;
 
 import com.example.daangn.domain.user.entity.User;
+import com.example.daangn.security.jwt.JwtUtil;
+import com.example.daangn.security.jwt.LoginFilter;
 import com.example.daangn.security.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -12,9 +14,11 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -27,25 +31,16 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final CustomUserDetailsService customUserDetailsService;
+    //AuthenticationManager가 인자로 받을 AuthenticationConfiguraion 객체 생성자 주입
+    private final AuthenticationConfiguration authenticationConfiguration;
+
+    private final JwtUtil jwtUtil;
 
     /**
      * 패스워드 암호화(BCrypt 인코딩) 메서드
      * */
     @Bean
     public PasswordEncoder passwordEncoder() { return new BCryptPasswordEncoder(); }
-
-    /**
-     * DaoAuthenticationProvider 설정
-     * UserDetailsService와 PasswordEncoder를 사용하여 인증 수행
-     */
-    @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(customUserDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder());
-        return authProvider;
-    }
 
     /**
      * AuthenticationManager 빈 설정
@@ -64,17 +59,31 @@ public class SecurityConfig {
         // cors 방지
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()));
+        // form 로그인 방지
+        http
+                .formLogin(AbstractHttpConfigurer::disable);
+        // http basic 인증 방식 비활성화(jwt를 써서 인증 할 거기에)
+        http
+                .httpBasic(AbstractHttpConfigurer::disable);
+        // 세션 설정
+        http
+                .sessionManagement((session) -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
+        //경로별 인가 작업
         http
                 .authorizeHttpRequests(auth -> auth
                         // API 문서 접근 허용
                         .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
                         // 모든 권한 접근 허용 페이지
-                        .requestMatchers("/", "/login").permitAll()
+                        .requestMatchers("/", "/auth/login", "/auth/signup").permitAll()
                         // 관리자만 허용
                         .requestMatchers("/admin/**").hasRole(User.Role.ADMIN.name())
                 );
 
+        // 필터 등록
+        http
+                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 

@@ -2,6 +2,7 @@ package com.example.daangn.domain.user.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.CurrentTimestamp;
 
 import java.math.BigDecimal;
@@ -39,7 +40,7 @@ public class User {
 
     private LocalDateTime lastest;
 
-    @CurrentTimestamp
+    @CreationTimestamp
     private LocalDateTime created;
 
     @Enumerated(EnumType.STRING)

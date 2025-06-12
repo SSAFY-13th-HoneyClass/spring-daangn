@@ -15,6 +15,7 @@ import java.util.Collections;
 
 /**
  * Spring Security의 UserDetailsService 인터페이스 구현
+ * DB기반으로 로그인 검증 로직을 실행
  */
 @Service
 @RequiredArgsConstructor
@@ -59,6 +60,26 @@ public class CustomUserDetailsService implements UserDetailsService {
         @Override
         public String getUsername() {
             return user.getId();
+        }
+
+        @Override
+        public boolean isAccountNonExpired() {
+            return true;
+        }
+
+        @Override
+        public boolean isAccountNonLocked() {
+            return true;
+        }
+
+        @Override
+        public boolean isCredentialsNonExpired() {
+            return true;
+        }
+
+        @Override
+        public boolean isEnabled() {
+            return true;
         }
     }
 }

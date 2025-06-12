@@ -4,6 +4,7 @@ import com.example.daangn.domain.product.entity.Product;
 import com.example.daangn.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.CurrentTimestamp;
 
 import java.time.LocalDateTime;
@@ -35,7 +36,7 @@ public class Chatting {
     @JoinColumn(name = "buy_user_id")
     private User buyUser;
 
-    @CurrentTimestamp
+    @CreationTimestamp
     private LocalDateTime created;
 
     private LocalDateTime lastest;
