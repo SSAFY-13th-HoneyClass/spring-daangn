@@ -17,12 +17,14 @@ import com.ssafy.daangn.favorite.dto.response.FavoriteMemberResponseDto;
 import com.ssafy.daangn.favorite.service.FavoriteService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/favorite")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "JWT")
 @Tag(name = "Favorite", description = "게시글 좋아요 관련 API")
 public class FavoriteController {
 

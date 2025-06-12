@@ -17,12 +17,14 @@ import com.ssafy.daangn.member.dto.response.MemberResponseDto;
 import com.ssafy.daangn.member.service.MemberService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/member")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "JWT")
 @Tag(name = "Member", description = "회원 관련 API")
 public class MemberController {
 
@@ -65,7 +67,8 @@ public class MemberController {
 
     @Operation(summary = "회원 정보 수정", description = "회원 정보를 수정합니다.")
     @PatchMapping("/{memberId}")
-    public ResponseEntity<MemberResponseDto> updateMember(@PathVariable Long memberId, @RequestBody MemberRequestDto dto) {
+    public ResponseEntity<MemberResponseDto> updateMember(@PathVariable Long memberId,
+            @RequestBody MemberRequestDto dto) {
         MemberResponseDto updated = memberService.updateMember(memberId, dto);
         return ResponseEntity.ok(updated);
     }

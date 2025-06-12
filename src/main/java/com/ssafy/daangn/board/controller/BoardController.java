@@ -18,12 +18,14 @@ import com.ssafy.daangn.board.dto.response.BoardResponseDto;
 import com.ssafy.daangn.board.service.BoardService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/board")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "JWT")
 @Tag(name = "Board", description = "게시글 관련 API")
 public class BoardController {
 

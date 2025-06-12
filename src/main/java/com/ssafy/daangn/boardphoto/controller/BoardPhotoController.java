@@ -16,12 +16,14 @@ import com.ssafy.daangn.boardphoto.dto.response.BoardPhotoResponseDto;
 import com.ssafy.daangn.boardphoto.service.BoardPhotoService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/board-photo")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "JWT")
 @Tag(name = "BoardPhoto", description = "게시글 사진 관련 API")
 public class BoardPhotoController {
 
