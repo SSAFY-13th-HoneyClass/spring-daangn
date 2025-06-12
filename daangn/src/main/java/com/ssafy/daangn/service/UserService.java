@@ -20,7 +20,12 @@ public interface UserService {
     // 닉네임으로 사용자 존재 여부 확인(닉네임 중복 체크)
     boolean existsByNickname(String nickname);
 
-    // 아이디 비밀번호로 로그인(로그인)
+    // 암호화된 비밀번호를 고려한 로그인을 위해
+    public Optional<User> findById(String id);
+    public Optional<User> findByLogin(String id, String rawPassword);
+
+
+        // 아이디 비밀번호로 로그인(로그인)
     Optional<User> findByIdAndPassword(String id, String password);
 
     User save(User user);

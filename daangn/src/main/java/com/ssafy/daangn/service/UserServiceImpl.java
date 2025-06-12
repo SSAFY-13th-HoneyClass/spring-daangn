@@ -6,6 +6,7 @@ import com.ssafy.daangn.dto.UserUpdateRequest;
 import com.ssafy.daangn.exception.UserNotFoundException;
 import com.ssafy.daangn.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +17,8 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
 
     @Override
     public Optional<User> findByNo(Long no) {
@@ -35,6 +38,17 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean existsByNickname(String nickname) {
         return userRepository.existsByNickname(nickname);
+    }
+
+    @Override
+    public Optional<User> findById(String id) {
+        return userRepository.findById(id);
+    }
+
+    @Override
+    public Optional<User> findByLogin(String id, String rawPassword) {
+        return userRepository.findById(id)
+                .filter(user -> encoder.matches(rawPassword, user.getPassword()));
     }
 
     @Override

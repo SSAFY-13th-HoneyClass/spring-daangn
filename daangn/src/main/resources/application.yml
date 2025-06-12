@@ -17,6 +17,12 @@ spring:
   profiles:
     active: local
 
+
+# JWT 설정 추가
+jwt:
+  secret: ${JWT_SECRET} # 환경변수에서 가져오기
+  token-validity-in-seconds: ${JWT_VALIDITY:86400} # 기본 24시간
+
 logging:
   level:
     org.hibernate.SQL: debug
