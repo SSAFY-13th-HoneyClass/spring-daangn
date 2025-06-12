@@ -53,56 +53,50 @@ public class AuthController {
     })
     public ResponseEntity<?> createUser(
             @RequestBody @Schema(description = "사용자 생성 요청 데이터") UserRequestDto requestDto) {
-        // DTO를 엔티티로 변환
-        User user = UserRequestDto.toEntity(requestDto);
-        user.setCreated(LocalDateTime.now());
-        user.setLastest(LocalDateTime.now());
+        try {
+            // 사용자 생성 (중복 체크 포함)
+            UserResponseDto savedUser = userService.join(requestDto);
 
-        // 사용자 생성 (중복 체크 포함)
-        User savedUser = userService.join(user);
-
-        // 중복된 ID인 경우 처리
-        if (savedUser == null) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body("이미 존재하는 사용자 ID입니다.");
+            // 생성된 사용자 정보를 반환
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("회원가입 중 오류가 발생했습니다: " + e.getMessage());
         }
-
-        // 생성된 사용자 정보를 DTO로 변환하여 반환
-        UserResponseDto responseDto = UserResponseDto.fromEntity(savedUser);
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
     /**
      * 로그인
      * POST /auth/login
      * */
-    @PostMapping("/login")
-    @Operation(summary = "로그인", description = "사용자 ID와 비밀번호로 로그인합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "로그인 성공"),
-            @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content)
-    })
-    public ResponseEntity<?> login(
-            @Valid @RequestBody LoginRequestDto loginRequestDto,
-            HttpServletRequest request) {
-
-        Map<String, Object> response = new HashMap<>();
-
-        // Spring Security를 사용해 등록된 회원인지 여부를 파악 후 인증 토큰 발부
-        UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(loginRequestDto.getId(), loginRequestDto.getPassword());
-
-        // 인증 토큰을 통해 인증된 사용자 정보를 가져옴
-        // 내부적으로 DaoAuthenticationProvider -> CustomUserDetailsService 호출됨
-        Authentication authentication = authenticationManager.authenticate(authenticationToken);
-
-        // 사용자 정보를 SecurityContextHolder에 저장해둠
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        // jwt 토큰 사용 시 여기에 토큰 생성 로직 추가(06/11에 해야지)
-
-        return new ResponseEntity<>(authentication, HttpStatus.OK);
-    }
+//    @PostMapping("/login")
+//    @Operation(summary = "로그인", description = "사용자 ID와 비밀번호로 로그인합니다.")
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "로그인 성공"),
+//            @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content)
+//    })
+//    public ResponseEntity<?> login(
+//            @Valid @RequestBody LoginRequestDto loginRequestDto,
+//            HttpServletRequest request) {
+//
+//        Map<String, Object> response = new HashMap<>();
+//
+//        // Spring Security를 사용해 등록된 회원인지 여부를 파악 후 인증 토큰 발부
+//        UsernamePasswordAuthenticationToken authenticationToken =
+//                new UsernamePasswordAuthenticationToken(loginRequestDto.getId(), loginRequestDto.getPassword());
+//
+//        // 인증 토큰을 통해 인증된 사용자 정보를 가져옴
+//        // 내부적으로 DaoAuthenticationProvider -> CustomUserDetailsService 호출됨
+//        Authentication authentication = authenticationManager.authenticate(authenticationToken);
+//
+//        // 사용자 정보를 SecurityContextHolder에 저장해둠
+//        SecurityContextHolder.getContext().setAuthentication(authentication);
+//
+//        // jwt 토큰 사용 시 여기에 토큰 생성 로직 추가(06/11에 해야지)
+//
+//        return new ResponseEntity<>(authentication, HttpStatus.OK);
+//    }
 
     /**
      * 로그아웃 API

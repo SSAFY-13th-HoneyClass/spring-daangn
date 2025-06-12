@@ -23,7 +23,7 @@ public class UserResponseDto {
     private BigDecimal manner;         // 매너 온도
     private LocalDateTime lastest;     // 최근 활동 날짜
     private LocalDateTime created;     // 가입 일자
-    private String role;               // 사용자 권한
+    private User.Role role;               // 사용자 권한
 
     /**
      * User 엔티티를 DTO로 변환하는 정적 팩토리 메서드

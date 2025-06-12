@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
  * */
 @RestController
 @RequestMapping("/admin")
-@PreAuthorize("hasRole('ADMIN')")
 @RequiredArgsConstructor
 public class AdminController {
 
