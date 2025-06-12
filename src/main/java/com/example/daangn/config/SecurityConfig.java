@@ -1,6 +1,7 @@
 package com.example.daangn.config;
 
 import com.example.daangn.domain.user.entity.User;
+import com.example.daangn.security.jwt.JwtFilter;
 import com.example.daangn.security.jwt.JwtUtil;
 import com.example.daangn.security.jwt.LoginFilter;
 import com.example.daangn.security.service.CustomUserDetailsService;
@@ -83,7 +84,10 @@ public class SecurityConfig {
 
         // 필터 등록
         http
+                .addFilterBefore(new JwtFilter(jwtUtil), LoginFilter.class);
+        http
                 .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 
