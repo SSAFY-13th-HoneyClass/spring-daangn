@@ -28,7 +28,6 @@ import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true) //@PreAuthorize 사용을 위해 선언
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -79,7 +78,7 @@ public class SecurityConfig {
                         // 모든 권한 접근 허용 페이지
                         .requestMatchers("/", "/auth/login", "/auth/signup").permitAll()
                         // 관리자만 허용
-                        .requestMatchers("/admin/**").hasRole(User.Role.ADMIN.name())
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                 );
 
         // 필터 등록

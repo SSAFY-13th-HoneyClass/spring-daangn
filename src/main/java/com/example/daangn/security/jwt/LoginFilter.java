@@ -54,19 +54,31 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) {
         CustomUserDetailsService.CustomUserPrinciple principal = (CustomUserDetailsService.CustomUserPrinciple) authentication.getPrincipal();
 
+        String userId = principal.getUsername();
+
+        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
+        GrantedAuthority auth = iterator.next();
+        String role = auth.getAuthority();
+
+        // 10시간 = 10 * 60 * 60 * 1000 밀리초
+        Long expiredMs = 10 * 60 * 60 * 1000L;
+
         // 사용자 정보와 만료 시간을 넘겨주며 토큰 생성
-        String token = jwtUtil.createToken(authentication, 60*60*10L);
+        String token = jwtUtil.createToken(userId, role, expiredMs);
 
         // 헤더에 토큰 추가
         response.addHeader("Authorization", "Bearer " + token);
 
         System.out.println("successfulAuthentication: " + token);
+        System.out.println("Token expires in: " + expiredMs + " milliseconds");
     }
 
     //로그인 실패시 실행하는 메소드
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) {
-        //로그인 실패시 401 응답 코드 반환
+        // 로그인 실패시 401 응답 코드 반환
         response.setStatus(401);
+        System.out.println("Login failed: " + failed.getMessage());
     }
 }

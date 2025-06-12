@@ -28,48 +28,59 @@ public class JwtFilter extends OncePerRequestFilter {
         //request에서 Authorization 헤더를 찾음
         String authorization= request.getHeader(AUTHORIZATION_HEADER);
 
-        //Authorization 헤더 검증
+        // Authorization 헤더 검증
         if (authorization == null || !authorization.startsWith(BEARER_PREFIX)) {
-
-            System.out.println("token null");
+            System.out.println("Authorization 헤더가 없거나 Bearer 토큰이 아닙니다.");
             filterChain.doFilter(request, response);
-
-            //조건이 해당되면 메소드 종료 (필수)
             return;
         }
 
-        System.out.println("authorization now");
-        //Bearer 부분 제거 후 순수 토큰만 획득
-        String token = authorization.split(" ")[1];
+        // Bearer 부분 제거 후 순수 토큰만 획득
+        String token = authorization.substring(BEARER_PREFIX.length());
 
-        //토큰 소멸 시간 검증
-        if (jwtUtil.isExpired(token)) {
+        try {
+            // 토큰 유효성 검증
+            if (!jwtUtil.validateToken(token)) {
+                System.out.println("유효하지 않은 토큰입니다.");
+                filterChain.doFilter(request, response);
+                return;
+            }
 
-            System.out.println("token expired");
-            filterChain.doFilter(request, response);
+            // 토큰이 만료되었는지 확인
+            if (jwtUtil.isExpired(token)) {
+                System.out.println("만료된 토큰입니다.");
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("{\"error\": \"토큰이 만료되었습니다.\"}");
+                return;
+            }
 
-            //조건이 해당되면 메소드 종료 (필수)
-            return;
+            // 토큰에서 username과 role 획득
+            String userId = jwtUtil.getUserId(token);
+            String role = jwtUtil.getRole(token);
+
+            // userEntity를 생성하여 값 set
+            User user = new User();
+            user.setId(userId);
+            user.setPassword("temppassword"); // 실제 패스워드는 필요 없음
+            user.setRole("ROLE_USER".equals(role) ? User.Role.USER : User.Role.ADMIN);
+
+            // UserDetails에 회원 정보 객체 담기
+            CustomUserDetailsService.CustomUserPrinciple principle =
+                    new CustomUserDetailsService.CustomUserPrinciple(user);
+
+            // 스프링 시큐리티 인증 토큰 생성
+            Authentication authentication = new UsernamePasswordAuthenticationToken(
+                    principle, null, principle.getAuthorities());
+
+            // 세션에 사용자 등록
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            System.out.println("JWT 인증 성공: " + userId + ", Role: " + role);
+
+        } catch (Exception e) {
+            System.out.println("JWT 처리 중 오류 발생: " + e.getMessage());
+            SecurityContextHolder.clearContext();
         }
-
-        //토큰에서 username과 role 획득
-        String userId = jwtUtil.getUserId(token);
-        String role = jwtUtil.getRole(token);
-
-        //userEntity를 생성하여 값 set
-        User user = new User();
-        user.setId(userId);
-        user.setPassword("temppassword");
-        user.setRole(User.Role.USER.name().equals(role) ? User.Role.USER : User.Role.ADMIN);
-
-        //UserDetails에 회원 정보 객체 담기
-        CustomUserDetailsService.CustomUserPrinciple principle = new CustomUserDetailsService.CustomUserPrinciple(user);
-
-        //스프링 시큐리티 인증 토큰 생성
-        Authentication authentication = new UsernamePasswordAuthenticationToken(principle, null, principle.getAuthorities());
-
-        //세션에 사용자 등록
-        SecurityContextHolder.getContext().setAuthentication(authentication);
 
         filterChain.doFilter(request, response);
     }
