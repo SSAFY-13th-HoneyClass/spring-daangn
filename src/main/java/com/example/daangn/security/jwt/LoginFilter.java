@@ -23,6 +23,14 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
+
+        // 파라미터 이름 설정 (주의!! 이걸로 1시간 삽질함)
+
+        // 로그인 처리 URL을 /auth/login으로 설정
+        // UsernamePasswordAuthenticationFilter는 기본적으로 /login 경로에서만 동작하기 때문
+        setFilterProcessesUrl("/auth/login");
+        // UsernamePasswordAuthenticationFilter는 기본적으로 username으로 값을 받고 저장
+        setUsernameParameter("id");        // 'id' 파라미터를 username으로 사용
     }
 
     @Override
