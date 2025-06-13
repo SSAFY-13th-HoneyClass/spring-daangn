@@ -164,3 +164,43 @@ public void solution() {
 
 ### 커스텀 에러 처리
 ![alt text](/image/image-3.png)
+
+
+
+
+# 5주차 과제 : 스프링 시큐리티
+
+## 1. JWT 인증(Authentication) 방법
+STUDY > auth_flow_summary.md 참고
+
+## 2. 액세스 토큰 및 인증 인가
+
+### 회원가입
+![alt text](/image/image-9.png)
+
+### encoding된 password
+![alt text](/image/image-10.png)
+
+### 로그인 시 액세스 토큰 발급
+![alt text](/image/image-11.png)
+
+### 토큰 없이 채팅방 생성 시 인증 필요
+![alt text](/image/image-12.png)
+
+### 토큰 인증 후 채팅방 생성 시 성공
+![alt text](/image/image-13.png)
+
+![alt text](/image/image-14.png)
+
+### 리프레시 토큰 로그인
+![alt text](/image/image-15.png)
+
+### 리프레시 토큰을 이용한 액세스 토큰 갱신
+![alt text](/image/image-16.png)
+
+
+### 추가 하고싶은 일
+- 로그아웃 시 액세스 토큰도 블랙리스트에 등록하기
+- 토큰에 있는 user정보와 실제 api에 필요한 권한이 일치하는지 확인하는 filter추가
+- 레디스에 올리고 쿠키에서 안보이게 하기
+

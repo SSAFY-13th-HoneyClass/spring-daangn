@@ -111,4 +111,30 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
+
+
+    // GlobalExceptionHandler에 추가
+    @ExceptionHandler(IpValidationException.class)
+    public ResponseEntity<ErrorResponse> handleIpValidationException(IpValidationException e) {
+        log.error("IpValidationException: {}", e.getMessage());
+
+        ErrorResponse errorResponse = ErrorResponse.of(
+                ErrorCode.INVALID_PASSWORD, // 또는 새로운 보안 관련 에러 코드
+                "보안 검증에 실패했습니다."
+        );
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
+    }
+
+    @ExceptionHandler(TokenRefreshException.class)
+    public ResponseEntity<ErrorResponse> handleTokenRefreshException(TokenRefreshException e) {
+        log.error("TokenRefreshException: {}", e.getMessage());
+
+        ErrorResponse errorResponse = ErrorResponse.of(
+                ErrorCode.INVALID_PASSWORD, // 또는 새로운 토큰 관련 에러 코드 추가
+                e.getMessage()
+        );
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
+    }
 }
