@@ -21,6 +21,13 @@
 - Global Exception Handler 만들기
 - Swagger 연동 후 Controller 통합 테스트
 
+### [🔐 5주차 미션](./5주차%20미션.md)
+- JWT 인증(Authentication) 방법에 대해서 알아보기
+- 액세스 토큰 발급 및 검증 로직 구현하기
+- 회원가입 및 로그인 API 구현하고 테스트하기
+- 토큰이 필요한 API 1개 이상 구현하고 테스트하기
+- 리프레쉬 토큰 발급 로직 구현하고 테스트하기
+
 ---
 
 ## 🛠️ 기술 스택
@@ -29,8 +36,10 @@
 - **Spring Boot**: 3.4.5
 - **Spring Data JPA**
 - **H2 Database** (개발/테스트 환경)
+- **Redis** (RefreshToken 관리)
 - **Swagger/OpenAPI 3.0**
 - **Spring Security**
+- **JWT (JSON Web Token)**
 - **Gradle**
 
 ---
@@ -46,11 +55,13 @@ spring-daangn/
 │   ├── entity/           # JPA 엔티티
 │   ├── dto/              # 데이터 전송 객체
 │   ├── exception/        # 예외 처리 클래스
+│   ├── security/         # JWT 인증 및 보안 설정
 │   └── config/           # 설정 클래스
 ├── src/test/java/        # 테스트 코드
 ├── 2주차 미션.md         # 2주차 미션 문서
 ├── 3주차 미션.md         # 3주차 미션 문서
 ├── 4주차 미션.md         # 4주차 미션 문서
+├── 5주차 미션.md         # 5주차 미션 문서
 └── README.md            # 프로젝트 소개
 ```
 
@@ -82,4 +93,7 @@ spring-daangn/
 - **Spring Boot**: RESTful API 개발, 계층형 아키텍처
 - **테스트**: 단위 테스트, 통합 테스트, TDD
 - **API 문서화**: Swagger/OpenAPI를 활용한 문서화
-- **예외 처리**: Global Exception Handler를 통한 통합 예외 처리 
+- **예외 처리**: Global Exception Handler를 통한 통합 예외 처리
+- **JWT 인증**: 토큰 기반 인증 시스템, RefreshToken 관리
+- **Redis**: 인메모리 데이터베이스를 활용한 토큰 관리
+- **보안**: Spring Security, XSS/CSRF 방지, HttpOnly 쿠키 
