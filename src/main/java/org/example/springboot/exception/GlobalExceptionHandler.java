@@ -10,6 +10,17 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(CustomException.class)
+    public ResponseEntity<ErrorResponse> handleCustomException(CustomException e) {
+        log.error("Custom exception occurred: code={}, message={}", e.getErrorCode().getCode(), e.getMessage());
+        ErrorResponse errorResponse = ErrorResponse.of(
+                e.getErrorCode().getStatus().value(),
+                e.getErrorCode().getCode(),
+                e.getMessage()
+        );
+        return ResponseEntity.status(e.getErrorCode().getStatus()).body(errorResponse);
+    }
+
     @ExceptionHandler(ItemNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleItemNotFoundException(ItemNotFoundException e) {
         log.error("Item not found: {}", e.getMessage());

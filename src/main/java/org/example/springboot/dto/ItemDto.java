@@ -22,16 +22,12 @@ public class ItemDto {
         
         @Schema(description = "아이템 설명", example = "깨끗하게 사용했습니다. 직거래 선호", required = true)
         private String content;
-        
-        @Schema(description = "사용자 ID", example = "1", required = true)
-        private Long userId;
 
         // 정적 팩토리 메서드
-        public static CreateRequest of(String title, String content, Long userId) {
+        public static CreateRequest of(String title, String content) {
             return CreateRequest.builder()
                     .title(title)
                     .content(content)
-                    .userId(userId)
                     .build();
         }
     }

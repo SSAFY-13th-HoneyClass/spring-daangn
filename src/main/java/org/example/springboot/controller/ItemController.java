@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +15,7 @@ import org.example.springboot.exception.ErrorResponse;
 import org.example.springboot.service.ItemService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,11 +29,14 @@ public class ItemController {
 
     private final ItemService itemService;
 
-    @Operation(summary = "새로운 아이템 생성", description = "새로운 당근마켓 아이템을 생성합니다.")
+    @Operation(summary = "새로운 아이템 생성", description = "새로운 당근마켓 아이템을 생성합니다.",
+            security = @SecurityRequirement(name = "Bearer Authentication"))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "아이템 생성 성공",
                     content = @Content(schema = @Schema(implementation = ItemDto.DetailResponse.class))),
             @ApiResponse(responseCode = "400", description = "잘못된 요청",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "인증 실패",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping
@@ -41,10 +46,12 @@ public class ItemController {
                     required = true,
                     content = @Content(schema = @Schema(implementation = ItemDto.CreateRequest.class))
             )
-            @RequestBody ItemDto.CreateRequest request) {
-        log.info("Creating new item with request: {}", request);
+            @RequestBody ItemDto.CreateRequest request,
+            Authentication authentication) {
+        Long currentUserId = Long.parseLong(authentication.getName());
+        log.info("Creating new item with request: {} by user: {}", request, currentUserId);
         
-        ItemDto.DetailResponse response = itemService.createItem(request);
+        ItemDto.DetailResponse response = itemService.createItem(request, currentUserId);
         
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -81,28 +88,40 @@ public class ItemController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "특정 아이템 삭제", description = "ID로 특정 아이템을 삭제합니다.")
+    @Operation(summary = "특정 아이템 삭제", description = "ID로 특정 아이템을 삭제합니다.",
+            security = @SecurityRequirement(name = "Bearer Authentication"))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "아이템 삭제 성공"),
             @ApiResponse(responseCode = "404", description = "아이템을 찾을 수 없음",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "인증 실패",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "권한 없음",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteItem(
             @Parameter(description = "삭제할 아이템의 ID", required = true, example = "1")
-            @PathVariable("id") Long itemId) {
-        log.info("Deleting item with id: {}", itemId);
+            @PathVariable("id") Long itemId,
+            Authentication authentication) {
+        Long currentUserId = Long.parseLong(authentication.getName());
+        log.info("Deleting item with id: {} by user: {}", itemId, currentUserId);
         
-        itemService.deleteItem(itemId);
+        itemService.deleteItem(itemId, currentUserId);
         
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "특정 아이템 업데이트", description = "ID로 특정 아이템의 정보를 업데이트합니다.")
+    @Operation(summary = "특정 아이템 업데이트", description = "ID로 특정 아이템의 정보를 업데이트합니다.",
+            security = @SecurityRequirement(name = "Bearer Authentication"))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "아이템 업데이트 성공",
                     content = @Content(schema = @Schema(implementation = ItemDto.DetailResponse.class))),
             @ApiResponse(responseCode = "404", description = "아이템을 찾을 수 없음",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "인증 실패",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "권한 없음",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PutMapping("/{id}")
@@ -114,10 +133,12 @@ public class ItemController {
                     required = true,
                     content = @Content(schema = @Schema(implementation = ItemDto.UpdateRequest.class))
             )
-            @RequestBody ItemDto.UpdateRequest request) {
-        log.info("Updating item with id: {} and request: {}", itemId, request);
+            @RequestBody ItemDto.UpdateRequest request,
+            Authentication authentication) {
+        Long currentUserId = Long.parseLong(authentication.getName());
+        log.info("Updating item with id: {} and request: {} by user: {}", itemId, request, currentUserId);
         
-        ItemDto.DetailResponse response = itemService.updateItem(itemId, request);
+        ItemDto.DetailResponse response = itemService.updateItem(itemId, request, currentUserId);
         
         return ResponseEntity.ok(response);
     }

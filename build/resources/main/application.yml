@@ -31,3 +31,10 @@ springdoc:
     path: /v3/api-docs
   default-consumes-media-type: application/json
   default-produces-media-type: application/json
+
+jwt:
+  secret: TVHH28SHOICF0iwejO5N/tE9qSpzc0BmcsWxF91KdWvjtWjvThzMtZc2Vt0WTM82nWQHbONUzwDrC2Svzf7i8w==
+  access-token:
+    expiration: 3600000  # 1시간 (밀리초)
+  refresh-token:
+    expiration: 604800000  # 7일 (밀리초)
