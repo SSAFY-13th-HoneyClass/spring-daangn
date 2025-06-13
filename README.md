@@ -242,7 +242,7 @@ public class AdminController {
 -----------
 
 ### Redis 기반 Refresh Token 관리
-> 확장 가능하고 성능이 우수한 토큰 저장소 구현
+> In-Memory 기반의 토큰 저장소 구현
 
 **Redis 설정**
 ```java
