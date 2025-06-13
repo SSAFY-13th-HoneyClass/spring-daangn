@@ -189,3 +189,102 @@ http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilt
 | `service`    | `AuthService`                       | 비즈니스 로직 처리                  |
 | `repository` | `RefreshTokenRepository` (optional) | Redis 또는 DB 저장소             |
 | `config`     | `SecurityConfig`                    | Spring Security 설정          |
+
+
+# 🚗해보자 해보자
+
+1. JWT 의존성 추가하기
+2. JWTUtil 만들기
+3. JwtAuthenticationFilter 만듥; (JWT 인증 필터)
+4. userDetailsService 구현체 만들기
+5. SecurityConfig 만들기
+6. 필수 JWT DTO 만들기
+7. UserService와 UserServiceImpl JWT 방식으로 업그레이드
+8. BCrypt 적용을 위해 회원가입 리팩토링
+9. UserController 만들기
+10. application.yml에 JWT 설정 추가하기
+11. SecurityConfig에서 로그인관련 요청권한 업데이트 하기
+12. JWT토큰을 Swagger에서 입력할 수 있도록 SwaggerConfig 업데이트
+13. SecurityUtil 만들기
+14. GlobalExceptionHandler에 접근 권한 예외 처리 추가
+15. TokenProvider라는걸 이제야 발견!! 공부해보고 구현해보자 아래에서 다시 이야기 하겠다.
+
+## ❓ BCrypt 가 뭔데?
+
+- Blowfish 암호 알고리즘을 기반으로 만들어진 비밀번호 해싱 함수
+- Salt(랜덤 값)를 자동으로 생성·조합하고, 반복(round) 횟수를 조절할 수 있어 점점 더 느리게(→ 더 안전하게) 연산
+- 해시 결과 문자열에 사용된 salt와 cost(work factor)가 함께 인코딩되어 저장됨
+
+## ❓ Blowfish 가 뭐지?
+
+- 1993년, 암호학자 Bruce Schneier가 개발한 대칭키 블록 암호화 알고리즘
+- 대칭키: 암호화/복호화에 같은 키를 사용하는 방식
+- 블록 암호: 고정된 크기(예: 64비트)의 데이터를 블록 단위로 암호화함
+- 빠르고 유연하고 무료,공개 알고리즘 이지만 옛날 알고리즘이라 AES보다는 덜 추천
+
+## 로그인 및 회원가입 Swagger 페이지
+![img_11.png](img_11.png)
+
+## 회원가입 성공!
+![img_5.png](img_5.png)
+
+## Bcrypt 로 비밀번호 해싱
+![img_6.png](img_6.png)
+
+## 로그인 성공!
+![img_7.png](img_7.png)
+
+## 12번에서 Swagger 페이지에 Authorize 추가
+![img_9.png](img_9.png)
+
+## 기본적으로 로그인 하지않으면(토큰이 없으면) 403 권한 없음
+![img_12.png](img_12.png)
+
+## 로그인 진행후 사용자 정보 조회
+![img_13.png](img_13.png)
+
+## JWT 토큰 정보를 이용하여 사용자 정보조회
+![img_14.png](img_14.png)
+
+# TokenProvider
+JWTUtil을 만들었었는데 과제 내용을 보니 TokenProvider을 사용하는 방식이었다.
+무슨 차이가 있을까?
+
+
+## JwtUtil: 기본적인 로그인/인증 
+- 회원가입/로그인
+- 기본 API 인증
+- 간단하고 빠름
+
+## TokenProvider: 고급 보안 기능
+
+- 복잡한 권한 관리
+- 토큰 갱신 시스템
+- 실시간 보안 모니터링
+- Spring Security 완전 통합
+- 토큰 분석 및 통계
+
+## TokenProvider로 구현하면 좋을 기능들
+- 토큰 갱신 API - 가장 실용적
+- 관리자 권한 시스템 - 확장성 좋음
+- 보안 모니터링 대시보드 - 운영에 유용
+- 다중 권한 관리 - 비즈니스 로직에 필요
+
+
+# TokenProvider 적용해보기
+
+- 토큰 갱신 기능을 추가해보자
+
+1. UserServiceImpl에 TokenProvider 추가하기
+2. UserController에 토큰 갱신 추가
+3. 필요한 DTO 추가
+4. JwtAuthenticationFilter에 TokenProvider지원 추가
+5. SecurityConfig에 경로 추가
+
+## 토큰 갱신 과정
+1. 로그인시 AccessToken과 RefreshToken 두개 발급
+2. Access Token 만료시 /api/users/refresh로 토큰 재발급
+3. 새로운 Access Token으로 API 호출
+
+현재는 수동 갱신 방법으로 진행중이다. 이후 Redis를 이용하여 자동갱신까지 진행해 보자
+
