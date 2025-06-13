@@ -125,12 +125,13 @@ JPA에서 발생할 수 있는 N+1 문제**를 확인하고, fetch join을 통�
 ## 2. 액세스 토큰 발급 및 검증 로직 구현하기
 * 액세스 토근 발급
 <img width="836" alt="image" src="https://github.com/user-attachments/assets/054fe0ad-45cb-4eb4-a573-c5fcba9f2c46" />
+
 * 검증 로직
 <img width="692" alt="image" src="https://github.com/user-attachments/assets/00a41aec-bde8-40ff-bc5d-5767ff8bce4a" />
 
 
 ## 3. 회원가입 및 로그인 API 구현하고 테스트하기
-* 회원가입
+### 회원가입
 <img width="1431" alt="image" src="https://github.com/user-attachments/assets/67c2a55d-008b-4e98-9ebc-1245bf226528" />
 <img width="1410" alt="image" src="https://github.com/user-attachments/assets/a4945293-12eb-4aa0-833e-6361fb393d19" />
 
@@ -147,6 +148,7 @@ JPA에서 발생할 수 있는 N+1 문제**를 확인하고, fetch join을 통�
 <img width="1398" alt="image" src="https://github.com/user-attachments/assets/d0c89f4c-0f66-434d-a8b5-efd9a7b98552" />
 
 <img width="886" alt="image" src="https://github.com/user-attachments/assets/709e8c9a-7569-4b17-b415-d65070201e04" />
+
 결과가
 403에러 발생....ㅠ
 
