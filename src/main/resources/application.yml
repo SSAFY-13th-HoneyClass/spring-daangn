@@ -1,4 +1,8 @@
 spring:
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: 6379
   datasource:
     url: ${JDBC_URL}
     username: ${DB_USER}
@@ -17,6 +21,9 @@ logging:
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
 
+# jwt 설정
+jwt:
+  secret: ${JWT_SECRET}
 
 # Swagger 설정
 springdoc:

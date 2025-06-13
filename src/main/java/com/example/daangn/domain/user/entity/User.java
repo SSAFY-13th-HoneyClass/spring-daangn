@@ -2,6 +2,7 @@ package com.example.daangn.domain.user.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.CurrentTimestamp;
 
 import java.math.BigDecimal;
@@ -39,11 +40,17 @@ public class User {
 
     private LocalDateTime lastest;
 
-    @CurrentTimestamp
+    @CreationTimestamp
     private LocalDateTime created;
 
-    private String role;
+    @Enumerated(EnumType.STRING)
+    @Column(length = 10)
+    private Role role;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserLocation> userLocations = new ArrayList<>();
+
+    public enum Role {
+        ADMIN, USER
+    }
 }

@@ -3,6 +3,7 @@ package com.example.daangn.domain.post.entity;
 import com.example.daangn.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.CurrentTimestamp;
 
 import java.time.LocalDateTime;
@@ -43,7 +44,7 @@ public class Post {
 
     private Boolean hot;
 
-    @CurrentTimestamp
+    @CreationTimestamp
     private LocalDateTime created;
 
     private Integer views;
