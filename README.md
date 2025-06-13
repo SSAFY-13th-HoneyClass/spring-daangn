@@ -333,7 +333,8 @@ private void setRefreshTokenCookie(HttpServletResponse response, String refreshT
     - **refresh token 확인(cookie에 담겨서 옴)**
       ![img_3.png](assets/img_3.png)
     - **redis의 refresh token 확인**
-      ![img_4.png](assets/img_4.png)
+      
+        ![img.png](assets/redis.png)
 
 3. **권한별 관리자 API 접근** → `GET` `http://localhost:8080/admin/` (관리자만 접근 가능)
     - **`USER` 권한으로 접근 시 -> `403` 발생**
