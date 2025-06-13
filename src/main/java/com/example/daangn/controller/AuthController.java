@@ -1,16 +1,18 @@
 package com.example.daangn.controller;
 
 import com.example.daangn.domain.user.dto.LoginRequestDto;
+import com.example.daangn.domain.user.dto.LoginResponseDto;
 import com.example.daangn.domain.user.dto.UserRequestDto;
 import com.example.daangn.domain.user.dto.UserResponseDto;
-import com.example.daangn.domain.user.entity.User;
 import com.example.daangn.domain.user.service.UserService;
+import com.example.daangn.security.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -18,134 +20,184 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "Authentication", description = "인증 관련 API")
 public class AuthController {
 
-    private final AuthenticationManager authenticationManager;
+    private final AuthService authService;
     private final UserService userService;
 
     /**
-     * 새로운 사용자 생성 (회원가입)
-     * POST /auth/signup
+     * 회원가입
      */
     @PostMapping("/signup")
-    @Operation(summary = "사용자 생성", description = "새로운 사용자를 생성합니다 (회원가입)")
+    @Operation(summary = "회원가입", description = "새로운 사용자를 생성합니다")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "사용자 생성 성공",
+            @ApiResponse(responseCode = "201", description = "회원가입 성공",
                     content = @Content(schema = @Schema(implementation = UserResponseDto.class))),
-            @ApiResponse(responseCode = "409", description = "이미 존재하는 사용자 ID",
+            @ApiResponse(responseCode = "400", description = "입력값 오류 또는 중복된 정보",
                     content = @Content(schema = @Schema(implementation = String.class)))
     })
-    public ResponseEntity<?> createUser(
-            @RequestBody @Schema(description = "사용자 생성 요청 데이터") UserRequestDto requestDto) {
+    public ResponseEntity<?> signup(
+            @Valid @RequestBody @Schema(description = "회원가입 요청 데이터") UserRequestDto requestDto) {
         try {
-            // 사용자 생성 (중복 체크 포함)
             UserResponseDto savedUser = userService.join(requestDto);
-
-            // 생성된 사용자 정보를 반환
             return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("회원가입 중 오류가 발생했습니다: " + e.getMessage());
+            log.error("회원가입 오류", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("회원가입 중 오류가 발생했습니다: " + e.getMessage());
         }
     }
 
     /**
      * 로그인
-     * POST /auth/login
-     * */
-//    @PostMapping("/login")
-//    @Operation(summary = "로그인", description = "사용자 ID와 비밀번호로 로그인합니다.")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "로그인 성공"),
-//            @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content)
-//    })
-//    public ResponseEntity<?> login(
-//            @Valid @RequestBody LoginRequestDto loginRequestDto,
-//            HttpServletRequest request) {
-//
-//        Map<String, Object> response = new HashMap<>();
-//
-//        // Spring Security를 사용해 등록된 회원인지 여부를 파악 후 인증 토큰 발부
-//        UsernamePasswordAuthenticationToken authenticationToken =
-//                new UsernamePasswordAuthenticationToken(loginRequestDto.getId(), loginRequestDto.getPassword());
-//
-//        // 인증 토큰을 통해 인증된 사용자 정보를 가져옴
-//        // 내부적으로 DaoAuthenticationProvider -> CustomUserDetailsService 호출됨
-//        Authentication authentication = authenticationManager.authenticate(authenticationToken);
-//
-//        // 사용자 정보를 SecurityContextHolder에 저장해둠
-//        SecurityContextHolder.getContext().setAuthentication(authentication);
-//
-//        // jwt 토큰 사용 시 여기에 토큰 생성 로직 추가(06/11에 해야지)
-//
-//        return new ResponseEntity<>(authentication, HttpStatus.OK);
-//    }
-
-    /**
-     * 로그아웃 API
-     *
-     * POST /auth/logout
      */
-    @PostMapping("/logout")
-    public ResponseEntity<Map<String, Object>> logout(HttpServletRequest request) {
-        Map<String, Object> response = new HashMap<>();
-
+    @PostMapping("/login")
+    @Operation(summary = "로그인", description = "사용자 ID와 비밀번호로 로그인합니다")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "로그인 성공",
+                    content = @Content(schema = @Schema(implementation = LoginResponseDto.class))),
+            @ApiResponse(responseCode = "401", description = "인증 실패",
+                    content = @Content(schema = @Schema(implementation = String.class)))
+    })
+    public ResponseEntity<?> login(
+            @Valid @RequestBody LoginRequestDto loginRequest,
+            HttpServletResponse response) {
         try {
-            // SecurityContext 클리어
-            SecurityContextHolder.clearContext();
+            LoginResponseDto loginResponse = authService.login(loginRequest);
 
-            //추후 쿠키,토큰,헤더 처리 필요(6/11 하자)
+            // Refresh Token을 HttpOnly 쿠키로 설정
+            setRefreshTokenCookie(response, loginResponse.getRefreshToken());
 
-            response.put("success", true);
-            response.put("message", "로그아웃되었습니다.");
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(loginResponse);
 
+        } catch (BadCredentialsException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         } catch (Exception e) {
-            response.put("success", false);
-            response.put("message", "로그아웃 처리 중 오류 발생");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            log.error("로그인 오류", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("로그인 중 오류가 발생했습니다");
         }
     }
 
     /**
-     * 특정 사용자 삭제
-     * DELETE /auth/users/{id}/
+     * Access Token 재발급
      */
-    @DeleteMapping("/users/{id}/")
-    @Operation(summary = "사용자 삭제", description = "사용자 ID로 특정 사용자를 삭제합니다")
+    @PostMapping("/refresh")
+    @Operation(summary = "토큰 재발급", description = "Refresh Token을 사용해 새로운 Access Token을 발급받습니다")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "사용자 삭제 성공",
-                    content = @Content(schema = @Schema(implementation = String.class))),
-            @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없음",
+            @ApiResponse(responseCode = "200", description = "토큰 재발급 성공",
+                    content = @Content(schema = @Schema(implementation = LoginResponseDto.class))),
+            @ApiResponse(responseCode = "401", description = "유효하지 않은 Refresh Token",
                     content = @Content(schema = @Schema(implementation = String.class)))
     })
-    public ResponseEntity<?> deleteUser(
-            @PathVariable @Parameter(description = "사용자 ID") Long id) {
-        Optional<User> user = userService.findByUID(id);
+    public ResponseEntity<?> refreshToken(HttpServletRequest request) {
+        try {
+            String refreshToken = getRefreshTokenFromCookie(request);
 
-        if (user.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("해당 ID의 사용자를 찾을 수 없습니다.");
+            if (refreshToken == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body("Refresh Token이 없습니다");
+            }
+
+            LoginResponseDto refreshResponse = authService.refreshAccessToken(refreshToken);
+            return ResponseEntity.ok(refreshResponse);
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        } catch (Exception e) {
+            log.error("토큰 재발급 오류", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("토큰 재발급 중 오류가 발생했습니다");
         }
+    }
 
-        userService.delete(id);
-        return ResponseEntity.ok("사용자가 성공적으로 삭제되었습니다.");
+    /**
+     * 로그아웃
+     */
+    @PostMapping("/logout")
+    @Operation(summary = "로그아웃", description = "로그아웃 처리를 합니다")
+    @ApiResponse(responseCode = "200", description = "로그아웃 성공")
+    public ResponseEntity<Map<String, Object>> logout(
+            HttpServletRequest request,
+            HttpServletResponse response) {
+        Map<String, Object> result = new HashMap<>();
+
+        try {
+            // 현재 인증된 사용자 정보 가져오기
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null && authentication.isAuthenticated()) {
+                String userId = authentication.getName();
+                authService.logout(userId);
+            }
+
+            // Refresh Token 쿠키 삭제
+            clearRefreshTokenCookie(response);
+
+            // SecurityContext 클리어
+            SecurityContextHolder.clearContext();
+
+            result.put("success", true);
+            result.put("message", "로그아웃되었습니다");
+            return ResponseEntity.ok(result);
+
+        } catch (Exception e) {
+            log.error("로그아웃 오류", e);
+            result.put("success", false);
+            result.put("message", "로그아웃 처리 중 오류 발생");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
+        }
+    }
+
+    /**
+     * Refresh Token을 HttpOnly 쿠키로 설정
+     */
+    private void setRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
+        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
+        refreshTokenCookie.setHttpOnly(true);
+        refreshTokenCookie.setSecure(true); // HTTPS에서만 전송 (개발환경에서는 false로 설정)
+        refreshTokenCookie.setPath("/");
+        refreshTokenCookie.setMaxAge(7 * 24 * 60 * 60); // 7일
+        response.addCookie(refreshTokenCookie);
+    }
+
+    /**
+     * 쿠키에서 Refresh Token 추출
+     */
+    private String getRefreshTokenFromCookie(HttpServletRequest request) {
+        if (request.getCookies() != null) {
+            return Arrays.stream(request.getCookies())
+                    .filter(cookie -> "refreshToken".equals(cookie.getName()))
+                    .map(Cookie::getValue)
+                    .findFirst()
+                    .orElse(null);
+        }
+        return null;
+    }
+
+    /**
+     * Refresh Token 쿠키 삭제
+     */
+    private void clearRefreshTokenCookie(HttpServletResponse response) {
+        Cookie cookie = new Cookie("refreshToken", null);
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+        cookie.setHttpOnly(true);
+        response.addCookie(cookie);
     }
 }

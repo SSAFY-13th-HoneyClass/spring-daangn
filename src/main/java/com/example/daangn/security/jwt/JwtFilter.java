@@ -6,6 +6,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,6 +14,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+@Slf4j
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
@@ -25,12 +27,20 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        //request에서 Authorization 헤더를 찾음
-        String authorization= request.getHeader(AUTHORIZATION_HEADER);
+
+        // 인증이 필요하지 않은 경로는 바로 통과
+        String requestURI = request.getRequestURI();
+        if (isPublicPath(requestURI)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        // Authorization 헤더에서 토큰 추출
+        String authorization = request.getHeader(AUTHORIZATION_HEADER);
 
         // Authorization 헤더 검증
         if (authorization == null || !authorization.startsWith(BEARER_PREFIX)) {
-            System.out.println("Authorization 헤더가 없거나 Bearer 토큰이 아닙니다.");
+            log.debug("Authorization 헤더가 없거나 Bearer 토큰이 아닙니다: {}", requestURI);
             filterChain.doFilter(request, response);
             return;
         }
@@ -41,47 +51,77 @@ public class JwtFilter extends OncePerRequestFilter {
         try {
             // 토큰 유효성 검증
             if (!jwtUtil.validateToken(token)) {
-                System.out.println("유효하지 않은 토큰입니다.");
+                log.debug("유효하지 않은 토큰입니다: {}", requestURI);
                 filterChain.doFilter(request, response);
                 return;
             }
 
             // 토큰이 만료되었는지 확인
             if (jwtUtil.isExpired(token)) {
-                System.out.println("만료된 토큰입니다.");
+                log.debug("만료된 토큰입니다: {}", requestURI);
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("{\"error\": \"토큰이 만료되었습니다.\"}");
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                response.getWriter().write("{\"error\": \"토큰이 만료되었습니다.\", \"code\": \"TOKEN_EXPIRED\"}");
                 return;
             }
 
-            // 토큰에서 username과 role 획득
+            // Access Token인지 확인
+            if (!jwtUtil.isAccessToken(token)) {
+                log.debug("Access Token이 아닙니다: {}", requestURI);
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                response.getWriter().write("{\"error\": \"유효하지 않은 토큰 타입입니다.\", \"code\": \"INVALID_TOKEN_TYPE\"}");
+                return;
+            }
+
+            // 토큰에서 사용자 정보 추출
             String userId = jwtUtil.getUserId(token);
             String role = jwtUtil.getRole(token);
 
-            // userEntity를 생성하여 값 set
+            // User 엔티티 생성 (실제 DB 조회 대신 토큰 정보 사용)
             User user = new User();
             user.setId(userId);
-            user.setPassword("temppassword"); // 실제 패스워드는 필요 없음
-            user.setRole("ROLE_USER".equals(role) ? User.Role.USER : User.Role.ADMIN);
+            user.setPassword(""); // 패스워드는 필요 없음
+            user.setRole("ROLE_ADMIN".equals(role) ? User.Role.ADMIN : User.Role.USER);
 
-            // UserDetails에 회원 정보 객체 담기
-            CustomUserDetailsService.CustomUserPrinciple principle =
+            // UserDetails 생성
+            CustomUserDetailsService.CustomUserPrinciple principal =
                     new CustomUserDetailsService.CustomUserPrinciple(user);
 
-            // 스프링 시큐리티 인증 토큰 생성
+            // Spring Security 인증 토큰 생성
             Authentication authentication = new UsernamePasswordAuthenticationToken(
-                    principle, null, principle.getAuthorities());
+                    principal, null, principal.getAuthorities());
 
-            // 세션에 사용자 등록
+            // SecurityContext에 인증 정보 저장
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            System.out.println("JWT 인증 성공: " + userId + ", Role: " + role);
+            log.debug("JWT 인증 성공: {} ({})", userId, role);
 
         } catch (Exception e) {
-            System.out.println("JWT 처리 중 오류 발생: " + e.getMessage());
+            log.error("JWT 처리 중 오류 발생: {}", e.getMessage(), e);
             SecurityContextHolder.clearContext();
+
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write("{\"error\": \"토큰 처리 중 오류가 발생했습니다.\", \"code\": \"TOKEN_PROCESSING_ERROR\"}");
+            return;
         }
 
         filterChain.doFilter(request, response);
     }
+
+    /**
+     * 인증이 필요하지 않은 공개 경로인지 확인
+     */
+    private boolean isPublicPath(String requestURI) {
+        return requestURI.equals("/") ||
+                requestURI.startsWith("/auth/") ||
+                requestURI.startsWith("/swagger-ui") ||
+                requestURI.startsWith("/v3/api-docs");
+    }
 }
+
+
