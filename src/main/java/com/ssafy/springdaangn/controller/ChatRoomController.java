@@ -1,6 +1,6 @@
 package com.ssafy.springdaangn.controller;
 
-import com.ssafy.springdaangn.Domain.ChatRoom;
+import com.ssafy.springdaangn.domain.ChatRoom;
 import com.ssafy.springdaangn.service.ChatroomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

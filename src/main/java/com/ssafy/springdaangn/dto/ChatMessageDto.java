@@ -1,7 +1,7 @@
 package com.ssafy.springdaangn.dto;
 
-import com.ssafy.springdaangn.Domain.ChatMessage;
-import com.ssafy.springdaangn.Domain.MessageType;
+import com.ssafy.springdaangn.domain.ChatMessage;
+import com.ssafy.springdaangn.domain.MessageType;
 import lombok.Builder;
 import lombok.Getter;
 

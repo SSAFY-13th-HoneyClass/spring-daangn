@@ -1,11 +1,11 @@
 package com.ssafy.springdaangn.service;
 
-import com.ssafy.springdaangn.Domain.ChatMessage;
-import com.ssafy.springdaangn.Domain.ChatRoom;
-import com.ssafy.springdaangn.Exception.ChatMessageNotFoundException;
-import com.ssafy.springdaangn.Exception.ChatRoomNotFoundException;
-import com.ssafy.springdaangn.Repository.ChatMessageRepository;
-import com.ssafy.springdaangn.Repository.ChatRoomRepository;
+import com.ssafy.springdaangn.domain.ChatMessage;
+import com.ssafy.springdaangn.domain.ChatRoom;
+import com.ssafy.springdaangn.exception.ChatMessageNotFoundException;
+import com.ssafy.springdaangn.exception.ChatRoomNotFoundException;
+import com.ssafy.springdaangn.repository.ChatMessageRepository;
+import com.ssafy.springdaangn.repository.ChatRoomRepository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

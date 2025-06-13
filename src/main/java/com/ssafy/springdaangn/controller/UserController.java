@@ -1,7 +1,9 @@
 package com.ssafy.springdaangn.controller;
 
-import com.ssafy.springdaangn.Domain.User;
+import com.ssafy.springdaangn.domain.User;
 import com.ssafy.springdaangn.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +34,7 @@ public class UserController {
     }
 
     // 3. 특정 사용자 조회
+    @Operation(security = @SecurityRequirement(name="bearerAuth"))
     @GetMapping("/{userId}")
     public ResponseEntity<User> getUser(@PathVariable Long userId) {
         User user = userService.getUser(userId);
@@ -51,4 +54,5 @@ public class UserController {
         userService.deleteUser(userId);
         return ResponseEntity.noContent().build();
     }
+
 }

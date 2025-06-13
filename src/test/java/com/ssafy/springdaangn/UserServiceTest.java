@@ -1,7 +1,7 @@
 package com.ssafy.springdaangn;
 
-import com.ssafy.springdaangn.Domain.User;
-import com.ssafy.springdaangn.Repository.UserRepository;
+import com.ssafy.springdaangn.domain.User;
+import com.ssafy.springdaangn.repository.UserRepository;
 import com.ssafy.springdaangn.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;

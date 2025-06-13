@@ -1,11 +1,11 @@
 package com.ssafy.springdaangn;
 
-import com.ssafy.springdaangn.Domain.Address;
-import com.ssafy.springdaangn.Domain.Post;
-import com.ssafy.springdaangn.Domain.User;
-import com.ssafy.springdaangn.Repository.AddressRepository;
-import com.ssafy.springdaangn.Repository.PostRepository;
-import com.ssafy.springdaangn.Repository.UserRepository;
+import com.ssafy.springdaangn.domain.Address;
+import com.ssafy.springdaangn.domain.Post;
+import com.ssafy.springdaangn.domain.User;
+import com.ssafy.springdaangn.repository.AddressRepository;
+import com.ssafy.springdaangn.repository.PostRepository;
+import com.ssafy.springdaangn.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

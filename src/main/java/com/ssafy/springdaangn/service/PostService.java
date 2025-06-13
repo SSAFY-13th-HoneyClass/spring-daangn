@@ -1,11 +1,11 @@
 package com.ssafy.springdaangn.service;
 
-import com.ssafy.springdaangn.Domain.Post;
-import com.ssafy.springdaangn.Domain.User;
-import com.ssafy.springdaangn.Exception.PostNotFoundException;
-import com.ssafy.springdaangn.Exception.UserNotFoundException;
-import com.ssafy.springdaangn.Repository.PostRepository;
-import com.ssafy.springdaangn.Repository.UserRepository;
+import com.ssafy.springdaangn.domain.Post;
+import com.ssafy.springdaangn.domain.User;
+import com.ssafy.springdaangn.exception.PostNotFoundException;
+import com.ssafy.springdaangn.exception.UserNotFoundException;
+import com.ssafy.springdaangn.repository.PostRepository;
+import com.ssafy.springdaangn.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

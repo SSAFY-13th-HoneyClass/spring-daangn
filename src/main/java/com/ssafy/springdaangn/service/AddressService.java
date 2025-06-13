@@ -1,11 +1,11 @@
 package com.ssafy.springdaangn.service;
 
-import com.ssafy.springdaangn.Domain.Address;
-import com.ssafy.springdaangn.Domain.User;
-import com.ssafy.springdaangn.Exception.AddressNotFoundException;
-import com.ssafy.springdaangn.Exception.UserNotFoundException;
-import com.ssafy.springdaangn.Repository.AddressRepository;
-import com.ssafy.springdaangn.Repository.UserRepository;
+import com.ssafy.springdaangn.domain.Address;
+import com.ssafy.springdaangn.domain.User;
+import com.ssafy.springdaangn.exception.AddressNotFoundException;
+import com.ssafy.springdaangn.exception.UserNotFoundException;
+import com.ssafy.springdaangn.repository.AddressRepository;
+import com.ssafy.springdaangn.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

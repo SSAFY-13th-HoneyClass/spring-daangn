@@ -1,6 +1,6 @@
 package com.ssafy.springdaangn.controller;
 
-import com.ssafy.springdaangn.Domain.Post;
+import com.ssafy.springdaangn.domain.Post;
 import com.ssafy.springdaangn.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

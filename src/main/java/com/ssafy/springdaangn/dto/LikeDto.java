@@ -1,6 +1,6 @@
 package com.ssafy.springdaangn.dto;
 
-import com.ssafy.springdaangn.Domain.Like;
+import com.ssafy.springdaangn.domain.Like;
 import lombok.Builder;
 import lombok.Getter;
 

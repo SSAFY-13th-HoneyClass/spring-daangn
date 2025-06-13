@@ -1,6 +1,6 @@
 package com.ssafy.springdaangn.controller;
 
-import com.ssafy.springdaangn.Domain.ChatMessage;
+import com.ssafy.springdaangn.domain.ChatMessage;
 import com.ssafy.springdaangn.service.ChatMessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

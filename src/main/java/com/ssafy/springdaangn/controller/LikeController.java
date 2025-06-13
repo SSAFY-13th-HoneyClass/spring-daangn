@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/likes")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*")
 @Tag(name = "좋아요 관리", description = "게시글 좋아요/좋아요 취소 API")
 public class LikeController {
 

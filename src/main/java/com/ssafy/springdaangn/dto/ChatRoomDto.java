@@ -1,6 +1,6 @@
 package com.ssafy.springdaangn.dto;
 
-import com.ssafy.springdaangn.Domain.ChatRoom;
+import com.ssafy.springdaangn.domain.ChatRoom;
 import lombok.Builder;
 import lombok.Getter;
 

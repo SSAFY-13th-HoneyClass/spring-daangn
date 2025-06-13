@@ -1,8 +1,6 @@
 package com.ssafy.springdaangn.dto;
 
-import com.ssafy.springdaangn.Domain.Post;
-import com.ssafy.springdaangn.dto.AddressDto;
-import com.ssafy.springdaangn.dto.UserDto;
+import com.ssafy.springdaangn.domain.Post;
 import lombok.Builder;
 import lombok.Getter;
 
