@@ -123,10 +123,10 @@ JPA에서 발생할 수 있는 N+1 문제**를 확인하고, fetch join을 통�
 ## 1. JWT 인증(Authentication) 방법에 대해서 알아보기
 
 ## 2. 액세스 토큰 발급 및 검증 로직 구현하기
-* 액세스 토근 발급
+### 액세스 토근 발급
 <img width="836" alt="image" src="https://github.com/user-attachments/assets/054fe0ad-45cb-4eb4-a573-c5fcba9f2c46" />
 
-* 검증 로직
+### 검증 로직
 <img width="692" alt="image" src="https://github.com/user-attachments/assets/00a41aec-bde8-40ff-bc5d-5767ff8bce4a" />
 
 
@@ -135,18 +135,18 @@ JPA에서 발생할 수 있는 N+1 문제**를 확인하고, fetch join을 통�
 <img width="1431" alt="image" src="https://github.com/user-attachments/assets/67c2a55d-008b-4e98-9ebc-1245bf226528" />
 <img width="1410" alt="image" src="https://github.com/user-attachments/assets/a4945293-12eb-4aa0-833e-6361fb393d19" />
 
-- 회원가입 성공
-- <img width="282" alt="image" src="https://github.com/user-attachments/assets/1e0bd829-6912-43e4-8b38-4c2c1cfc44c1" />
+### 회원가입 성공
+<img width="282" alt="image" src="https://github.com/user-attachments/assets/1e0bd829-6912-43e4-8b38-4c2c1cfc44c1" />
 
-* 로그인
+### 로그인
 <img width="1422" alt="image" src="https://github.com/user-attachments/assets/b2a6db82-f3fe-47d6-8cae-7e0c979e92f2" />
 <img width="1405" alt="image" src="https://github.com/user-attachments/assets/d28f4bbd-ba42-4997-93b8-ea30e0a54085" />
 
 ## 4. 토큰이 필요한 API 1개 이상 구현하고 테스트하기
-* 토큰 없을 때 403 에러
+
+### 토큰 없을 때 403 에러
 <img width="1422" alt="image" src="https://github.com/user-attachments/assets/81d473ee-5dae-4c7d-bfd4-e642000392ed" />
 <img width="1398" alt="image" src="https://github.com/user-attachments/assets/d0c89f4c-0f66-434d-a8b5-efd9a7b98552" />
-
 <img width="886" alt="image" src="https://github.com/user-attachments/assets/709e8c9a-7569-4b17-b415-d65070201e04" />
 
 결과가
