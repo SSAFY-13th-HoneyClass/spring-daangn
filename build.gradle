@@ -51,6 +51,9 @@ dependencies {
 
 	// Spring Security Test
 	testImplementation 'org.springframework.security:spring-security-test'
+
+	// Redis 관련
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 }
 
 tasks.named('test') {
