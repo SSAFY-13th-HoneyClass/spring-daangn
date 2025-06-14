@@ -293,7 +293,7 @@ JPA에서 발생할 수 있는 N+1 문제**를 확인하고, fetch join을 통�
 
 
 ## 2. 액세스 토큰 발급 및 검증 로직 구현하기
-### 액세스 토근 발급
+### 액세스 토큰 발급
 <img width="836" alt="image" src="https://github.com/user-attachments/assets/054fe0ad-45cb-4eb4-a573-c5fcba9f2c46" />
 
 ### 검증 로직
