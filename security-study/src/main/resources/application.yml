@@ -1,0 +1,17 @@
+spring:
+  jwt:
+    secret: MFLfK5+zvztj1U1EoywO9zGdDb09kJkA3pS3DhJtFgp0OoX6FeUQKmE8i4KHZo3Ix8OvnUchmNHjvHfLGuR6Ng==
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/security?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: root
+    password: Hong1234!
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
