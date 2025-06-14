@@ -16,7 +16,7 @@ public class ProductResponse {
 
     public static ProductResponse from(ProductEntity productEntity) {
         return ProductResponse.builder()
-                .writerName(productEntity.getWriter().getName())
+                .writerName(productEntity.getWriter().getUsername())
                 .categoryName(productEntity.getCategory().getCategoryName())
                 .title(productEntity.getTitle())
                 .description(productEntity.getDescription())
