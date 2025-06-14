@@ -129,7 +129,8 @@ JPA에서 발생할 수 있는 N+1 문제**를 확인하고, fetch join을 통�
 
 ### jwt 구성
 
-![image.png](attachment:f68d5fa5-7b3f-4a1a-b07a-1156433ed7b2:image.png)
+<img width="664" alt="image" src="https://github.com/user-attachments/assets/4d5946b4-e9d6-4ddb-9914-306ed1f8cdde" />
+
 
 - header
 
