@@ -5,6 +5,7 @@ import com.example.daangn.domain.location.entity.Location;
 import com.example.daangn.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.CurrentTimestamp;
 
 import java.time.LocalDateTime;
@@ -43,7 +44,7 @@ public class Product {
 
     private Integer price;
 
-    @CurrentTimestamp
+    @CreationTimestamp
     private LocalDateTime created;
 
     private Integer views;

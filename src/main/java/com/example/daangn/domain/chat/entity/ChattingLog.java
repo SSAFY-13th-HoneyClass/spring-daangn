@@ -3,6 +3,7 @@ package com.example.daangn.domain.chat.entity;
 import com.example.daangn.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.CurrentTimestamp;
 
 import java.time.LocalDateTime;
@@ -28,7 +29,7 @@ public class ChattingLog {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @CurrentTimestamp
+    @CreationTimestamp
     private LocalDateTime created;
 
     @Column(name = "is_checked")  // 예약어 피하기

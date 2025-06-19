@@ -27,8 +27,19 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
+    // JWT 관련 의존성
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.3'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.3'
+
+    // Spring Security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
     // MySQL Connector 의존성에 명시적 버전 추가
     runtimeOnly 'com.mysql:mysql-connector-j'
+
+    // redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
     // Lombok
     compileOnly 'org.projectlombok:lombok'
@@ -41,6 +52,8 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.junit.jupiter:junit-jupiter-api'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+    testImplementation 'org.springframework.security:spring-security-test'
+
     // H2 데이터베이스 추가 (테스트용 내장 DB)
     testRuntimeOnly 'com.h2database:h2'
 }
