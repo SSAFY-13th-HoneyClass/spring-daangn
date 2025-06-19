@@ -24,5 +24,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // 아이디 비밀번호로 로그인(로그인)
     Optional<User> findByIdAndPassword(String id, String password);
 
+    Optional<User> findById(String id);
+
+
 }
 

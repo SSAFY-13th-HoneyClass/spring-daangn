@@ -17,7 +17,22 @@ spring:
   profiles:
     active: local
 
+
+# JWT 설정 추가
+jwt:
+  secret: ${JWT_SECRET} # 환경변수에서 가져오기
+  access-token-validity-in-seconds: ${JWT_ACCESS_VALIDITY:3600}  # 1시간
+  refresh-token-validity-in-seconds: ${JWT_REFRESH_VALIDITY:604800}  # 7일
+
+# 보안 설정(리프레시 토큰 탈취 방지)
+security:
+  ip-validation:
+    enabled: true  # IP 검증 활성화
+    strict-mode: false  # false: 같은 네트워크 대역 허용, true: 정확한 IP만 허용
+
 logging:
   level:
     org.hibernate.SQL: debug
     org.hibernate.type.descriptor.sql.BasicBinder: trace
+    com.ssafy.daangn.service.RefreshTokenService: INFO
+    com.ssafy.daangn.util.IpUtils: DEBUG
