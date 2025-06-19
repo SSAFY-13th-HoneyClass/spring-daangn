@@ -17,12 +17,14 @@ import com.ssafy.daangn.comment.dto.response.CommentResponseDto;
 import com.ssafy.daangn.comment.service.CommentService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/comment")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "JWT")
 @Tag(name = "Comment", description = "댓글 관련 API")
 public class CommentController {
 

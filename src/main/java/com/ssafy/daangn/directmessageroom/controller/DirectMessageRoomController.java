@@ -12,12 +12,14 @@ import com.ssafy.daangn.directmessageroom.dto.response.DirectMessageRoomResponse
 import com.ssafy.daangn.directmessageroom.service.DirectMessageRoomService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/dm/room")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "JWT")
 @Tag(name = "DirectMessageRoom", description = "DM 방 관련 API")
 public class DirectMessageRoomController {
 

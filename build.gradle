@@ -1,6 +1,6 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '3.4.5'
+	id 'org.springframework.boot' version '3.1.6'
 	id 'io.spring.dependency-management' version '1.1.7'
 }
 
@@ -30,6 +30,14 @@ dependencies {
 	// Lombok (컴파일 타임에서 Getter/Setter 등 자동 생성)
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
+
+	// Spring Security
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+
+	// JWT 토큰 생성을 위한 jjwt
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5' // JSON 처리용
 
 	// 인메모리 DB (H2) for @DataJpaTest 등
 	runtimeOnly 'com.h2database:h2'

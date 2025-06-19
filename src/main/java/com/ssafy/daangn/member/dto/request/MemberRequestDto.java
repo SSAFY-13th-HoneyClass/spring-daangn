@@ -13,10 +13,10 @@ public class MemberRequestDto {
     @Schema(description = "회원 이름", example = "홍길동")
     private String membername;
 
-    @Schema(description = "이메일", example = "user@example.com")
+    @Schema(description = "이메일", example = "test@test.com")
     private String email;
 
-    @Schema(description = "비밀번호", example = "password123")
+    @Schema(description = "비밀번호", example = "Passw0rd!")
     private String password;
 
     @Schema(description = "프로필 이미지 URL", example = "https://example.com/profile.jpg")
