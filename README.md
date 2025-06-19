@@ -324,4 +324,37 @@ signature
 403에러 발생....ㅠ
 
 
+# 6주차
+
+## 이미지 생성하고 실행하기
+
+./gradlew bootJar 통해 build/libs/*.jar파일 생성
+Dockerfile 생성
+docker-compose.yml 생성
+docker build -t {docker image 이름} {Dockerfile의 위치} -> 이미지 생성
+docker run -p 8080:8080 {docker image 이름} -> 이미지 실행
+
+![image](https://github.com/user-attachments/assets/8ad877a0-34ec-4a53-91cb-fb089adb65b3)
+
+## EC2 & RDS 인스턴스 만들기
+<img width="1459" alt="image" src="https://github.com/user-attachments/assets/ea7756e4-a853-48df-bf29-0a59bf517ea7" />
+<img width="1469" alt="image" src="https://github.com/user-attachments/assets/bfee7067-5130-4258-802b-9cf3bfc5dc25" />
+
+## EC2에 도커 설치 
+
+설치 후 도커 버전 확인
+![image](https://github.com/user-attachments/assets/25a8e066-a0a4-40bc-b049-7d7225c9989c)
+
+## EC2에서 도커로 이미지 실행
+![image](https://github.com/user-attachments/assets/2a764f88-6010-4b1d-a138-d8064374699c)
+
+## 배포 후 테스트하기
+![image](https://github.com/user-attachments/assets/c837d8d7-b217-4f50-8cd7-601ffbdc618a)
+![image](https://github.com/user-attachments/assets/a7608969-cc05-44b7-9be5-afb634263acc)
+![image](https://github.com/user-attachments/assets/4a186765-f7c7-4d18-b1bd-3c55fb89532c)
+
+
+
+
+
 
