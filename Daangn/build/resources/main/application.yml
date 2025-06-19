@@ -6,9 +6,9 @@ spring:
     import: optional:file:.env[.properties]
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: ${JDBC_URL}
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
+    url: jdbc:mysql://database-1.c3k88oim28pu.ap-northeast-2.rds.amazonaws.com:3306/Daangn?createDatabaseIfNotExist=true
+    username: admin
+    password: taeho7882
 
   jpa:
     database: mysql
