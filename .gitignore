@@ -1,0 +1,38 @@
+# IDE
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+
+# Build
+build/
+target/
+*.jar
+*.war
+
+# Gradle
+.gradle/
+gradlew
+gradlew.bat
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Resources - 설정 파일 제외
+src/main/resources/
+src/test/resources/
+
+# Docker
+.dockerignore
+
+# Temporary files
+*.tmp
+*.temp
+
+# Other
+cookies.txt 
