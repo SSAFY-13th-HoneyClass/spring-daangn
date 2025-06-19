@@ -10,8 +10,8 @@ services:
       SERVER_PORT: 8080
       JDBC_URL: jdbc:mysql://database-1.cr6o8qs8ufwt.ap-northeast-2.rds.amazonaws.com/Daangn?createDatabaseIfNotExist=true
       DB_USER: admin
-      DB_PASSWORD: hwilee2529*
+      DB_PASSWORD:
       JPA_SHOW_SQL: true
-      JWT_TOKEN: fjlsflsfieiwofjhwohefnddddfnnled556654eyhjuhytfrdhikdjhlfgogreghdslsodjddddddddddddddddddksososlslslslsls
+      JWT_TOKEN:
     ports:
       - "8080:8080"

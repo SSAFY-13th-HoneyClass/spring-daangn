@@ -24,4 +24,4 @@ logging:
     org.hibernate.SQL: debug
 
 jwt:
-  secret: 
+  secret:
