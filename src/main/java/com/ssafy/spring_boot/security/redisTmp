@@ -1,0 +1,290 @@
+// 1. Redis 설정
+@Configuration
+@EnableCaching
+public class RedisConfig {
+
+    @Bean
+    public RedisConnectionFactory redisConnectionFactory() {
+        LettuceConnectionFactory factory = new LettuceConnectionFactory("localhost", 6379);
+        factory.setDatabase(0);
+        return factory;
+    }
+
+    @Bean
+    public RedisTemplate<String, String> redisTemplate() {
+        RedisTemplate<String, String> template = new RedisTemplate<>();
+        template.setConnectionFactory(redisConnectionFactory());
+        template.setDefaultSerializer(new StringRedisSerializer());
+        return template;
+    }
+}
+
+// 2. Redis 토큰 관리 서비스
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class RedisTokenService {
+
+    private final RedisTemplate<String, String> redisTemplate;
+    private final TokenProvider tokenProvider;
+
+    /**
+     * 🔥 Redis에 사용자 토큰 정보 저장
+     */
+    public void storeUserTokens(Long userId, String accessToken, String refreshToken) {
+        String userKey = "user_tokens:" + userId;
+
+        Map<String, String> tokenData = new HashMap<>();
+        tokenData.put("accessToken", accessToken);
+        tokenData.put("refreshToken", refreshToken);
+        tokenData.put("lastUpdate", String.valueOf(System.currentTimeMillis()));
+        tokenData.put("authorities", tokenProvider.getAuthoritiesFromToken(accessToken));
+
+        // Redis Hash로 저장 (7일 TTL)
+        redisTemplate.opsForHash().putAll(userKey, tokenData);
+        redisTemplate.expire(userKey, 7, TimeUnit.DAYS);
+
+        log.info("Redis에 사용자 {} 토큰 저장 완료", userId);
+    }
+
+    /**
+     * Redis에서 사용자 Refresh Token 조회
+     */
+    public String getRefreshToken(Long userId) {
+        String userKey = "user_tokens:" + userId;
+        return (String) redisTemplate.opsForHash().get(userKey, "refreshToken");
+    }
+
+    /**
+     * Redis에서 사용자 Access Token 조회
+     */
+    public String getAccessToken(Long userId) {
+        String userKey = "user_tokens:" + userId;
+        return (String) redisTemplate.opsForHash().get(userKey, "accessToken");
+    }
+
+    /**
+     * 🚀 자동 토큰 갱신 핵심 메서드
+     */
+    public String autoRefreshToken(Long userId) {
+        String refreshToken = getRefreshToken(userId);
+
+        if (refreshToken == null) {
+            throw new IllegalStateException("저장된 Refresh Token이 없습니다.");
+        }
+
+        if (!tokenProvider.validateRefreshToken(refreshToken)) {
+            // Refresh Token도 만료 → 재로그인 필요
+            removeUserTokens(userId);
+            throw new IllegalStateException("Refresh Token이 만료되었습니다. 재로그인이 필요합니다.");
+        }
+
+        // 새로운 토큰 생성
+        String email = tokenProvider.getEmailFromToken(refreshToken);
+        String authorities = tokenProvider.getAuthoritiesFromToken(refreshToken);
+
+        String newAccessToken = tokenProvider.createAccessToken(userId, email, authorities);
+        String newRefreshToken = tokenProvider.createRefreshToken(userId, email, authorities);
+
+        // Redis 업데이트
+        storeUserTokens(userId, newAccessToken, newRefreshToken);
+
+        log.info("사용자 {} 토큰 자동 갱신 완료", userId);
+        return newAccessToken;
+    }
+
+    /**
+     * 사용자 토큰 정보 삭제 (로그아웃 시)
+     */
+    public void removeUserTokens(Long userId) {
+        String userKey = "user_tokens:" + userId;
+        redisTemplate.delete(userKey);
+        log.info("사용자 {} 토큰 정보 삭제", userId);
+    }
+
+    /**
+     * 토큰 만료 임박 확인
+     */
+    public boolean isTokenExpiringSoon(String accessToken) {
+        if (!tokenProvider.validateToken(accessToken)) {
+            return true; // 이미 만료됨
+        }
+
+        long remainingTime = tokenProvider.getRemainingTime(accessToken);
+        return remainingTime < 10 * 60 * 1000; // 10분 미만 남음
+    }
+}
+
+// 3. 자동 갱신 필터
+@Component
+@RequiredArgsConstructor
+@Slf4j
+public class AutoRefreshTokenFilter extends OncePerRequestFilter {
+
+    private final TokenProvider tokenProvider;
+    private final RedisTokenService redisTokenService;
+    private final CustomUserDetailsService userDetailsService;
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                  HttpServletResponse response,
+                                  FilterChain filterChain) throws ServletException, IOException {
+
+        try {
+            String accessToken = getJwtFromRequest(request);
+
+            if (StringUtils.hasText(accessToken)) {
+
+                // 🔥 자동 갱신 로직
+                if (tokenProvider.validateToken(accessToken)) {
+                    // 토큰이 유효하지만 만료 임박인지 확인
+                    if (redisTokenService.isTokenExpiringSoon(accessToken)) {
+                        Long userId = tokenProvider.getUserIdFromToken(accessToken);
+
+                        try {
+                            // 자동 갱신 시도
+                            String newAccessToken = redisTokenService.autoRefreshToken(userId);
+
+                            // 응답 헤더에 새 토큰 추가
+                            response.setHeader("X-New-Access-Token", newAccessToken);
+
+                            log.info("토큰 자동 갱신 성공: 사용자 {}", userId);
+
+                            // 새 토큰으로 인증 처리
+                            processAuthentication(newAccessToken);
+                        } catch (Exception e) {
+                            log.error("토큰 자동 갱신 실패: {}", e.getMessage());
+                            // 기존 토큰으로 계속 진행
+                            processAuthentication(accessToken);
+                        }
+                    } else {
+                        // 토큰이 유효하고 만료 임박하지 않음
+                        processAuthentication(accessToken);
+                    }
+
+                } else {
+                    // Access Token이 만료됨 → 자동 갱신 시도
+                    try {
+                        // 만료된 토큰에서 사용자 ID 추출 (위험하지만 가능)
+                        Long userId = extractUserIdFromExpiredToken(accessToken);
+
+                        if (userId != null) {
+                            String newAccessToken = redisTokenService.autoRefreshToken(userId);
+
+                            // 새 토큰으로 인증 처리
+                            processAuthentication(newAccessToken);
+
+                            // 클라이언트에게 새 토큰 전달
+                            response.setHeader("X-New-Access-Token", newAccessToken);
+
+                            log.info("만료된 토큰 자동 갱신 성공: 사용자 {}", userId);
+                        }
+                    } catch (Exception e) {
+                        log.error("만료된 토큰 갱신 실패: {}", e.getMessage());
+                        // 갱신 실패 시 401 에러로 진행
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            log.error("자동 토큰 갱신 필터 오류", e);
+        }
+
+        filterChain.doFilter(request, response);
+    }
+
+    private void processAuthentication(String accessToken) {
+        try {
+            Authentication authentication = tokenProvider.getAuthentication(accessToken);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        } catch (Exception e) {
+            log.error("인증 처리 실패", e);
+        }
+    }
+
+    private String getJwtFromRequest(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+        return null;
+    }
+
+    private Long extractUserIdFromExpiredToken(String expiredToken) {
+        try {
+            // 만료된 토큰도 파싱 가능 (서명은 확인됨)
+            return tokenProvider.getUserIdFromToken(expiredToken);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        return path.startsWith("/api/users/signup") ||
+               path.startsWith("/api/users/login") ||
+               path.startsWith("/api/users/refresh") ||
+               path.startsWith("/swagger-ui/") ||
+               path.startsWith("/v3/api-docs") ||
+               path.equals("/hello");
+    }
+}
+
+// 4. 업데이트된 UserServiceImpl (Redis 연동)
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class RedisUserServiceImpl implements UserService {
+
+    private final UserRepository userRepository;
+    private final RegionRepository regionRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final TokenProvider tokenProvider;
+    private final RedisTokenService redisTokenService;  // Redis 서비스 추가
+
+    @Override
+    @Transactional
+    public LoginResponseDTO jwtLogin(LoginRequestDTO loginRequest) {
+        log.debug("JWT 로그인 시도: {}", loginRequest.getEmail());
+
+        // 1. 사용자 조회 및 비밀번호 검증
+        User user = userRepository.findByEmail(loginRequest.getEmail())
+                .orElseThrow(() -> new EntityNotFoundException("해당 이메일을 가진 사용자가 없습니다: " + loginRequest.getEmail()));
+
+        if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+        // 2. 토큰 생성
+        String authorities = "ROLE_USER";
+        String accessToken = tokenProvider.createAccessToken(user.getId().longValue(), user.getEmail(), authorities);
+        String refreshToken = tokenProvider.createRefreshToken(user.getId().longValue(), user.getEmail(), authorities);
+
+        // 3. 🔥 Redis에 토큰 저장 (자동 갱신을 위해)
+        redisTokenService.storeUserTokens(user.getId().longValue(), accessToken, refreshToken);
+
+        log.debug("JWT 로그인 성공 + Redis 저장: {}", user.getEmail());
+
+        return LoginResponseDTO.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .tokenType("Bearer")
+                .expiresIn(tokenProvider.getAccessTokenValidityInMilliseconds() / 1000)
+                .userId(user.getId().longValue())
+                .nickname(user.getNickname())
+                .email(user.getEmail())
+                .temperature(user.getTemperature())
+                .regionName(user.getRegion().getName())
+                .build();
+    }
+
+    /**
+     * 🚀 로그아웃 (Redis에서 토큰 삭제)
+     */
+    @Transactional
+    public void logout(Long userId) {
+        redisTokenService.removeUserTokens(userId);
+        log.info("사용자 {} 로그아웃 완료", userId);
+    }
+}

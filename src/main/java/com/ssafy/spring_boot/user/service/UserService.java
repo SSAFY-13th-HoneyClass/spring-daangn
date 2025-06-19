@@ -3,6 +3,10 @@ package com.ssafy.spring_boot.user.service;
 import com.ssafy.spring_boot.chat.dto.ChatRoomDTO;
 import com.ssafy.spring_boot.product.dto.ProductDTO;
 import com.ssafy.spring_boot.user.dto.LoginInfoDTO;
+import com.ssafy.spring_boot.user.dto.LoginRequestDTO;
+import com.ssafy.spring_boot.user.dto.LoginResponseDTO;
+import com.ssafy.spring_boot.user.dto.SignupRequestDTO;
+import com.ssafy.spring_boot.user.dto.SignupResponseDTO;
 import com.ssafy.spring_boot.user.dto.UserDTO;
 
 import java.util.List;
@@ -13,7 +17,21 @@ import java.util.List;
 public interface UserService {
 
     /**
-     * 이메일과 비밀번호로 로그인 처리
+     * 회원가입 처리
+     * @param signupRequest 회원가입 요청 DTO
+     * @return 회원가입 결과 DTO
+     */
+    SignupResponseDTO signup(SignupRequestDTO signupRequest);
+
+    /**
+     * JWT 기반 로그인 처리 (새로운 방식)
+     * @param loginRequest 로그인 요청 DTO (이메일, 비밀번호)
+     * @return JWT 토큰과 사용자 정보가 담긴 DTO
+     */
+    LoginResponseDTO jwtLogin(LoginRequestDTO loginRequest);
+
+    /**
+     * 이메일과 비밀번호로 로그인 처리 (기존 방식 - 호환성 유지)
      * @param email 사용자 이메일
      * @param password 사용자 비밀번호
      * @return 로그인 정보가 담긴 DTO
