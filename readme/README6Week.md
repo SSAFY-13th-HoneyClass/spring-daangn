@@ -122,7 +122,7 @@ Docker 이미지 생성 → ECR에 업로드 → App Runner에서 실행 → URL
 
 # 🚀해보자!
 ### 1. 인텔리제이에 gradle/Tasks/build/bootJar을 클릭
-![img_15.png](png/before/img_15.png)
+![img_15.png](./png/before/img_15.png)
 ![img_16.png](png/before/img_16.png)
 ![img_17.png](png/before/img_17.png)
 
