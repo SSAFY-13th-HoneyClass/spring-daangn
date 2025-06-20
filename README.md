@@ -104,6 +104,10 @@ docker-compose -f docker-compose.yml up --build
 - EC2와 동일 보안 그룹 사용
   - 인바운드/아웃바운드에 MySQL/Aurora 3306 포트 추가
 
+![image](https://github.com/user-attachments/assets/4199b689-e357-4793-b321-45f53428f712)
+![image](https://github.com/user-attachments/assets/feffca22-9ee3-443e-850d-bea7e47c7f82)
+
+
 ## 수동 배포를 위한 이미지 푸시
 ### 빌드 - jar 파일 생성
 ```
