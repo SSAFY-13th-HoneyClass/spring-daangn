@@ -122,57 +122,57 @@ Docker 이미지 생성 → ECR에 업로드 → App Runner에서 실행 → URL
 
 # 🚀해보자!
 ### 1. 인텔리제이에 gradle/Tasks/build/bootJar을 클릭
-![img_15.png](png/img_15.png)
-![img_16.png](png/img_16.png)
-![img_17.png](png/img_17.png)
+![img_15.png](png/before/img_15.png)
+![img_16.png](png/before/img_16.png)
+![img_17.png](png/before/img_17.png)
 
 ### 2. AWS 회원가입!
-![img_18.png](png/img_18.png)
+![img_18.png](png/before/img_18.png)
 
 ### 3. EC2에 인스턴스 시작하기!
-![img_19.png](png/img_19.png)
+![img_19.png](png/before/img_19.png)
 - 이름을 적고 시작해보자
 - 일단 우분투로 한다고 한다
 - 이미지는 22.04 버전으로 지정
-![img_20.png](png/img_20.png)
+![img_20.png](png/before/img_20.png)
 - 키페어 생성하기
-![img_21.png](png/img_21.png)
+![img_21.png](png/before/img_21.png)
 - RSA에 SSH 형식으로 사용
 ![img_22.png](img_22.png
 - 네트워크 설정
-![img_23.png](png/img_23.png)
+![img_23.png](png/before/img_23.png)
 - 스토리지 구성
-![img_24.png](png/img_24.png)
+![img_24.png](png/before/img_24.png)
 - 10기가로 설정
 - 인스턴스 시작하기!
-![img_25.png](png/img_25.png)
-![img_26.png](png/img_26.png)
+![img_25.png](png/before/img_25.png)
+![img_26.png](png/before/img_26.png)
 - AWS 로부터 한대의 컴퓨터를 빌린것이라 할 수 있다
 
 ### 포트 번호 열어주기!!
-![img_28.png](png/img_28.png)
+![img_28.png](png/before/img_28.png)
 - 보안 그룹에서 해당 EC2가 존재하는 보안그룹에서 인바운드 규칙 편집
-![img_30.png](png/img_30.png)!
+![img_30.png](png/before/img_30.png)!
 - 8080포트에 대해 모든 사용자가 접근 할 수 있도록 오픈
-![img_31.png](png/img_31.png)
+![img_31.png](png/before/img_31.png)
 - 인스턴스가 잘 생성되었고 보안그룹이 launch-wizard-1로 지정되어있으므로 제대로 되었다고 볼수있다.
 
 ### 인스턴스에 연결하기
-![img_32.png](png/img_32.png)
+![img_32.png](png/before/img_32.png)
 - 우클릭하고 연결누르기
-![img_33.png](png/img_33.png)
+![img_33.png](png/before/img_33.png)
 - SSH 클라이언트를 통해 해당 컴포트에 접속하는 방법 확인
 - git bash 켜서 메인키가 있는 장소로 이동하기
-![img_34.png](png/img_34.png)
+![img_34.png](png/before/img_34.png)
 - 해당 키.pem에 chmod 400 권한을 준다
-![img_35.png](png/img_35.png)
+![img_35.png](png/before/img_35.png)
 ```java
 ssh -i "daangn-mainkey.pem" ubuntu@ec2-52-64-23-251.ap-southeast-2.compute.amazonaws.com
 ```
 - 해당 명령어를 입력하여 실행하고 처음 실햄하면 yes 입력해주기
-![img_36.png](png/img_36.png)
+![img_36.png](png/before/img_36.png)
 - 자바 깔려있는지 java -version 으로 확인
-![img_37.png](png/img_37.png)
+![img_37.png](png/before/img_37.png)
 - 없으면 아래 apt 라는걸 이용해서 설치할껀데 그럴라면 apt 업데이트 진행해야함
 ```java
 sudo apt update
@@ -190,20 +190,20 @@ sudo apt install openjdk-17-jre-headless
 scp -i daangn-mainkey.pem ~/Desktop/spring-boot-0.0.1-SNAPSHOT.jar ubuntu@ec2-52-64-23-251.ap-southeast-2.compute.amazonaws.com:~/
 ```
 - 해당 명령어를 이용해 내 컴퓨터에있는 jar 파일을 AWS로 올린다.
-![img_38.png](png/img_38.png)
+![img_38.png](png/before/img_38.png)
 - 잘 전달이 되었다!!
 - 실행을 해보자
-![img_39.png](png/img_39.png)
+![img_39.png](png/before/img_39.png)
 - 🔥🔥🔥 무지성으로 따라했더니 버전이 안맞는다
 ```java
 sudo apt install openjdk-21-jre-headless 
 ```
 - 21 버전으로 다시 깔자
-![img_40.png](png/img_40.png)
+![img_40.png](png/before/img_40.png)
 - 에러빵빵..
 - .env 파일 문제이거나 DB접속 설정이 안되어서 JPA가 작동을 안했다고 한다.
 - 해결해보자
-![img_41.png](png/img_41.png)
+![img_41.png](png/before/img_41.png)
 - 환경변수를 직접 export 하는 방식을 사용해 보았다
 - echo 를 통해 잘 들어가있는걸 확인할 수 있었다.
 - 근데 또안된다
@@ -250,24 +250,24 @@ ENTRYPOINT ["java", "-jar", "app.jar"]
 
 ```
 - 이제 이거걸 build/libs/ 에 snapshot 이랑 같은 위치로 이동시키는게 좋다고 한다
-![img.png](img.png)
+![img.png](png/6week/img.png)
 - 파일을 이동시키고
-![img_1.png](img_1.png)
+![img_1.png](png/6week/img_1.png)
 - 해당 위치로 이동해서
 ```dockerfile
  docker build -t spring-boot-app .
 ```
 - 도커이미지 이름을 spring-boot-app으로 지정하고
 - . : 현재 디렉토리의 Dockerfile을 기준으로 build 하겠다는 의미이다.
-![img_2.png](img_2.png)
+![img_2.png](png/6week/img_2.png)
 
 
 - Docker 이미지 빌드를 성공했다.
-![img_3.png](img_3.png)
-![img_4.png](img_4.png)
+![img_3.png](png/6week/img_3.png)
+![img_4.png](png/6week/img_4.png)
 
 - .env 도 같은 위치에있어야 돌아간다하므로 복사해서 넣어주었다
-![img_5.png](img_5.png)
+![img_5.png](png/6week/img_5.png)
 
 ### 도커 컨테이너 실행하기
 
@@ -312,9 +312,9 @@ docker run -d -p 8080:8080 --name spring-app --env-file .env spring-boot-app
 ```
 
 ### 와우와우~
-![img_6.png](img_6.png)
+![img_6.png](png/6week/img_6.png)
 - 내가 실행을 안시키고있는데 접속이된다..
-![img_7.png](img_7.png)
+![img_7.png](png/6week/img_7.png)
 
 # Docker-compose
 - 이제는 spring +MySQL 동시에 배포하려한다, Docker-compose 에 대해 공부해보자
@@ -394,16 +394,16 @@ volumes:
 ```bash
 docker-compose up --build
 ```
-![img_8.png](img_8.png)
+![img_8.png](png/6week/img_8.png)
 
 - 막 뭔가 잘돌아간다
-![img_9.png](img_9.png)
+![img_9.png](png/6week/img_9.png)
 - 에러발생!!
 - spring-app 이라는 이름의 컨테이너가 Docker에 잉미있어서 컨테이너를 못만든다고 한다!!
-![img_10.png](img_10.png)
+![img_10.png](png/6week/img_10.png)
 컨테이너 중지하고, 삭제!
 
-![img_11.png](img_11.png)
+![img_11.png](png/6week/img_11.png)
 3306 포트번호 사용중! : 당연히 내컴퓨터에서 mysql 3306으로 사용중이잖아..
 ```dockerfile
     ports:
@@ -411,8 +411,8 @@ docker-compose up --build
 ```
 - docker-compose.yml에서 포트번호 변경
 ### 와우와우~
-![img_12.png](img_12.png)
-![img_13.png](img_13.png)
+![img_12.png](png/6week/img_12.png)
+![img_13.png](png/6week/img_13.png)
 
 ## 전에 만들어뒀던 인스턴스가 사라졌다 이유는 모르겠다
 - 그래서 다시 인스턴스 만들고 
@@ -424,12 +424,12 @@ sudo apt install -y docker.io docker-compose
 ```
 - 해당 컴퓨터로 접속해서~, docker-compose 설치!
 
-![img_14.png](img_14.png)
-![img_15.png](img_15.png)
+![img_14.png](png/6week/img_14.png)
+![img_15.png](png/6week/img_15.png)
 
 - 파일들 옮기고~
 
-![img_16.png](img_16.png)
+![img_16.png](png/6week/img_16.png)
 
 확인!!, .env 파일이 안보인다면
 ```dockerfile
@@ -441,18 +441,18 @@ ls -al
 sudo docker-compose up --build
 ```
 - 실행!!
-![img_17.png](img_17.png)
+![img_17.png](png/6week/img_17.png)
 - dockerfile 에서는 .jar 파일경로가 build/libs/에있는거로 되어있어서 해당파일만들어서 넣어줌
 
 ## 맛탱이가 갔다.. 아무것도 안눌리고 접속도안된다
-![img_18.png](img_18.png)
+![img_18.png](png/6week/img_18.png)
 - 인스턴스 재부팅!!!
 - 인스턴스 껏다키면 IP가 바뀔수 있으니 주의하기, 한대 맞았다
-![img_19.png](img_19.png)
+![img_19.png](png/6week/img_19.png)
 - 와우..
 ## 우여곡절에 서버를 열긴 했지만..
 
-![img_20.png](img_20.png)
+![img_20.png](png/6week/img_20.png)
 - swagger에서 쏘는 주소랑 CORS 가 문제생김
 
 # Elastic IP
@@ -464,14 +464,14 @@ sudo docker-compose up --build
 - Elastic IP 사용시 public IP 고정, 항상 같은 IP로 접속 가능
 
 ## 당장 해보자
-![img_21.png](img_21.png)
-![img_22.png](img_22.png)
+![img_21.png](png/6week/img_21.png)
+![img_22.png](png/6week/img_22.png)
 ```dockerfile
 ssh -i mainkey.pem ubuntu@3.38.231.79
 ```
 - 접속도 편해졌다
 
-![img_23.png](img_23.png)
+![img_23.png](png/6week/img_23.png)
 - 
 - URL 이 날라간다.. 
 
