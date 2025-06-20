@@ -1,3 +1,9 @@
 .DS_Store
 .Rhistory
+.pem
 /uploads/
+# 민감한 키
+my-daangn-server-key.pem
+
+# 로컬 설정
+daangn/docker-compose.yml
