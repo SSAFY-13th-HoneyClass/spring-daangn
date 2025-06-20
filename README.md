@@ -39,7 +39,7 @@ ARG JAR_FILE=/build/libs/*.jar
 COPY ${JAR_FILE} app.jar
 ENTRYPOINT ["java","-jar", "/app.jar"]
 ```
-[구현 이후 버전 이슈 발생](#애플리케이션-java-버전와-docker의-jre-java-버전-불일치)
+[이미지 빌드 과정 버전 이슈 발생](#애플리케이션-java-버전와-docker의-jre-java-버전-불일치)
 
 ### Docker 이미지 빌드
 ```docker
