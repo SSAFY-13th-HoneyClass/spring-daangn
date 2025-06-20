@@ -21,7 +21,7 @@ public class SwaggerConfig {
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
-                .servers(List.of(new Server().url("http://localhost:8080")))
+                .servers(List.of(new Server().url("http://3.38.231.79:8080")))
                 .info(new Info()
                         .title("🥕 당근마켓 API")
                         .description("당근마켓 클론 프로젝트 REST API 문서\n\n" +

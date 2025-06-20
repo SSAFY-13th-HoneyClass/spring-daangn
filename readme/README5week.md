@@ -223,28 +223,28 @@ http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilt
 - 빠르고 유연하고 무료,공개 알고리즘 이지만 옛날 알고리즘이라 AES보다는 덜 추천
 
 ## 로그인 및 회원가입 Swagger 페이지
-![img_11.png](img_11.png)
+![img_11.png](png/img_11.png)
 
 ## 회원가입 성공!
-![img_5.png](img_5.png)
+![img_5.png](png/img_5.png)
 
 ## Bcrypt 로 비밀번호 해싱
-![img_6.png](img_6.png)
+![img_6.png](png/img_6.png)
 
 ## 로그인 성공!
-![img_7.png](img_7.png)
+![img_7.png](png/img_7.png)
 
 ## 12번에서 Swagger 페이지에 Authorize 추가
-![img_9.png](img_9.png)
+![img_9.png](png/img_9.png)
 
 ## 기본적으로 로그인 하지않으면(토큰이 없으면) 403 권한 없음
-![img_12.png](img_12.png)
+![img_12.png](png/img_12.png)
 
 ## 로그인 진행후 사용자 정보 조회
-![img_13.png](img_13.png)
+![img_13.png](png/img_13.png)
 
 ## JWT 토큰 정보를 이용하여 사용자 정보조회
-![img_14.png](img_14.png)
+![img_14.png](png/img_14.png)
 
 # TokenProvider
 JWTUtil을 만들었었는데 과제 내용을 보니 TokenProvider을 사용하는 방식이었다.

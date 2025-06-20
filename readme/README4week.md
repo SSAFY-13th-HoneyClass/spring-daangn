@@ -105,17 +105,17 @@ springdoc-openapi 는 아직 이 변경사항을 반영하지 못했다고 한�
 
 ## API 테스트
 
-![img.png](img.png)
+![img.png](png/img.png)
 
 - 대충 더미데이터들을 넣어서 Talend Test를 통해 Get 메서드에 대해 실행 시켜보았다.
 
 # swagger 연결
 
-![img_1.png](img_1.png)
+![img_1.png](png/img_1.png)
 
 - Product 관련 API를 만들어서 Swagger를 연결한 상태이다.
 
-![img_2.png](img_2.png)
+![img_2.png](png/img_2.png)
 
 - 정상적으로 잘 작동한다.
 
@@ -236,7 +236,7 @@ public class GlobalExceptionHandler {
     }
 ```
 
-![img_3.png](img_3.png)
+![img_3.png](png/img_3.png)
 
 # 정적 팩토리 메서드란
 - 객체 생성을 담당하는 static 메서드, 생성자 대신 객체를 생성
