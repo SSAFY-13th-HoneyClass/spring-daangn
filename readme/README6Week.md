@@ -466,3 +466,111 @@ sudo docker-compose up --build
 ## 당장 해보자
 ![img_21.png](img_21.png)
 ![img_22.png](img_22.png)
+```dockerfile
+ssh -i mainkey.pem ubuntu@3.38.231.79
+```
+- 접속도 편해졌다
+
+![img_23.png](img_23.png)
+- 
+- URL 이 날라간다.. 
+
+# ✅ 6주차 배포 미션 요약
+
+
+## 1. Spring Boot JAR 빌드
+```bash
+./gradlew bootJar
+```
+- `build/libs/spring-boot-0.0.1-SNAPSHOT.jar` 생성
+
+---
+
+## 2. Docker 이미지 만들기
+```Dockerfile
+# Dockerfile
+FROM openjdk:21-jdk-slim
+WORKDIR /app
+COPY build/libs/spring-boot-0.0.1-SNAPSHOT.jar app.jar
+ENV DB_URL=...
+ENV DB_USERNAME=...
+ENV DB_PASSWORD=...
+ENTRYPOINT ["java", "-jar", "app.jar"]
+```
+```bash
+docker build -t spring-boot-app .
+```
+
+---
+
+## 3. Docker Compose 구성
+```yaml
+# docker-compose.yml
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_DATABASE: daangn
+      MYSQL_USER: ssafy
+      MYSQL_PASSWORD: ssafy
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  spring-app:
+    build:
+      context: .
+    container_name: spring-app
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    depends_on:
+      - mysql
+
+volumes:
+  mysql-data:
+```
+```env
+# .env
+DB_URL=jdbc:mysql://mysql:3306/daangn?...
+DB_USERNAME=ssafy
+DB_PASSWORD=ssafy
+```
+
+---
+
+## 4. AWS EC2 서버 준비
+- Ubuntu 인스턴스 생성
+- 포트 **8080, 3306/3307** 인바운드 오픈
+- Docker & Docker Compose 설치
+```bash
+sudo apt update
+sudo apt install -y docker.io docker-compose
+```
+
+---
+
+## 5. Elastic IP 할당
+- EC2는 재부팅 시 IP가 바뀌므로 **고정 공인 IP (Elastic IP)** 할당 필요
+- AWS 콘솔 → EC2 → Elastic IP → 생성 후 EC2 인스턴스에 연결
+- 이후 고정된 IP를 기반으로 Swagger, API 테스트 가능
+
+---
+
+## 6. 파일 업로드 & 배포
+```bash
+scp -i mainkey.pem ... ubuntu@<Elastic-IP>:~/
+ssh -i mainkey.pem ubuntu@<Elastic-IP>
+sudo docker-compose up --build
+```
+
+---
+
+## ✅ 한 줄 요약
+> **Spring Boot 앱을 Docker로 컨테이너화하여 EC2에 배포하고, MySQL과 함께 Docker Compose로 실행 완료!**
+
