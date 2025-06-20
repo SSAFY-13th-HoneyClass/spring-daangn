@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+
+  app:
+    build: .
+    container_name: daangn-app
+    restart: unless-stopped
+    environment:
+      SERVER_PORT: 8080
+      JDBC_URL: ${JDBC_URL}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JPA_SHOW_SQL: true
+      JWT_TOKEN: ${JWT_TOKEN}
+    ports:
+      - "8080:8080"

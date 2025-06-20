@@ -71,4 +71,31 @@ public class AuthController {
             return ResponseEntity.badRequest().body(error);
         }
     }
+
+    @Operation(summary = "로그아웃")
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestBody Map<String, String> request) {
+        try{
+            String refreshToken = request.get("refreshToken");
+
+            if(refreshToken == null){
+                Map<String, Object> error = new HashMap<>();
+                error.put("code", 400);
+                error.put("message", "Refresh Token 이 없음");
+                return ResponseEntity.badRequest().body(error);
+            }
+
+            authService.logoutByRefreshToken(refreshToken);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("code", 200);
+            response.put("message", "로그아웃 성공");
+            return ResponseEntity.ok(response);
+        } catch (Exception e){
+            Map<String, Object> error = new HashMap<>();
+            error.put("code", 400);
+            error.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(error);
+        }
+    }
 }
