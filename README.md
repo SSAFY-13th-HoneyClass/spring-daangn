@@ -17,7 +17,8 @@
 
 `Tasks/bulid/bootJar` 실행
 
-![image](https://github.com/user-attachments/assets/eb2fbbae-d3a5-433e-87b9-3b1be8099b29)
+![image](https://github.com/user-attachments/assets/164ca120-b4f2-4127-a449-c418b7f746b8)
+
 
 방법 2. 콘솔로 파일 생성
 ```
@@ -71,6 +72,7 @@ services:
   app:
     ...Spring 관련 설정
 ```
+
 ![image](https://github.com/user-attachments/assets/1e5ff0ae-c983-4695-b3c5-74a056918c9a)
 
 ### docker-compose.yml 실행
@@ -84,6 +86,7 @@ docker-compose -f docker-compose.yml up --build
 ### 회원가입
 - 프리티어 기간인 1년이 지나서 새 계정 생성
 - 서울(ap-northeast-2) 리전에서 인스턴스 생성
+
 ![image](https://github.com/user-attachments/assets/3c410cbc-03ef-4bca-9faf-9aa18a92cb4a)
 
 ### EC2 인스턴스 생성
@@ -91,10 +94,15 @@ docker-compose -f docker-compose.yml up --build
 - 보안 그룹 설정:
   - SSH 22/TCP (내 IP)
   - HTTP 80/TCP, Spring Boot 8080/TCP (0.0.0.0/0)
+
 ![image](https://github.com/user-attachments/assets/88ed877f-a79f-42a3-8183-5117a34a4cbc)
 
 ### RDS 인스턴스 생성
+
 ![image](https://github.com/user-attachments/assets/8bd4c7b9-b1eb-432b-b455-899da0823a4a)
+
+- EC2와 동일 보안 그룹 사용
+  - 인바운드/아웃바운드에 MySQL/Aurora 3306 포트 추가
 
 ## 수동 배포를 위한 이미지 푸시
 ### 빌드 - jar 파일 생성
@@ -159,6 +167,7 @@ echo '/swapfile swap swap defaults 0 0' | sudo tee -a /etc/fstab
 ```
 free -m
 ```
+
 ![image](https://github.com/user-attachments/assets/8d7e8f3d-b03c-4611-97ff-ca6c5994bb3b)
 - Swap 메모리 생성 확인
 
@@ -223,6 +232,7 @@ docker run -d \
 ```
 docker ps
 ```
+
 ![image](https://github.com/user-attachments/assets/09bbce9d-0680-485c-b952-a5a7d847a03d)
 
 로그 확인
@@ -232,6 +242,7 @@ docker logs -f daangn-app
 
 ## Swagger UI 접근
 [Swagger 접속 링크](http://43.200.181.113/swagger-ui/index.html)
+
 ![image](https://github.com/user-attachments/assets/defebaf5-52c8-41af-9ccc-55481eb6298c)
 
 
