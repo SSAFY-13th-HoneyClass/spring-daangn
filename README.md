@@ -12,10 +12,10 @@
 
 # 구현 기능
 
-## jar 파일 생성
+## 로컬 빌드 - jar 파일 생성
 방법 1. Gradle 확장프로그램을 통해 jar 파일 생성
 
-`Tasks > bulid > bootJar` 실행
+`Tasks/bulid/bootJar` 실행
 
 ![image](https://github.com/user-attachments/assets/eb2fbbae-d3a5-433e-87b9-3b1be8099b29)
 
@@ -27,11 +27,11 @@
 
 실행된 jar 파일 생성 위치
 
-`build > libs > *-SNAPSHOT.jar`
+`build/libs/*-SNAPSHOT.jar`
 
 ![image](https://github.com/user-attachments/assets/b6504593-de93-489f-89ae-aded2d9b6b8e)
 
-## 도커 이미지 생성 및 실행
+## Docker 이미지 빌드 및 실행
 ### Dockerfile 생성
 ```
 FROM openjdk:21
@@ -41,7 +41,7 @@ ENTRYPOINT ["java","-jar", "/app.jar"]
 ```
 [구현 이후 버전 이슈 발생](#애플리케이션-java-버전와-docker의-jre-java-버전-불일치)
 
-### 이미지 생성
+### Docker 이미지 빌드
 ```docker
 docker build -t {docker image 이름} {Dockerfile의 위치}
 ```
@@ -50,7 +50,7 @@ docker build -t {docker image 이름} {Dockerfile의 위치}
 docker build -t daangn .
 ```
 
-### 이미지 실행
+### Docker 이미지 실행
 ```docker
 docker run -p 8080:8080 {docker image 이름}
 ```
@@ -79,6 +79,160 @@ docker-compose -f docker-compose.yml up --build
 ```
 - `-d` : 백그라운드 실행
   - 생략시 터미널에 실시간 로그 출력
+
+## AWS 설정
+### 회원가입
+- 프리티어 기간인 1년이 지나서 새 계정 생성
+- 서울(ap-northeast-2) 리전에서 인스턴스 생성
+![image](https://github.com/user-attachments/assets/3c410cbc-03ef-4bca-9faf-9aa18a92cb4a)
+
+### EC2 인스턴스 생성
+- t2.micro Ubuntu 22.04 인스턴스 생성
+- 보안 그룹 설정:
+  - SSH 22/TCP (내 IP)
+  - HTTP 80/TCP, Spring Boot 8080/TCP (0.0.0.0/0)
+![image](https://github.com/user-attachments/assets/88ed877f-a79f-42a3-8183-5117a34a4cbc)
+
+### RDS 인스턴스 생성
+![image](https://github.com/user-attachments/assets/8bd4c7b9-b1eb-432b-b455-899da0823a4a)
+
+## 수동 배포를 위한 이미지 푸시
+### 빌드 - jar 파일 생성
+```
+./gradlew clean build
+```
+
+### Docker 이미지 빌드
+```docker
+docker build --platform linux/amd64 -t [도커아이디]/[리포지토리명] .
+```
+
+```docker
+docker build --platform linux/amd64 -t [도커아이디]/spring-daangn:v1.0.0 .
+```
+
+### Docker hub 이미지 푸시
+```docker
+docker push [도커아이디]/[리포지토리명]
+```
+
+```docker
+docker push [도커아이디]/spring-daangn:v1.0.0
+```
+
+![image](https://github.com/user-attachments/assets/cf7bce8d-77da-4480-b39a-d0dd916c2d47)
+
+## EC2의 배포 설정
+### 키 파일 권한 설정 및 SSH 접속
+```
+chmod 400 my-key-pair.pem
+ssh -i my-key-pair.pem ubuntu@[Public IPv4 주소]
+```
+
+### 스왑 메모리 설정
+1. 루트 파일 시스템에 Swap 파일을 생성
+```
+sudo dd if=/dev/zero of=/swapfile bs=128M count=16
+```
+
+2. Swap 파일에 읽기 및 쓰기 권한을 부여(600 ➝ r, w)
+```
+sudo chmod 600 /swapfile
+```
+
+3. 리눅스 Swap 영역 설정
+```
+sudo mkswap /swapfile
+```
+
+4. Swap 공간에 Swap 파일 설정
+```
+sudo swapon /swapfile
+```
+
+5. 부팅 시 Swap 파일 활성화 설정
+```
+echo '/swapfile swap swap defaults 0 0' | sudo tee -a /etc/fstab
+```
+
+6. Swap 메모리 확인
+```
+free -m
+```
+![image](https://github.com/user-attachments/assets/8d7e8f3d-b03c-4611-97ff-ca6c5994bb3b)
+- Swap 메모리 생성 확인
+
+## EC2에서 Docker 배포
+### 사용자 네트워크(bridge) 생성
+```
+docker network create daangn-net
+```
+- MySQL과 Spring 컨테이너를 같은 네트워크에 묶기
+
+### 환경변수 파일(.env) 생성
+```
+cat <<EOF > ~/spring-daangn.env
+SPRING_DATASOURCE_URL=jdbc:mysql://daangn-mysql:3306/daangn?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul
+SPRING_DATASOURCE_USERNAME=ssafy
+SPRING_DATASOURCE_PASSWORD=ssafy
+SPRING_JPA_HIBERNATE_DDL_AUTO=update
+SPRING_JPA_SHOW_SQL=true
+
+JWT_SECRET=IFTHEWORLDWASENDINGIDWANNABENEXTTOYOU
+JWT_ACCESS_TOKEN_EXPIRATION=3600000
+JWT_REFRESH_TOKEN_EXPIRATION=1209600000
+EOF
+```
+
+### MySQL 공식 이미지 풀
+```
+sudo docker pull mysql
+```
+
+### Spring 이미지 풀
+```
+sudo docker pull [도커아이디]/spring-daangn:v1.0.0
+```
+
+### MySQL 컨테이너 실행
+```
+docker run -d \
+  --name daangn-mysql \
+  --network daangn-net \
+  -e MYSQL_ROOT_PASSWORD=0307 \
+  -e MYSQL_DATABASE=daangn \
+  -e MYSQL_USER=ssafy \
+  -e MYSQL_PASSWORD=ssafy \
+  mysql:latest
+```
+
+### Spring Boot 컨테이너 실행
+```
+docker run -d \
+  --name daangn-app \
+  --network daangn-net \
+  --env-file ~/spring-daangn.env \
+  -p 80:8080 \
+  nodb00/spring-daangn:v1.0.0
+```
+- 컨테이너 실행 시 `--env-file` 로 환경변수 주입
+- env-file + 네트워크 + 포트 매핑
+
+### 배포 확인
+실행 중 컨테이너 확인
+```
+docker ps
+```
+![image](https://github.com/user-attachments/assets/09bbce9d-0680-485c-b952-a5a7d847a03d)
+
+로그 확인
+```
+docker logs -f daangn-app
+```
+
+## Swagger UI 접근
+[Swagger 접속 링크](http://43.200.181.113/swagger-ui/index.html)
+![image](https://github.com/user-attachments/assets/defebaf5-52c8-41af-9ccc-55481eb6298c)
 
 
 # 구현 중 이슈
@@ -119,3 +273,7 @@ ENTRYPOINT ["java","-jar", "/app.jar"]
 >
 > - `docker rm -f ...` : 컨테이너를 강제 중지 후 삭제
 > - `docker rmi` : 이미지 제거
+
+- 이외에는 형준이형 자료에 너무 자세하게 나와있어서 그대로 진행하니 막힘없이 진행되었다...
+- 배포가 이렇게까지 잘 준비되어있다니! 한 학기 과정보다도 더 값진 경험이었다 :)
+- 🥰👍
