@@ -1,353 +1,206 @@
-# 당근마켓 클론 프로젝트 - 5주차
+# 당근마켓 클론 프로젝트 - 6주차
+> 프로젝트를 배포해보자!
 
-## 1️⃣ JWT 인증(Authentication) 방법에 대해서 알아보기
------------
+## ✅ 전체 아키텍처 개요
+```scss
+[DockerHub] ← (Spring 서버 이미지) ← [로컬 개발환경]
+      ↓
+[EC2 인스턴스]
+├── Spring 서버 (Docker)
+├── Redis (Docker)
+└── 연결: [AWS RDS - MySQL]
 
-### 인증 방식 조사 및 분석
-> JWT, 세션/쿠키, OAuth 등 다양한 인증 방식에 대한 심화 학습 진행
-
-#### JWT (JSON Web Token) 방식
-**구조**: Header.Payload.Signature
-- **Header**: 암호화 알고리즘 정보
-- **Payload**: 사용자 정보 및 클레임
-- **Signature**: 토큰 위변조 방지를 위한 서명
-
-**장점**
-- Stateless: 서버에 상태 저장 불필요
-- 확장성: 마이크로서비스 환경에 적합
-- 토큰 자체에 정보 포함
-
-**단점**
-- 토큰 크기가 세션보다 큼
-- 토큰 탈취 시 만료까지 악용 가능
-
-#### Access Token + Refresh Token 전략
-```javascript
-{
-  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "expires_in": 900000,
-  "token_type": "Bearer"
-}
+사용자는 EC2의 퍼블릭 IP를 통해 Spring 서버에 접근
 ```
 
-- **Access Token**: 짧은 만료시간 (15분)으로 보안성 강화
-- **Refresh Token**: 긴 만료시간 (7일)으로 사용자 편의성 확보
+## 🛠️ Setp.1 Spring 프로젝트를 DockerHub에 배포하자
 
-## 2️⃣ JWT 토큰 발급 및 검증 로직 구현하기
------------
+### 1️⃣ Dockerfile 생성
 
-### JwtUtil 클래스 구현
-> JWT 토큰 생성, 검증, 정보 추출을 담당하는 핵심 유틸리티
+Spring 프로젝트 루트 경로에 `Dockerfile` 추가:
 
-```java
-@Component
-public class JwtUtil {
-    
-    // Access Token 유효시간 (15분)
-    private static final long ACCESS_TOKEN_EXPIRE_TIME = 15 * 60 * 1000L;
-    
-    // Refresh Token 유효시간 (7일)
-    private static final long REFRESH_TOKEN_EXPIRE_TIME = 7 * 24 * 60 * 60 * 1000L;
-
-    public String createAccessToken(String userId, String role) {
-        return Jwts.builder()
-                .claim("userId", userId)
-                .claim("role", role)
-                .claim("tokenType", "ACCESS")
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRE_TIME))
-                .signWith(secretKey)
-                .compact();
-    }
-
-    public boolean validateToken(String token) {
-        try {
-            Jwts.parser()
-                    .verifyWith(secretKey)
-                    .build()
-                    .parseSignedClaims(token);
-            return true;
-        } catch (ExpiredJwtException e) {
-            return false;
-        }
-    }
-}
+```Dockerfile
+FROM openjdk:21-jdk-slim
+ARG JAR_FILE=build/libs/*.jar
+COPY ${JAR_FILE} app.jar
+ENTRYPOINT ["java","-jar","/app.jar"]
+EXPOSE 8080
 ```
 
-### JWT Filter 구현
-> 모든 요청에서 JWT 토큰을 검증하는 필터
+### 2️⃣ 프로젝트 빌드
 
-```java
-@Slf4j
-public class JwtFilter extends OncePerRequestFilter {
-
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, 
-                                   HttpServletResponse response, 
-                                   FilterChain filterChain) throws ServletException, IOException {
-        String authorization = request.getHeader("Authorization");
-        
-        if (authorization != null && authorization.startsWith("Bearer ")) {
-            String token = authorization.substring(7);
-            
-            if (jwtUtil.validateToken(token) && jwtUtil.isAccessToken(token)) {
-                // SecurityContext에 인증 정보 저장
-                Authentication authentication = createAuthentication(token);
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            }
-        }
-        
-        filterChain.doFilter(request, response);
-    }
-}
+```bash
+./gradlew clean build
 ```
 
-## 3️⃣ 회원가입 및 로그인 API 구현하고 테스트하기
------------
+#### ⚠️ 오류 발생 시
 
-### Filter 방식에서 Controller 방식으로의 전환
-> 실무적 관점에서 유지보수성과 확장성을 고려한 설계 개선
-
-#### 기존 Filter 방식의 한계점
-```java
-// LoginFilter.java (사용 중단)
-public class LoginFilter extends UsernamePasswordAuthenticationFilter {
-    // 단순 Filter만 사용 - 로직이 필터에 집중되어 유지보수 어려움
-    // 에러 처리와 응답 형식 제어가 제한적
-    // 비즈니스 로직과 보안 로직이 혼재
-}
+```text
+오류: 기본 클래스 org.gradle.wrapper.GradleWrapperMain을(를) 찾거나 로드할 수 없습니다.
 ```
 
-#### Controller 방식의 장점과 개선점
+**원인**: `gradle-wrapper.jar`가 누락되어 있음 또는 Gradle이 설치되지 않음
 
-**1. 관심사의 분리**
-- 인증 로직을 Service 레이어로 분리
-- Controller는 HTTP 요청/응답 처리에만 집중
-- 비즈니스 로직의 재사용성 향상
+**해결법**:
 
-**2. 향상된 에러 처리**
-```java
-@PostMapping("/login")
-public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDto loginRequest) {
-    try {
-        LoginResponseDto loginResponse = authService.login(loginRequest);
-        return ResponseEntity.ok(loginResponse);
-    } catch (BadCredentialsException e) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
-    } catch (Exception e) {
-        log.error("로그인 오류", e);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("로그인 중 오류가 발생했습니다");
-    }
-}
+- Gradle 설치 또는 아래 방법으로 `jar` 수동 생성:
+
+```bash
+cd gradle/wrapper
+curl -L -o gradle-wrapper.jar https://github.com/gradle/gradle/raw/v8.13.0/gradle/wrapper/gradle-wrapper.jar
+cd ../..
+chmod +x gradlew
+./gradlew --version
 ```
 
-**3. 표준화된 응답 형식**
-```java
-@Getter
-@Builder
-public class LoginResponseDto {
-    @JsonProperty("access_token")
-    private String accessToken;
-    
-    @JsonProperty("token_type") 
-    private String tokenType;
-    
-    @JsonProperty("expires_in")
-    private long expiresIn;
-    
-    private UserResponseDto user;
-}
+또는 IntelliJ에서 `bootJar` 실행 (우측 Gradle 탭 > Tasks > build > bootJar)
+
+### 3️⃣ DockerHub에 이미지 Push
+
+```bash
+docker build -t {dockerhub_id}/spring-daangn .
+docker login
+docker push {dockerhub_id}/spring-daangn
 ```
 
-### AuthService 구현
-> 인증 관련 비즈니스 로직을 담당하는 서비스
+#### ⚠️ 오류: `requested access to the resource is denied`
 
-```java
-@Service
-@Transactional
-public class AuthService {
+**원인**: 사용자 ID 미일치 **해결법**: DockerHub ID를 명시적으로 포함해야 함 → `docker push {dockerhub_id}/spring-daangn`
 
-    public LoginResponseDto login(LoginRequestDto loginRequest) {
-        // Spring Security 인증 매니저를 통한 인증
-        UsernamePasswordAuthenticationToken authToken = 
-            new UsernamePasswordAuthenticationToken(loginRequest.getId(), loginRequest.getPassword());
-        
-        Authentication authentication = authenticationManager.authenticate(authToken);
-        
-        // 토큰 발급
-        String accessToken = jwtUtil.createAccessToken(userId, role);
-        String refreshToken = jwtUtil.createRefreshToken(userId);
-        
-        // Refresh Token Redis 저장
-        refreshTokenService.saveRefreshToken(userId, refreshToken, refreshTokenExpiration);
-        
-        return LoginResponseDto.success(accessToken, refreshToken, expiresIn, userInfo);
-    }
-}
+---
+
+## ☁️ Step 2. AWS 설정
+
+### 1️⃣ EC2 인스턴스 생성
+![img.png](assets/readme6/img.png)
+- 우리는 초록색으로 표시된 퍼블릭 IPv4주소를 사용할 예정
+  - 해당 주소는 EC2를 중지 후 재시작하면 계속해서 바뀌는 주소
+    - 고정된 주소를 원하면 탄력적IP를 받아서 이를 연결해주면 됨 (단, 과금 주의)
+
+### 2️⃣ 보안 그룹 설정
+![img_1.png](assets/readme6/img_1.png)
+- 기본적으로 HTTPS, HTTP, SSH를 열어준다.
+- 추가로 사용할 DB 포트도 열어줌(MySQL, Redis)
+- 거기에 우리의 Spring 서버가 사용할 서버 포트(8080)도 열어준다.
+
+### 3️⃣ RDS (MySQL) 생성
+![img_2.png](assets/readme6/img_2.png)
+- 우리는 초록색으로 표시된 엔드포인트를 jdbc의 주소로 사용할 예정
+- Endpoint 확인 → `jdbc:mysql://<rds-endpoint>:3306/db_name`
+
+---
+
+## 🔐 Step 3. EC2 인스턴스 셋업
+
+### 1️⃣ EC2 접속 (PuTTY 기준)
+> 본인은 window os 이기에 putty를 사용하여 접속
+
+#### 1-1. .ppk 만들기
+- putty를 다운받으면 puttygen도 같이 다운받아 졌을텐데 이 puttygen이 .pem를 가지고 .ppk를 만들어준다.
+  ![img_3.png](assets/readme6/img_3.png)
+  - `load`버튼을 눌러 .pem 파일을 선택
+  - .pem 파일이 안보인다면 load버튼을 누르고 하단의 파일 형식을 전체로 선택
+  ![img_4.png](assets/readme6/img_4.png)
+  - 다음과 같이 뜬다면 성공
+  - 확인 버튼 누른 후 `Save private key` 눌러서 .ppk 파일 생성
+#### 1-2. putty 셋팅
+- putty에 생성한 .ppk 첨부하기
+  ![img_5.png](assets/readme6/img_5.png)
+  - Connection->SSH->Auth->Credetials에 .ppk 셋팅
+- Session에 ec2 등록
+  ![img_6.png](assets/readme6/img_6.png)
+  - 녹색 부분에 AWS EC2의 퍼블릭IP 주소를 넣어주면 된다.
+  - 파란색으로 표시된 부분 중 Saved Sessions 명은 자유롭게 정하면 된다.
+  - 이후 open 버튼을 눌러 ec2에 접속한다.
+#### 1-3. ec2 접속
+- ec2 생성시 사용한 AMI가 ubuntu이기에 ubuntu를 입력해서 접속
+  ![img_7.png](assets/readme6/img_7.png)
+- 정상 접속 확인
+  ![img_8.png](assets/readme6/img_8.png)
+
+### 2️⃣ Docker 설치
+```bash
+sudo apt update
+sudo apt install docker.io -y
 ```
 
-## 4️⃣ 토큰이 필요한 API 구현하고 테스트하기
------------
-
-### 권한별 접근 제어 구현
-> Role-based Access Control을 통한 세밀한 권한 관리
-
-**Security 설정**
-```java
-@Configuration
-@EnableWebSecurity
-public class SecurityConfig {
-
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(auth -> auth
-                // 공개 API
-                .requestMatchers("/", "/auth/login", "/auth/signup").permitAll()
-                // 관리자 전용 API  
-                .requestMatchers("/admin/**").hasRole("ADMIN")
-                // 나머지는 인증 필요
-                .anyRequest().authenticated()
-        );
-        
-        // JWT 필터 등록
-        http.addFilterBefore(new JwtFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
-        
-        return http.build();
-    }
-}
+### 3️⃣ docker-compose 설치
+```bash
+sudo apt install docker-compose -y
 ```
 
-**관리자 전용 API 예시**
-```java
-@RestController
-@RequestMapping("/admin")
-@RequiredArgsConstructor
-public class AdminController {
-
-    @GetMapping("/")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<UserResponseDto>> getAllUsers() {
-        List<User> users = userService.findAll();
-        List<UserResponseDto> responseDtos = users.stream()
-                .map(UserResponseDto::fromEntity)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(responseDtos);
-    }
-}
+### 4️⃣ .env 파일 생성
+- 해당 명령어를 통해 파일을 생성 및 편집
+```bash
+vi .env
+```
+- .env 파일 설정
+```env
+JDBC_URL=jdbc:mysql://{AWS RDS endpoints}:3306/{db 이름}?serverTimezone\=UTC&characterEncoding\=UTF-8&createDatabaseIfNotExist\=true
+DB_PASSWORD=AWS RDS에서 셋팅한 db password
+DB_USER=AWS RDS에서 셋팅한 user 이름
+REDIS_HOST=redis
+JWT_SECRET=로컬에서 셋팅한 jwt 시크릿 키
 ```
 
-## 5️⃣ 리프레쉬 토큰 발급 로직 구현하고 테스트하기
------------
-
-### Redis 기반 Refresh Token 관리
-> In-Memory 기반의 토큰 저장소 구현
-
-**Redis 설정**
-```java
-@Configuration
-public class RedisConfig {
-    
-    @Bean
-    public RedisTemplate<String, String> redisTemplate() {
-        RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setConnectionFactory(redisConnectionFactory());
-        redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new StringRedisSerializer());
-        return redisTemplate;
-    }
-}
+### 5️⃣ docker-compose.yml 작성
+- 해당 명령어를 통해 파일을 생성 및 편집
+```bash
+vi docker-compose.yml 
 ```
+- docker-compose.yml
+```yaml
+version: '3.8'
 
-**RefreshTokenService 구현**
-```java
-@Service
-@RequiredArgsConstructor
-public class RefreshTokenService {
+services:
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    restart: always
 
-    private final RedisTemplate<String, String> redisTemplate;
-    private static final String REFRESH_TOKEN_PREFIX = "refresh_token:";
-
-    public void saveRefreshToken(String userId, String refreshToken, long expirationTimeMs) {
-        String key = REFRESH_TOKEN_PREFIX + userId;
-        Duration expiration = Duration.ofMillis(expirationTimeMs - System.currentTimeMillis());
-        
-        if (expiration.toMillis() > 0) {
-            redisTemplate.opsForValue().set(key, refreshToken, expiration);
-        }
-    }
-
-    public boolean isValidRefreshToken(String userId, String refreshToken) {
-        String storedToken = getRefreshToken(userId);
-        return refreshToken.equals(storedToken);
-    }
-}
+  app:
+    image: { 내가 dockerhub에 올린 나의 어플 image이름 }
+    container_name: spring-daangn
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    depends_on:
+      - redis
+    restart: always
 ```
-
-**토큰 재발급 API**
-```java
-@PostMapping("/refresh")
-public ResponseEntity<?> refreshToken(HttpServletRequest request) {
-    try {
-        String refreshToken = getRefreshTokenFromCookie(request);
-        
-        if (refreshToken == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Refresh Token이 없습니다");
-        }
-        
-        LoginResponseDto refreshResponse = authService.refreshAccessToken(refreshToken);
-        return ResponseEntity.ok(refreshResponse);
-        
-    } catch (IllegalArgumentException e) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
-    }
-}
+### 6️⃣ 컨테이너 실행
+```bash
+sudo docker-compose up -d
 ```
-
-### 보안 강화 방안
-**HttpOnly 쿠키를 통한 Refresh Token 관리**
-```java
-private void setRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
-    Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
-    refreshTokenCookie.setHttpOnly(true);  // XSS 공격 방지
-    refreshTokenCookie.setSecure(true);    // HTTPS에서만 전송
-    refreshTokenCookie.setPath("/");
-    refreshTokenCookie.setMaxAge(7 * 24 * 60 * 60); // 7일
-    response.addCookie(refreshTokenCookie);
-}
+- 실행 확인
+```bash
+sudo docker ps -a
 ```
+---
 
-## 📊 API 테스트 결과
------------
+## 🔍 Step 4. 테스트 및 검증
 
-### Postman을 사용한 API 테스트
-1. **회원 가입** → `POST` `http://localhost:8080/auth/signup` (누구나 접근 가능)
-   - **회원 가입 성공**
-       ![img.png](assets/img.png)
+### ✅ Swagger 확인
+- EC2의 퍼블릭IP 주소로 접속
+- `http://<EC2-PUBLIC-IP>:8080/...` 형식으로 접근
+![img_9.png](assets/readme6/img_9.png)
 
-2. **로그인** → `POST` `http://localhost:8080/auth/login` (누구나 접근 가능)
-    - **로그인 성공 -> access token 확인(body에 담겨서 옴)**
-      ![img_2.png](assets/img_2.png)
-    - **refresh token 확인(cookie에 담겨서 옴)**
-      ![img_3.png](assets/img_3.png)
-    - **redis의 refresh token 확인**
-      
-        ![img.png](assets/redis.png)
+### ✅ Postman 테스트
+- EC2의 퍼블릭IP 주소록 접근
+- `http://<EC2-PUBLIC-IP>:8080/auth/signup`
+![img_10.png](assets/readme6/img_10.png)
 
-3. **권한별 관리자 API 접근** → `GET` `http://localhost:8080/admin/` (관리자만 접근 가능)
-    - **`USER` 권한으로 접근 시 -> `403` 발생**
-      ![img_5.png](assets/img_5.png)
-    - **`ADMIN` 권한으로 접근 시 -> 정상 응답**
-      ![img_6.png](assets/img_6.png)
-4. **유효한 토큰으로 리소스 접근** → 정상 응답
+## 📅 찾은 점 & 해결점
 
-## 결론
------------
+| 오류/문제                 | 해결 방법                       |
+| --------------------- | --------------------------- |
+| gradle-wrapper.jar 없음 | curl 로 직접 다운로드              |
+| Docker push 실패        | dockerhub ID 명시 필수          |
+| .env 누락               | EC2 내 직접 작성 및 연결 확인         |
+| EC2 포트 차단             | 보안 그룹에서 8080, 3306, 6379 오픈 |
+| RDS 연결 불가             | 보안 그룹 양방향 열기, VPC 설정 확인     |
 
-### 핵심 성과
-1. **실무 중심 설계**: Filter 기반에서 Controller 기반으로 전환하여 유지보수성과 확장성 대폭 개선
-2. **보안 강화**: Access Token + Refresh Token 이중 토큰 전략으로 보안성과 사용자 편의성 동시 확보
-3. **안전한 토큰 관리**: Redis 기반 토큰 관리로 분산 환경에서도 확장 가능한 구조 구현
-4. **세밀한 권한 제어**: Role 기반 접근 제어로 API별 차등 권한 관리 구현
+---
