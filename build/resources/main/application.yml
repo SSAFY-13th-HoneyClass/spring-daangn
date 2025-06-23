@@ -1,22 +1,22 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/test
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
+    url: jdbc:mysql://database-1.cr6o8qs8ufwt.ap-northeast-2.rds.amazonaws.com/Daangn?createDatabaseIfNotExist=true
+    username: admin
+    password: hwilee2529*
 
   jpa:
     database: mysql
     database-platform: org.hibernate.dialect.MySQL8Dialect
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show_sql: true
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect
-        database-platform: org.hibernate.dialect.MySQL8Dialect
-
-        format_sql: true
+#    properties:
+#      hibernate:
+#        dialect: org.hibernate.dialect.MySQL8Dialect
+#        database-platform: org.hibernate.dialect.MySQL8Dialect
+#
+#        format_sql: true
 
 
 logging:
@@ -24,4 +24,4 @@ logging:
     org.hibernate.SQL: debug
 
 jwt:
-  secret: ${jwt_secret}
+  secret: fjlsflsfieiwofjhwohefnddddfnnled556654eyhjuhytfrdhikdjhlfgogreghdslsodjddddddddddddddddddksososlslslslsls
