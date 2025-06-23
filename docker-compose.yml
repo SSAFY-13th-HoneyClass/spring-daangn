@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  # Redis 서비스
+  redis:
+    image: redis:7-alpine
+    container_name: spring-daangn-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - spring-daangn-network
+    restart: unless-stopped
+
+  # Spring Boot 애플리케이션
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: spring-daangn-app
+    ports:
+      - "8080:8080"
+    environment:
+      # Spring Boot 표준 환경변수
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_DATA_REDIS_PORT=6379
+      
+      # 프로필 설정 (선택사항)
+      - SPRING_PROFILES_ACTIVE=docker
+      
+      # JVM 옵션
+      - JAVA_OPTS=-Xmx512m -Xms256m
+    depends_on:
+      - redis
+    networks:
+      - spring-daangn-network
+    restart: unless-stopped
+
+# 볼륨 정의
+volumes:
+  redis_data:
+    driver: local
+
+# 네트워크 정의
+networks:
+  spring-daangn-network:
+    driver: bridge 
